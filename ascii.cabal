@@ -5,17 +5,17 @@ Description:         Type-safe, bytestring-based ASCII values.
 License:             BSD3
 License-file:        LICENSE
 Author:              Michael Snoyman
-Maintainer:          michael@snoyman.com
+Maintainer:          Chris Martin, Julie Moronuki
 Stability:           Stable
 Category:            Data
-Homepage:            https://github.com/snoyberg/ascii
-Bug-Reports:         https://github.com/snoyberg/ascii/issues
+Homepage:            https://github.com/typeclasses/ascii
+Bug-Reports:         https://github.com/typeclasses/ascii/issues
 Build-type:          Simple
 Cabal-version:       >= 1.6
 
 Source-Repository head
     Type:     git
-    Location: git://github.com/snoyberg/ascii.git
+    Location: git://github.com/typeclasses/ascii.git
 
 Library
   Exposed-modules:     Data.Ascii
