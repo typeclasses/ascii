@@ -67,7 +67,7 @@ toString :: Ascii -> String
 toString (Ascii bs) = S8.unpack bs
 
 toText :: Ascii -> Text
-toText (Ascii bs) = TE.decodeASCII bs
+toText (Ascii bs) = TE.decodeUtf8 bs
 
 ciToByteString :: CIAscii -> ByteString
 ciToByteString = toByteString . original
