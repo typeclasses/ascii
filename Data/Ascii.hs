@@ -74,7 +74,7 @@ import Data.Monoid (Monoid)
 import Data.CaseInsensitive (FoldCase, CI, mk, original)
 
 newtype Ascii = Ascii ByteString
-    deriving (Show, Eq, Read, Ord, Data, Typeable, IsString, FoldCase, Hashable, Monoid)
+    deriving (Show, Eq, Read, Ord, Data, Typeable, IsString, FoldCase, Hashable, Semigroup, Monoid)
 
 type CIAscii = CI Ascii
 
@@ -128,7 +128,7 @@ fromAsciiBuilder :: AsciiBuilder -> Ascii
 fromAsciiBuilder (AsciiBuilder b) = Ascii $ Blaze.toByteString b
 
 newtype AsciiBuilder = AsciiBuilder (Blaze.Builder)
-    deriving Monoid
+    deriving (Semigroup, Monoid)
 
 unsafeFromBuilder :: Blaze.Builder -> AsciiBuilder
 unsafeFromBuilder = AsciiBuilder
