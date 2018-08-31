@@ -5,6 +5,7 @@ module Data.Ascii.Blaze where
 import Data.Ascii.ByteString
 
 -- base
+import Data.Monoid (Monoid)
 import Data.Semigroup (Semigroup)
 
 -- blaze-builder
