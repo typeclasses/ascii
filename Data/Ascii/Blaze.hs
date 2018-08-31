@@ -4,6 +4,9 @@ module Data.Ascii.Blaze where
 
 import Data.Ascii.ByteString
 
+-- base
+import Data.Semigroup (Semigroup)
+
 -- blaze-builder
 import qualified Blaze.ByteString.Builder as Blaze
 

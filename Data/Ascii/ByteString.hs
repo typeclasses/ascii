@@ -7,6 +7,7 @@ import Data.Data (Data)
 import Data.Typeable (Typeable)
 import Data.String (IsString (..))
 import qualified Data.Char as C
+import Data.Semigroup (Semigroup)
 
 -- bytestring
 import qualified Data.ByteString as S
