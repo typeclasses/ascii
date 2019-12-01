@@ -8,7 +8,12 @@ import Data.Function ((.))
 import qualified Prelude as Enum (Enum (..))
 import qualified Prelude as Num (Integral (..), Int, fromIntegral)
 import qualified Prelude as May (Maybe (..))
+import qualified Data.List as List
 import qualified Data.Word as Word
+import qualified Data.Array.Unboxed as Array
+
+
+---  Individual characters  ---
 
 data Char =
       Null
@@ -141,20 +146,25 @@ data Char =
     | Delete
   deriving (Eq, Ord, Enum, Bounded, Show)
 
+---  Direct usage of the Enum instance  ---
 
----  Safe usage of the Enum instance  ---
+intCharUnsafe :: Num.Int -> Char
+intCharUnsafe = Enum.toEnum
+
+charInt :: Char -> Num.Int
+charInt = Enum.fromEnum
+
+
+---  Safe bound-checked usage of the Enum instance  ---
 
 intInRange :: Num.Int -> Bool
 intInRange x = (x >= 0) && (x <= 127)
 
 intChar :: Num.Int -> Char
-intChar x = if intInRange x then Enum.toEnum x else Substitute
+intChar x = if intInRange x then intCharUnsafe x else Substitute
 
 intCharMaybe :: Num.Int -> May.Maybe Char
-intCharMaybe x = if intInRange x then May.Just (Enum.toEnum x) else May.Nothing
-
-charInt :: Char -> Num.Int
-charInt = Enum.fromEnum
+intCharMaybe x = if intInRange x then May.Just (intCharUnsafe x) else May.Nothing
 
 
 ---  Integral generalizations  ---
@@ -164,6 +174,9 @@ integralChar = intChar . Num.fromIntegral
 
 integralCharMaybe :: Num.Integral int => int -> May.Maybe Char
 integralCharMaybe = intCharMaybe . Num.fromIntegral
+
+integralCharUnsafe :: Num.Integral int => int -> Char
+integralCharUnsafe = intCharUnsafe . Num.fromIntegral
 
 charIntegral :: Num.Integral int => Char -> int
 charIntegral = Num.fromIntegral . charInt
@@ -177,5 +190,22 @@ word8Char = integralChar
 word8CharMaybe :: Word.Word8 -> May.Maybe Char
 word8CharMaybe = integralCharMaybe
 
+word8CharUnsafe :: Word.Word8 -> Char
+word8CharUnsafe = integralCharUnsafe
+
 charWord8 :: Char -> Word.Word8
 charWord8 = charIntegral
+
+
+---  Strings  --
+
+newtype String = String { stringArray :: Array.UArray Num.Int Word.Word8 }
+
+pack :: [Char] -> String
+pack = String . word8ListArray . List.map charWord8
+
+word8ListArray :: [Word.Word8] -> Array.UArray Num.Int Word.Word8
+word8ListArray xs = Array.listArray (1, List.length xs) xs
+
+unpack :: String -> [Char]
+unpack = List.map word8CharUnsafe . Array.elems . stringArray
