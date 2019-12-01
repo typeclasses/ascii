@@ -141,29 +141,41 @@ data Char =
     | Delete
   deriving (Eq, Ord, Enum, Bounded, Show)
 
+
+---  Safe usage of the Enum instance  ---
+
 intInRange :: Num.Int -> Bool
 intInRange x = (x >= 0) && (x <= 127)
 
 intChar :: Num.Int -> Char
 intChar x = if intInRange x then Enum.toEnum x else Substitute
 
-word8Char :: Word.Word8 -> Char
-word8Char = Enum.toEnum . Num.fromIntegral
-
-integralChar :: Num.Integral int => int -> Char
-integralChar = intChar . Num.fromIntegral
-
 intCharMaybe :: Num.Int -> May.Maybe Char
 intCharMaybe x = if intInRange x then May.Just (Enum.toEnum x) else May.Nothing
-
-integralCharMaybe :: Num.Integral int => int -> May.Maybe Char
-integralCharMaybe = intCharMaybe . Num.fromIntegral
 
 charInt :: Char -> Num.Int
 charInt = Enum.fromEnum
 
-charWord8 :: Char -> Word.Word8
-charWord8 = Num.fromIntegral . Enum.fromEnum
+
+---  Integral generalizations  ---
+
+integralChar :: Num.Integral int => int -> Char
+integralChar = intChar . Num.fromIntegral
+
+integralCharMaybe :: Num.Integral int => int -> May.Maybe Char
+integralCharMaybe = intCharMaybe . Num.fromIntegral
 
 charIntegral :: Num.Integral int => Char -> int
 charIntegral = Num.fromIntegral . charInt
+
+
+---  Word8 specializations  ---
+
+word8Char :: Word.Word8 -> Char
+word8Char = integralChar
+
+word8CharMaybe :: Word.Word8 -> May.Maybe Char
+word8CharMaybe = integralCharMaybe
+
+charWord8 :: Char -> Word.Word8
+charWord8 = charIntegral
