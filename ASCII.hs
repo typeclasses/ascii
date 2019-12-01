@@ -1,6 +1,23 @@
 {-# OPTIONS_GHC -Wall #-}
 
-module ASCII where
+module ASCII
+  (
+
+  -- * Characters
+    Char (..)
+  -- ** Int conversions
+  , charInt, intChar, intCharMaybe
+  -- ** Word8 conversions
+  , word8Char, word8CharMaybe, charWord8
+  -- ** General integral conversions
+  , integralChar, integralCharMaybe, charIntegral
+
+  -- * Strings
+  , String
+  -- ** [Char] conversions
+  , pack, unpack
+
+  ) where
 
 import Prelude (Bool, Eq, Enum, Bounded, Show, Ord (..), (&&))
 import Data.Function ((.))
@@ -145,6 +162,7 @@ data Char =
     | Tilde
     | Delete
   deriving (Eq, Ord, Enum, Bounded, Show)
+
 
 ---  Direct usage of the Enum instance  ---
 

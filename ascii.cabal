@@ -42,3 +42,5 @@ library
 
       -- untested
       , base < 4.13
+
+      , array
