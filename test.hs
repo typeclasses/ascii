@@ -1,18 +1,17 @@
-{-# LANGUAGE ImplicitParams, LambdaCase #-}
+{-# LANGUAGE ImplicitParams, LambdaCase, QuasiQuotes #-}
 
 import qualified ASCII
+import ASCII.QQ
+
 import qualified System.Exit as Exit
 import qualified Data.IORef as Ref
 import qualified GHC.Stack as Stack
 
 import Data.Foldable (for_)
 
-main :: IO ()
-main =
+tests :: (?failed :: Failed) => IO ()
+tests =
   do
-    failed <- Ref.newIORef False
-    let ?failed = failed
-
     ASCII.intChar 0 === ASCII.Null
     ASCII.intChar 65 === ASCII.CapitalLetterA
     ASCII.intChar 97 === ASCII.SmallLetterA
@@ -34,6 +33,17 @@ main =
     minBound === ASCII.Null
     maxBound === ASCII.Delete
 
+    [ascii|Cat|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT]
+
+    ASCII.equalsIgnoringCase [ascii|Cat|] [ascii|CAT|] === True
+    ASCII.equalsIgnoringCase [ascii|Cat|] [ascii|CAP|] === False
+
+main :: IO ()
+main =
+  do
+    failed <- Ref.newIORef False
+    let ?failed = failed
+    tests
     Ref.readIORef failed >>= \case { True -> Exit.exitFailure; False -> Exit.exitSuccess }
 
 type Failed = Ref.IORef Bool

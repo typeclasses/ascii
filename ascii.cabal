@@ -36,13 +36,18 @@ library
 
         ASCII
 
+        ASCII.QQ
+
     build-depends:
 
-      -- This version introduced the Data.Functor.Contravariant module
+      -- This version introduced the Data.Functor.Contravariant module.
         base >= 4.12
 
-      -- The changelog only goes back this far.
+      -- The changelog only goes back this far, and we have not tested with earlier versions.
       , array >= 0.4
 
+      -- This version added the MonadFail instance for Q.
+      , template-haskell >= 2.11
+
       -- These versions and above are untested because they did not yet exist at the time of writing.
-      , array < 0.6, base < 4.13
+      , array < 0.6, base < 4.13, template-haskell < 2.16
