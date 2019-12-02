@@ -17,12 +17,13 @@ module ASCII
 
   -- * Characters
     Char (..)
+  -- ** General integral conversions
+  -- $integralConversions
+  , integralChar, integralCharMaybe, charIntegral
   -- ** Int conversions
   , charInt, intChar, intCharMaybe
   -- ** Word8 conversions
   , word8Char, word8CharMaybe, charWord8
-  -- ** General integral conversions
-  , integralChar, integralCharMaybe, charIntegral
 
   -- * Strings
   , String
@@ -178,9 +179,11 @@ data Char =
 
 ---  Direct usage of the Enum instance  ---
 
+-- | Specialization of 'integralCharUnsafe'.
 intCharUnsafe :: Num.Int -> Char
 intCharUnsafe = Enum.toEnum
 
+-- | Specialization of 'charIntegral'.
 charInt :: Char -> Num.Int
 charInt = Enum.fromEnum
 
@@ -190,23 +193,33 @@ charInt = Enum.fromEnum
 intInRange :: Num.Int -> Bool
 intInRange x = (x >= 0) && (x <= 127)
 
+-- | Specialization of 'integralChar'.
 intChar :: Num.Int -> Char
 intChar x = if intInRange x then intCharUnsafe x else Substitute
 
+-- | Specialization of 'integralCharMaybe'.
 intCharMaybe :: Num.Int -> May.Maybe Char
 intCharMaybe x = if intInRange x then May.Just (intCharUnsafe x) else May.Nothing
 
 
 ---  Integral generalizations  ---
 
+-- $integralConversions
+-- These functions are conversions between a 'Char' and its corresponding number between 0 and 127. This module also contains specializations of these functions for 'Num.Int' and 'Word.Word8' in case you find those variants easier to use than their polymorphic counterparts.
+
+-- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns the 'Substitute' character for any numbers outside of this range.
 integralChar :: Num.Integral int => int -> Char
 integralChar = intChar . Num.fromIntegral
 
+-- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns 'Nothing' for any numbers outside of this range.
 integralCharMaybe :: Num.Integral int => int -> May.Maybe Char
 integralCharMaybe = intCharMaybe . Num.fromIntegral
 
+-- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Behavior is undefined for any numbers outside of this range.
 integralCharUnsafe :: Num.Integral int => int -> Char
 integralCharUnsafe = intCharUnsafe . Num.fromIntegral
+
+-- | Converts an ASCII 'Char' to its corresponding number between 0 and 127.
 
 charIntegral :: Num.Integral int => Char -> int
 charIntegral = Num.fromIntegral . charInt
@@ -214,15 +227,19 @@ charIntegral = Num.fromIntegral . charInt
 
 ---  Word8 specializations  ---
 
+-- | Specialization of 'integralChar'.
 word8Char :: Word.Word8 -> Char
 word8Char = integralChar
 
+-- | Specialization of 'integralCharMaybe'.
 word8CharMaybe :: Word.Word8 -> May.Maybe Char
 word8CharMaybe = integralCharMaybe
 
+-- | Specialization of 'integralCharUnsafe'.
 word8CharUnsafe :: Word.Word8 -> Char
 word8CharUnsafe = integralCharUnsafe
 
+-- | Specialization of 'charIntegral'.
 charWord8 :: Char -> Word.Word8
 charWord8 = charIntegral
 
