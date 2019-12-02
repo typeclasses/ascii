@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 {-# LANGUAGE TemplateHaskell #-}
 
 module ASCII.QQ (ascii) where

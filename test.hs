@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 {-# LANGUAGE ImplicitParams, LambdaCase, QuasiQuotes, TypeApplications #-}
 
 import qualified ASCII
@@ -6,8 +8,6 @@ import ASCII.QQ
 import qualified System.Exit as Exit
 import qualified Data.IORef as Ref
 import qualified GHC.Stack as Stack
-
-import Data.Foldable (for_)
 
 tests :: (?failed :: Failed) => IO ()
 tests =
