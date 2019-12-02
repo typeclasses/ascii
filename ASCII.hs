@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 
-{-# LANGUAGE DeriveLift, TypeFamilyDependencies #-}
+{-# LANGUAGE NoImplicitPrelude, DeriveLift, TypeFamilyDependencies #-}
 
 {- |
 
@@ -37,24 +37,51 @@ module ASCII
 
   ) where
 
-import Prelude (Eq, Enum, Bounded, Show, Ord (..), Bool, fmap)
-import Data.Traversable (traverse)
+import Prelude (Eq, Bounded, Ord (..), fmap)
 import Data.Function ((.))
 
+-- Various types of numbers
+import Data.Int (Int)
+import Data.Word (Word8)
+
+-- Miscellaneous number-related functions
+import qualified Prelude as Num (fromIntegral, (+), (-))
+
+-- We provide conversions to/from unicode representations of characters; the unicode types are the standard Char and String types from the base module.
 import qualified Data.Char as Unicode
 import qualified Data.String as Unicode
 
+-- The String type we define here has a custom (not derived) Show instance.
+import qualified Text.Show as Show
+import Text.Show (Show)
+
+-- The auto-generated Enum instance for Char makes it easy for us to write the encoding/decoding functions.
+import Prelude (Enum)
 import qualified Prelude as Enum (Enum (..))
-import qualified Prelude as Num (Int, fromIntegral, (+), (-))
-import qualified Data.Maybe as May (Maybe (..), fromMaybe)
-import qualified Data.Bool as Bool
-import qualified Data.List as List
-import qualified Data.Word as Word
-import qualified Data.Array.Unboxed as Array
+
+-- Case-insensitivity is expressed as an equivalence.
 import qualified Data.Functor.Contravariant as Eq (Equivalence (..), defaultEquivalence)
 import qualified Data.Functor.Contravariant as Contra (Contravariant (contramap))
+
+-- True and false, thanks to George Boole.
+import qualified Data.Bool as Bool
+import Data.Bool (Bool)
+
+-- Traversing is looping!
+import Data.Traversable (traverse)
+
+-- Maybe is the type of a decoding result, because decoding can fail.
+import Data.Maybe (Maybe)
+import qualified Data.Maybe as May (Maybe (..), fromMaybe)
+
+-- The classic linked list type, [].
+import qualified Data.List as List
+
+-- Arrays are for tightly-packed sequences of bytes.
+import qualified Data.Array.Unboxed as Array
+
+-- We give the Char type an instance of the Lift class from Template Haskell for the sake of the quasi-quoter in the ASCII.QQ module.
 import qualified Language.Haskell.TH.Syntax as TH (Lift)
-import qualified Text.Show as Show
 
 
 ---  Individual characters  ---
@@ -193,16 +220,16 @@ data Char =
 
 ---  Direct usage of the Enum instance  ---
 
-decodeCharIntUnsafe :: Num.Int -> Char
+decodeCharIntUnsafe :: Int -> Char
 decodeCharIntUnsafe = Enum.toEnum
 
-encodeCharInt :: Char -> Num.Int
+encodeCharInt :: Char -> Int
 encodeCharInt = Enum.fromEnum
 
 
 ---  Safe bound-checked usage of the Enum instance  ---
 
-decodeCharInt :: Num.Int -> May.Maybe Char
+decodeCharInt :: Int -> Maybe Char
 
 decodeCharInt x | x < 0   = May.Nothing
                 | x > 127 = May.Nothing
@@ -221,29 +248,29 @@ class CharEncoding a
     encodeChar :: Char -> a
 
     -- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns 'Nothing' for any numbers outside of this range.
-    decodeChar :: a -> May.Maybe Char
+    decodeChar :: a -> Maybe Char
 
     -- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns the 'Substitute' character for any numbers outside of this range.
     decodeCharSub :: a -> Char
     decodeCharSub = substitute . decodeChar
 
-instance CharEncoding Num.Int
+instance CharEncoding Int
   where
     encodeChar = encodeCharInt
     decodeChar = decodeCharInt
 
-instance CharEncoding Word.Word8
+instance CharEncoding Word8
   where
     encodeChar = Num.fromIntegral . encodeCharInt
     decodeChar = decodeCharInt . Num.fromIntegral
 
-substitute :: May.Maybe Char -> Char
+substitute :: Maybe Char -> Char
 substitute = May.fromMaybe Substitute
 
 
 ---  Strings  --
 
-newtype String = String { stringArray :: Array.UArray Num.Int Word.Word8 }
+newtype String = String { stringArray :: Array.UArray Int Word8 }
   deriving (Eq, Ord)
 
 instance Show String
@@ -253,7 +280,7 @@ instance Show String
 pack :: [Char] -> String
 pack = String . word8ListArray . List.map encodeChar
 
-word8ListArray :: [Word.Word8] -> Array.UArray Num.Int Word.Word8
+word8ListArray :: [Word8] -> Array.UArray Int Word8
 word8ListArray xs = Array.listArray (1, List.length xs) xs
 
 unpack :: String -> [Char]
@@ -319,7 +346,7 @@ class UnicodeConversion a
   where
     toUnicode :: a -> Unicode a
     fromUnicodeSub :: Unicode a -> a
-    fromUnicodeMaybe :: Unicode a -> May.Maybe a
+    fromUnicodeMaybe :: Unicode a -> Maybe a
 
 instance UnicodeConversion Char
   where
