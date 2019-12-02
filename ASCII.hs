@@ -1,5 +1,15 @@
 {-# OPTIONS_GHC -Wall #-}
 
+{- |
+
+The __American Standard Code for Information Interchange__ (ASCII) comprises a set of 128 characters, each represented by 7 bits. 33 of these characters are /control codes/; a few of these are still in use, but most are obsolete relics of the early days of computing. The other 95 are /printable characters/ such as letters and numbers, mostly corresponding to the keys on an American English keyboard.
+
+Nowadays instead of ASCII we typically work with text using an encoding such as UTF-8 that can represent the entire Unicode character set, which includes over a hundred thousand characters and is not limited to the symbols of any particular writing system or culture. However, ASCII is still relevant to network protocols; for example, we can see it in the specification of [HTTP message headers](https://tools.ietf.org/html/rfc7230#section-1.2).
+
+There is a convenient relationship between ASCII and Unicode: the ASCII characters are the first 128 characters of the much larger Unicode character set. The [C0 Controls and Basic Latin](https://www.unicode.org/charts/PDF/U0000.pdf) section of the Unicode standard contains a list of all the ASCII characters. You may also find this list replicated below; each ASCII character corresponds to a constructor of the 'Char' type.
+
+-}
+
 module ASCII
   (
 
