@@ -38,11 +38,19 @@ tests =
     ASCII.equalsIgnoringCase [ascii|Cat|] [ascii|CAT|] === True
     ASCII.equalsIgnoringCase [ascii|Cat|] [ascii|CAP|] === False
 
+    ASCII.toCase ASCII.UpperCase ASCII.SmallLetterX === ASCII.CapitalLetterX
+    ASCII.toCase ASCII.LowerCase ASCII.SmallLetterX === ASCII.SmallLetterX
+    ASCII.toCase ASCII.UpperCase ASCII.CapitalLetterX === ASCII.CapitalLetterX
+    ASCII.toCase ASCII.LowerCase ASCII.CapitalLetterX === ASCII.SmallLetterX
+    ASCII.toCase ASCII.LowerCase ASCII.ExclamationMark === ASCII.ExclamationMark
+
+    ASCII.toCase ASCII.UpperCase [ascii|Cat|] === [ascii|CAT|]
+    ASCII.toCase ASCII.LowerCase [ascii|Cat|] === [ascii|cat|]
+
 main :: IO ()
 main =
   do
-    failed <- Ref.newIORef False
-    let ?failed = failed
+    failed <- Ref.newIORef False; let ?failed = failed :: Failed
     tests
     Ref.readIORef failed >>= \case { True -> Exit.exitFailure; False -> Exit.exitSuccess }
 

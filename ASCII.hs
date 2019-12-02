@@ -19,18 +19,18 @@ module ASCII
 
   -- * Characters
     Char (..)
-  -- ** Encoding
+
+  -- * Char encoding
   , CharEncoding (..), substitute
-  -- ** Classification
-  , isUpper, isLower
 
   -- * Strings
   , String
-  -- ** [Char] conversions
+
+  -- * String-[Char] conversions
   , pack, unpack
 
-  -- * Case
-  , CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
+  -- * Upper/lower case
+  , Case (..), isCase, CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
 
   -- * Unicode conversion
   , Unicode, UnicodeConversion ( .. )
@@ -287,13 +287,13 @@ unpack :: String -> [Char]
 unpack = List.map (decodeCharIntUnsafe . Num.fromIntegral) . Array.elems . stringArray
 
 
----  Character classification  ---
+---  Case  ---
 
-isUpper :: Char -> Bool
-isUpper x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
+data Case = UpperCase | LowerCase
 
-isLower :: Char -> Bool
-isLower x = (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterZ)
+isCase :: Case -> Char -> Bool
+isCase UpperCase x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
+isCase LowerCase x = (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterZ)
 
 
 ---  Case-insensitive equivalence  ---
@@ -310,29 +310,27 @@ class CaseInsensitiveEquivalence a
 
 instance CaseInsensitiveEquivalence Char
   where
-    caseInsensitiveEquivalence = Contra.contramap toLower Eq.defaultEquivalence
+    caseInsensitiveEquivalence = Contra.contramap (toCase LowerCase) Eq.defaultEquivalence
 
 instance CaseInsensitiveEquivalence String
   where
-    caseInsensitiveEquivalence = Contra.contramap (List.map toLower . unpack) Eq.defaultEquivalence
+    caseInsensitiveEquivalence = Contra.contramap (List.map (toCase LowerCase) . unpack) Eq.defaultEquivalence
 
 
 ---  Case conversion  ---
 
 class CaseConversion a
   where
-    toLower :: a -> a
-    toUpper :: a -> a
+    toCase :: Case -> a -> a
 
 instance CaseConversion Char
   where
-    toLower x = if (isUpper x) then decodeCharIntUnsafe ((Num.+) (encodeCharInt x) 32) else x
-    toUpper x = if (isLower x) then decodeCharIntUnsafe ((Num.-) (encodeCharInt x) 32) else x
+    toCase LowerCase x = if (isCase UpperCase x) then decodeCharIntUnsafe ((Num.+) (encodeCharInt x) 32) else x
+    toCase UpperCase x = if (isCase LowerCase x) then decodeCharIntUnsafe ((Num.-) (encodeCharInt x) 32) else x
 
 instance CaseConversion String
   where
-    toLower = pack . List.map toLower . unpack
-    toUpper = pack . List.map toUpper . unpack
+    toCase c = pack . List.map (toCase c) . unpack
 
 
 ---  Conversions with Unicode types  ---
