@@ -1,15 +1,21 @@
 {-# OPTIONS_GHC -Wall #-}
 
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE NoImplicitPrelude, TemplateHaskell #-}
 
 module ASCII.QQ (ascii) where
 
-import qualified ASCII
+import qualified ASCII (pack, unpack, fromUnicodeMaybe)
+import qualified Control.Monad.Fail (fail)
+import Data.Maybe (Maybe (..))
 
-import Language.Haskell.TH.Quote (QuasiQuoter (..))
-import Language.Haskell.TH.Syntax (Exp, Lift (lift), Q)
+-- Template Haskell
+import qualified Language.Haskell.TH.Quote as QQ (QuasiQuoter (..))
+import qualified Language.Haskell.TH.Syntax as TH (Lift (lift))
+import Language.Haskell.TH.Syntax (Exp, Q)
 
-import qualified Control.Monad.Fail as Fail
+-- The two String types
+import qualified ASCII (String)
+import qualified Prelude as Unicode (String)
 
 {- | Produces an expression representing a 'ASCII.String' value corresponding to the quasiquoted string.
 
@@ -27,22 +33,31 @@ The expression fails to compile if the quasiquoted string contains characters th
 > >>> [ascii|helloλ|]
 >
 > interactive>:4:8: error:
->     • ascii cannot be used with non-ASCII characters
+>     • The ascii quasi-quoter cannot be used with non-ASCII characters.
 >     • In the quasi-quotation: [ascii|helloλ|]
 
 -}
 
-ascii :: QuasiQuoter
+ascii :: QQ.QuasiQuoter
 ascii =
-  QuasiQuoter
-    { quoteExp  = stringAsciiExp
-    , quotePat  = \_ -> fail "ascii cannot be used in a pattern context"
-    , quoteType = \_ -> fail "ascii cannot be used in a type context"
-    , quoteDec  = \_ -> fail "ascii cannot be used in a declaration context"
+  QQ.QuasiQuoter
+    { QQ.quoteExp  = asciiQuoteExp
+    , QQ.quotePat  = wrongContext
+    , QQ.quoteType = wrongContext
+    , QQ.quoteDec  = wrongContext
     }
 
-stringAsciiExp :: String -> Q Exp
-stringAsciiExp str =
-  case ASCII.fromUnicodeMaybe str of
-    Nothing -> Fail.fail "ascii cannot be used with non-ASCII characters"
-    Just x -> [e|ASCII.pack $(lift (ASCII.unpack x))|]
+wrongContext :: Unicode.String -> Q a
+wrongContext _ = failQ "The ascii quasi-quoter may only be used in an expression context."
+
+failQ :: Unicode.String -> Q a
+failQ = Control.Monad.Fail.fail
+
+asciiQuoteExp :: Unicode.String -> Q Exp
+asciiQuoteExp str =
+    case ASCII.fromUnicodeMaybe str of
+        Nothing -> failQ "The ascii quasi-quoter cannot be used with non-ASCII characters."
+        Just x -> asciiExp x
+
+asciiExp :: ASCII.String -> Q Exp
+asciiExp x = [e|ASCII.pack $(TH.lift (ASCII.unpack x))|]
