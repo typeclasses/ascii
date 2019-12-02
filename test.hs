@@ -1,4 +1,4 @@
-{-# LANGUAGE ImplicitParams, LambdaCase, QuasiQuotes #-}
+{-# LANGUAGE ImplicitParams, LambdaCase, QuasiQuotes, TypeApplications #-}
 
 import qualified ASCII
 import ASCII.QQ
@@ -12,23 +12,23 @@ import Data.Foldable (for_)
 tests :: (?failed :: Failed) => IO ()
 tests =
   do
-    ASCII.intChar 0 === ASCII.Null
-    ASCII.intChar 65 === ASCII.CapitalLetterA
-    ASCII.intChar 97 === ASCII.SmallLetterA
-    ASCII.intChar 127 === ASCII.Delete
+    ASCII.decodeCharSub @Int 0 === ASCII.Null
+    ASCII.decodeCharSub @Int 65 === ASCII.CapitalLetterA
+    ASCII.decodeCharSub @Int 97 === ASCII.SmallLetterA
+    ASCII.decodeCharSub @Int 127 === ASCII.Delete
 
-    ASCII.intChar (-1) === ASCII.Substitute
-    ASCII.intChar 128 === ASCII.Substitute
-    ASCII.intChar 11243228 === ASCII.Substitute
+    ASCII.decodeCharSub @Int (-1) === ASCII.Substitute
+    ASCII.decodeCharSub @Int 128 === ASCII.Substitute
+    ASCII.decodeCharSub @Int 11243228 === ASCII.Substitute
 
-    ASCII.intCharMaybe 0 === Just ASCII.Null
-    ASCII.intCharMaybe 65 === Just ASCII.CapitalLetterA
-    ASCII.intCharMaybe 97 === Just ASCII.SmallLetterA
-    ASCII.intCharMaybe 127 === Just ASCII.Delete
+    ASCII.decodeChar @Int 0 === Just ASCII.Null
+    ASCII.decodeChar @Int 65 === Just ASCII.CapitalLetterA
+    ASCII.decodeChar @Int 97 === Just ASCII.SmallLetterA
+    ASCII.decodeChar @Int 127 === Just ASCII.Delete
 
-    ASCII.intCharMaybe (-1) === Nothing
-    ASCII.intCharMaybe 128 === Nothing
-    ASCII.intCharMaybe 11243228 === Nothing
+    ASCII.decodeChar @Int (-1) === Nothing
+    ASCII.decodeChar @Int 128 === Nothing
+    ASCII.decodeChar @Int 11243228 === Nothing
 
     minBound === ASCII.Null
     maxBound === ASCII.Delete
