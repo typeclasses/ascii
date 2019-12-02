@@ -19,13 +19,8 @@ module ASCII
 
   -- * Characters
     Char (..)
-  -- ** General integral conversions
-  -- $integralConversions
-  , integralChar, integralCharMaybe, charIntegral
-  -- ** Int conversions
-  , charInt, intChar, intCharMaybe
-  -- ** Word8 conversions
-  , word8Char, word8CharMaybe, charWord8
+  -- ** Encoding
+  , CharEncoding (..), substitute
   -- ** Classification
   , isUpper, isLower
 
@@ -35,12 +30,10 @@ module ASCII
   , pack, unpack
 
   -- * Case
-  , CaseInsensitiveEquivalence ( .. )
-  , CaseConversion ( .. )
+  , CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
 
   -- * Unicode conversion
-  , Unicode
-  , UnicodeConversion ( .. )
+  , Unicode, UnicodeConversion ( .. )
 
   ) where
 
@@ -52,8 +45,8 @@ import qualified Data.Char as Unicode
 import qualified Data.String as Unicode
 
 import qualified Prelude as Enum (Enum (..))
-import qualified Prelude as Num (Integral (..), Int, fromIntegral, (+), (-))
-import qualified Prelude as May (Maybe (..))
+import qualified Prelude as Num (Int, fromIntegral, (+), (-))
+import qualified Data.Maybe as May (Maybe (..), fromMaybe)
 import qualified Data.Bool as Bool
 import qualified Data.List as List
 import qualified Data.Word as Word
@@ -200,69 +193,52 @@ data Char =
 
 ---  Direct usage of the Enum instance  ---
 
--- | Specialization of 'integralCharUnsafe'.
-intCharUnsafe :: Num.Int -> Char
-intCharUnsafe = Enum.toEnum
+decodeCharIntUnsafe :: Num.Int -> Char
+decodeCharIntUnsafe = Enum.toEnum
 
--- | Specialization of 'charIntegral'.
-charInt :: Char -> Num.Int
-charInt = Enum.fromEnum
+encodeCharInt :: Char -> Num.Int
+encodeCharInt = Enum.fromEnum
 
 
 ---  Safe bound-checked usage of the Enum instance  ---
 
-intInRange :: Num.Int -> Bool
-intInRange x = (Bool.&&) (x >= 0) (x <= 127)
+decodeCharInt :: Num.Int -> May.Maybe Char
 
--- | Specialization of 'integralChar'.
-intChar :: Num.Int -> Char
-intChar x = if intInRange x then intCharUnsafe x else Substitute
+decodeCharInt x | x < 0   = May.Nothing
+                | x > 127 = May.Nothing
 
--- | Specialization of 'integralCharMaybe'.
-intCharMaybe :: Num.Int -> May.Maybe Char
-intCharMaybe x = if intInRange x then May.Just (intCharUnsafe x) else May.Nothing
+decodeCharInt x = May.Just (decodeCharIntUnsafe x)
 
 
----  Integral generalizations  ---
+---  Character encoding  ---
 
--- $integralConversions
--- These functions are conversions between a 'Char' and its corresponding number between 0 and 127. This module also contains specializations of these functions for 'Num.Int' and 'Word.Word8' in case you find those variants easier to use than their polymorphic counterparts.
+-- Conversions between a 'Char' and its corresponding number between 0 and 127.
+class CharEncoding a
+  where
+    {-# MINIMAL encodeChar, decodeChar #-}
 
--- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns the 'Substitute' character for any numbers outside of this range.
-integralChar :: Num.Integral int => int -> Char
-integralChar = intChar . Num.fromIntegral
+    -- | Converts an ASCII 'Char' to its corresponding number between 0 and 127.
+    encodeChar :: Char -> a
 
--- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns 'Nothing' for any numbers outside of this range.
-integralCharMaybe :: Num.Integral int => int -> May.Maybe Char
-integralCharMaybe = intCharMaybe . Num.fromIntegral
+    -- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns 'Nothing' for any numbers outside of this range.
+    decodeChar :: a -> May.Maybe Char
 
--- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Behavior is undefined for any numbers outside of this range.
-integralCharUnsafe :: Num.Integral int => int -> Char
-integralCharUnsafe = intCharUnsafe . Num.fromIntegral
+    -- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns the 'Substitute' character for any numbers outside of this range.
+    decodeCharSub :: a -> Char
+    decodeCharSub = substitute . decodeChar
 
--- | Converts an ASCII 'Char' to its corresponding number between 0 and 127.
+instance CharEncoding Num.Int
+  where
+    encodeChar = encodeCharInt
+    decodeChar = decodeCharInt
 
-charIntegral :: Num.Integral int => Char -> int
-charIntegral = Num.fromIntegral . charInt
+instance CharEncoding Word.Word8
+  where
+    encodeChar = Num.fromIntegral . encodeCharInt
+    decodeChar = decodeCharInt . Num.fromIntegral
 
-
----  Word8 specializations  ---
-
--- | Specialization of 'integralChar'.
-word8Char :: Word.Word8 -> Char
-word8Char = integralChar
-
--- | Specialization of 'integralCharMaybe'.
-word8CharMaybe :: Word.Word8 -> May.Maybe Char
-word8CharMaybe = integralCharMaybe
-
--- | Specialization of 'integralCharUnsafe'.
-word8CharUnsafe :: Word.Word8 -> Char
-word8CharUnsafe = integralCharUnsafe
-
--- | Specialization of 'charIntegral'.
-charWord8 :: Char -> Word.Word8
-charWord8 = charIntegral
+substitute :: May.Maybe Char -> Char
+substitute = May.fromMaybe Substitute
 
 
 ---  Strings  --
@@ -275,13 +251,13 @@ instance Show String
     showsPrec _ str = Show.showString "[ascii|" . Show.showString (toUnicode str) . Show.showString "|]"
 
 pack :: [Char] -> String
-pack = String . word8ListArray . List.map charWord8
+pack = String . word8ListArray . List.map encodeChar
 
 word8ListArray :: [Word.Word8] -> Array.UArray Num.Int Word.Word8
 word8ListArray xs = Array.listArray (1, List.length xs) xs
 
 unpack :: String -> [Char]
-unpack = List.map word8CharUnsafe . Array.elems . stringArray
+unpack = List.map (decodeCharIntUnsafe . Num.fromIntegral) . Array.elems . stringArray
 
 
 ---  Character classification  ---
@@ -323,8 +299,8 @@ class CaseConversion a
 
 instance CaseConversion Char
   where
-    toLower x = if (isUpper x) then intCharUnsafe ((Num.+) (charInt x) 32) else x
-    toUpper x = if (isLower x) then intCharUnsafe ((Num.-) (charInt x) 32) else x
+    toLower x = if (isUpper x) then decodeCharIntUnsafe ((Num.+) (encodeCharInt x) 32) else x
+    toUpper x = if (isLower x) then decodeCharIntUnsafe ((Num.-) (encodeCharInt x) 32) else x
 
 instance CaseConversion String
   where
@@ -342,17 +318,17 @@ type family Unicode a = u | u -> a
 class UnicodeConversion a
   where
     toUnicode :: a -> Unicode a
-    fromUnicode :: Unicode a -> a
+    fromUnicodeSub :: Unicode a -> a
     fromUnicodeMaybe :: Unicode a -> May.Maybe a
 
 instance UnicodeConversion Char
   where
-    toUnicode = Unicode.chr . charInt
-    fromUnicode = intChar . Unicode.ord
-    fromUnicodeMaybe = intCharMaybe . Unicode.ord
+    toUnicode = Unicode.chr . encodeCharInt
+    fromUnicodeSub = decodeCharSub . Unicode.ord
+    fromUnicodeMaybe = decodeChar . Unicode.ord
 
 instance UnicodeConversion String
   where
     toUnicode = List.map toUnicode . unpack
-    fromUnicode = pack . List.map fromUnicode
+    fromUnicodeSub = pack . List.map fromUnicodeSub
     fromUnicodeMaybe = fmap pack . traverse fromUnicodeMaybe
