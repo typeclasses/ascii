@@ -24,23 +24,32 @@ module ASCII
   , charInt, intChar, intCharMaybe
   -- ** Word8 conversions
   , word8Char, word8CharMaybe, charWord8
+  -- ** Classification
+  , isUpper, isLower
 
   -- * Strings
   , String
   -- ** [Char] conversions
   , pack, unpack
 
+  -- * Case
+  , CaseInsensitiveEquivalence (..)
+  , CaseConversion (..)
+
   ) where
 
-import Prelude (Bool, Eq, Enum, Bounded, Show, Ord (..), (&&))
+import Prelude (Eq, Enum, Bounded, Show, Ord (..), Bool)
 import Data.Function ((.))
 
 import qualified Prelude as Enum (Enum (..))
-import qualified Prelude as Num (Integral (..), Int, fromIntegral)
+import qualified Prelude as Num (Integral (..), Int, fromIntegral, (+), (-))
 import qualified Prelude as May (Maybe (..))
+import qualified Data.Bool as Bool
 import qualified Data.List as List
 import qualified Data.Word as Word
 import qualified Data.Array.Unboxed as Array
+import qualified Data.Functor.Contravariant as Eq (Equivalence (..), defaultEquivalence)
+import qualified Data.Functor.Contravariant as Contra (Contravariant (contramap))
 
 
 ---  Individual characters  ---
@@ -191,7 +200,7 @@ charInt = Enum.fromEnum
 ---  Safe bound-checked usage of the Enum instance  ---
 
 intInRange :: Num.Int -> Bool
-intInRange x = (x >= 0) && (x <= 127)
+intInRange x = (Bool.&&) (x >= 0) (x <= 127)
 
 -- | Specialization of 'integralChar'.
 intChar :: Num.Int -> Char
@@ -247,6 +256,7 @@ charWord8 = charIntegral
 ---  Strings  --
 
 newtype String = String { stringArray :: Array.UArray Num.Int Word.Word8 }
+  deriving (Eq, Ord, Show)
 
 pack :: [Char] -> String
 pack = String . word8ListArray . List.map charWord8
@@ -256,3 +266,51 @@ word8ListArray xs = Array.listArray (1, List.length xs) xs
 
 unpack :: String -> [Char]
 unpack = List.map word8CharUnsafe . Array.elems . stringArray
+
+
+---  Character classification  ---
+
+isUpper :: Char -> Bool
+isUpper x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
+
+isLower :: Char -> Bool
+isLower x = (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterZ)
+
+
+---  Case-insensitive equivalence  ---
+
+class CaseInsensitiveEquivalence a
+  where
+    {-# MINIMAL caseInsensitiveEquivalence | equalsIgnoringCase #-}
+
+    caseInsensitiveEquivalence :: Eq.Equivalence a
+    caseInsensitiveEquivalence = Eq.Equivalence equalsIgnoringCase
+
+    equalsIgnoringCase :: a -> a -> Bool
+    equalsIgnoringCase = Eq.getEquivalence caseInsensitiveEquivalence
+
+instance CaseInsensitiveEquivalence Char
+  where
+    caseInsensitiveEquivalence = Contra.contramap toLower Eq.defaultEquivalence
+
+instance CaseInsensitiveEquivalence String
+  where
+    caseInsensitiveEquivalence = Contra.contramap (List.map toLower . unpack) Eq.defaultEquivalence
+
+
+---  Case conversion  ---
+
+class CaseConversion a
+  where
+    toLower :: a -> a
+    toUpper :: a -> a
+
+instance CaseConversion Char
+  where
+    toLower x = if (isUpper x) then intCharUnsafe ((Num.+) (charInt x) 32) else x
+    toUpper x = if (isLower x) then intCharUnsafe ((Num.-) (charInt x) 32) else x
+
+instance CaseConversion String
+  where
+    toLower = pack . List.map toLower . unpack
+    toUpper = pack . List.map toUpper . unpack

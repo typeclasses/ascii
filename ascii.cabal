@@ -2,7 +2,7 @@ cabal-version: 2.0
 
 name: ascii
 version: 0.1.0.0
-synopsis:  ...
+synopsis: ...
 category: Data, Text
 
 description:
@@ -38,9 +38,11 @@ library
 
     build-depends:
 
-        base
+      -- This version introduced the Data.Functor.Contravariant module
+        base >= 4.12
 
-      -- untested
-      , base < 4.13
+      -- The changelog only goes back this far.
+      , array >= 0.4
 
-      , array
+      -- These versions and above are untested because they did not yet exist at the time of writing.
+      , array < 0.6, base < 4.13
