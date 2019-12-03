@@ -137,6 +137,10 @@ listsAndPredicates =
     , ("letters", ASCII.letters, ASCII.isLetter)
     , ("capitalLetters", ASCII.capitalLetters, ASCII.isUpper)
     , ("smallLetters", ASCII.smallLetters, ASCII.isLower)
+    , ("digits", ASCII.digits, ASCII.isDigit)
+    , ("numbers", ASCII.numbers, ASCII.isNumber)
+    , ("octDigits", ASCII.octDigits, ASCII.isOctDigit)
+    , ("hexDigits", ASCII.hexDigits, ASCII.isHexDigit)
     ]
 
 classificationFunctions :: [(String, ASCII.Char -> Bool, Unicode.Char -> Bool)]

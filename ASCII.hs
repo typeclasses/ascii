@@ -56,6 +56,7 @@ module ASCII
 
   -- * Numeric characters
   , isDigit, isOctDigit, isHexDigit, isNumber
+  , digits, octDigits, hexDigits, numbers
 
   -- * Miscellaneous character classifications
   , isSpace, isAlphaNum, isMark, isPunctuation, isSymbol, isSeparator
@@ -393,11 +394,17 @@ instance UnicodeConversion String
 isDigit :: Char -> Bool
 isDigit x = (Bool.&&) (x >= Digit0) (x <= Digit9)
 
+digits :: [Char]
+digits = Enum.enumFromTo Digit0 Digit9
+
 -- | Returns True for the characters from 'Digit0' to 'Digit7'.
 --
 -- This function is analogous to 'Unicode.isOctDigit' in the "Data.Char" module.
 isOctDigit :: Char -> Bool
 isOctDigit x = (Bool.&&) (x >= Digit0) (x <= Digit7)
+
+octDigits :: [Char]
+octDigits = Enum.enumFromTo Digit0 Digit7
 
 -- | Returns True for characters in any of the following ranges:
 --
@@ -413,12 +420,24 @@ isHexDigit x | isDigit x = True
              | (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterF) = True
 isHexDigit _ = False
 
+hexDigits :: [Char]
+hexDigits =
+  List.concat
+    [ digits
+    , Enum.enumFromTo CapitalLetterA CapitalLetterF
+    , Enum.enumFromTo SmallLetterA SmallLetterF
+    ]
+
 -- | Synonym for 'isDigit'.
 --
 -- In the "Data.Char" module, 'Unicode.isDigit' selects only the ASCII digits 0 through 9, and 'Unicode.isNumber' selects a wider set of characters because the full Unicode character set contains more numeric characters than just the ASCII digits. In this module, these two functions are redundant, but we include this synonym for compatibility with "Data.Char".
 
 isNumber :: Char -> Bool
 isNumber = isDigit
+
+-- | Synonym for 'digits'.
+numbers :: [Char]
+numbers = digits
 
 
 
