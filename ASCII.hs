@@ -29,7 +29,10 @@ module ASCII
   -- * String-[Char] conversions
   , pack, unpack
 
-  -- * Upper/lower case
+  -- * Character groups
+  , Group ( .. ), inGroup, charGroup
+
+  -- * Upper/lower case letters
   , Case (..), isCase, letterCase, CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
 
   -- * Unicode conversion
@@ -37,15 +40,16 @@ module ASCII
 
   ) where
 
-import Prelude (Eq, Bounded, Ord (..), fmap)
-import Data.Function ((.))
+import Prelude ( Bounded, Ord (..), fmap )
+import Data.Function ( (.) )
+import Data.Eq ( Eq ( (==) ) )
 
 -- Various types of numbers
-import Data.Int (Int)
-import Data.Word (Word8)
+import Data.Int ( Int )
+import Data.Word ( Word8 )
 
 -- Miscellaneous number-related functions
-import qualified Prelude as Num (fromIntegral, (+), (-))
+import qualified Prelude as Num ( fromIntegral, (+), (-) )
 
 -- We provide conversions to/from unicode representations of characters; the unicode types are the standard Char and String types from the base module.
 import qualified Data.Char as Unicode
@@ -53,26 +57,26 @@ import qualified Data.String as Unicode
 
 -- The String type we define here has a custom (not derived) Show instance.
 import qualified Text.Show as Show
-import Text.Show (Show)
+import Text.Show ( Show )
 
 -- The auto-generated Enum instance for Char makes it easy for us to write the encoding/decoding functions.
-import Prelude (Enum)
-import qualified Prelude as Enum (Enum (..))
+import Prelude ( Enum )
+import qualified Prelude as Enum ( Enum (..) )
 
 -- Case-insensitivity is expressed as an equivalence.
-import qualified Data.Functor.Contravariant as Eq (Equivalence (..), defaultEquivalence)
-import qualified Data.Functor.Contravariant as Contra (Contravariant (contramap))
+import qualified Data.Functor.Contravariant as Eq ( Equivalence ( .. ), defaultEquivalence )
+import qualified Data.Functor.Contravariant as Contra ( Contravariant (contramap) )
 
 -- True and false, thanks to George Boole.
 import qualified Data.Bool as Bool
-import Data.Bool (Bool)
+import Data.Bool ( Bool ( .. ) )
 
 -- Traversing is looping!
-import Data.Traversable (traverse)
+import Data.Traversable ( traverse )
 
 -- Maybe is the type of a decoding result, because decoding can fail.
-import Data.Maybe (Maybe)
-import qualified Data.Maybe as May (Maybe (..), fromMaybe)
+import Data.Maybe ( Maybe )
+import qualified Data.Maybe as May ( Maybe ( .. ), fromMaybe )
 
 -- The classic linked list type, [].
 import qualified Data.List as List
@@ -81,7 +85,7 @@ import qualified Data.List as List
 import qualified Data.Array.Unboxed as Array
 
 -- We give the Char type an instance of the Lift class from Template Haskell for the sake of the quasi-quoter in the ASCII.QQ module.
-import qualified Language.Haskell.TH.Syntax as TH (Lift)
+import qualified Language.Haskell.TH.Syntax as TH ( Lift )
 
 
 ---  Individual characters  ---
@@ -290,6 +294,7 @@ unpack = List.map (decodeCharIntUnsafe . Num.fromIntegral) . Array.elems . strin
 ---  Case  ---
 
 data Case = UpperCase | LowerCase
+  deriving (Eq, Ord, Enum, Bounded, Show)
 
 isCase :: Case -> Char -> Bool
 isCase UpperCase x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
@@ -299,6 +304,21 @@ letterCase :: Char -> Maybe Case
 letterCase x | isCase UpperCase x = May.Just UpperCase
              | isCase LowerCase x = May.Just LowerCase
 letterCase _ = May.Nothing
+
+
+---  Group  ---
+
+data Group = Control | Printable
+  deriving (Eq, Ord, Enum, Bounded, Show)
+
+charGroup :: Char -> Group
+charGroup x | (x < Space) = Control
+charGroup Delete = Control
+charGroup _ = Printable
+
+inGroup :: Group -> Char -> Bool
+inGroup g x = charGroup x == g
+
 
 ---  Case-insensitive equivalence  ---
 

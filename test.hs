@@ -47,6 +47,16 @@ tests =
     ASCII.toCase ASCII.UpperCase [ascii|Cat|] === [ascii|CAT|]
     ASCII.toCase ASCII.LowerCase [ascii|Cat|] === [ascii|cat|]
 
+    ASCII.letterCase ASCII.SmallLetterA === Just ASCII.LowerCase
+    ASCII.letterCase ASCII.CapitalLetterA === Just ASCII.UpperCase
+    ASCII.letterCase ASCII.ExclamationMark === Nothing
+
+    ASCII.charGroup ASCII.Null === ASCII.Control
+    ASCII.charGroup ASCII.Space === ASCII.Printable
+    ASCII.charGroup ASCII.SmallLetterA === ASCII.Printable
+    ASCII.charGroup ASCII.Tilde === ASCII.Printable
+    ASCII.charGroup ASCII.Delete === ASCII.Control
+
 main :: IO ()
 main =
   do
