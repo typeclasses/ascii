@@ -24,7 +24,7 @@ module ASCII
   (
 
   -- * Characters
-    Char (..)
+    Char (..), all
 
   -- * Char encoding
   , CharEncoding (..)
@@ -36,7 +36,7 @@ module ASCII
   , pack, unpack
 
   -- * Character groups
-  , Group ( .. ), inGroup, charGroup
+  , Group ( .. ), inGroup, charGroup, controlCodes, printableCharacters
 
   -- * Upper/lower case letters
   , Case (..), isCase, letterCase, CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
@@ -50,9 +50,13 @@ module ASCII
 
   ) where
 
-import Prelude ( Bounded, Ord (..), fmap )
+import Prelude ( Ord (..), fmap )
 import Data.Function ( (.) )
 import Data.Eq ( Eq ( (==) ) )
+import qualified Data.List as List
+
+-- Min and max bounds
+import Prelude ( Bounded ( minBound, maxBound ) )
 
 -- Various types of numbers
 import Data.Int ( Int )
@@ -87,9 +91,6 @@ import Data.Traversable ( traverse )
 -- Maybe is the type of a decoding result, because decoding can fail.
 import Data.Maybe ( Maybe )
 import qualified Data.Maybe as May ( Maybe ( .. ), fromMaybe )
-
--- The classic linked list type, [].
-import qualified Data.List as List
 
 -- Arrays are for tightly-packed sequences of bytes.
 import qualified Data.Array.Unboxed as Array
@@ -133,6 +134,9 @@ data Char =
 
 
 ---  Direct usage of the Enum instance  ---
+
+all :: [Char]
+all = Enum.enumFromTo minBound maxBound
 
 decodeCharIntUnsafe :: Int -> Char
 decodeCharIntUnsafe = Enum.toEnum
@@ -225,6 +229,14 @@ charGroup _ = Printable
 
 inGroup :: Group -> Char -> Bool
 inGroup g x = charGroup x == g
+
+-- | A list of all characters in the 'Control' group.
+controlCodes :: [Char]
+controlCodes = (List.++) (Enum.enumFromTo Null UnitSeparator) [Delete]
+
+-- | A list of all characters in the 'Printable' group.
+printableCharacters :: [Char]
+printableCharacters = Enum.enumFromTo Space Tilde
 
 
 ---  Case-insensitive equivalence  ---

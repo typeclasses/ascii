@@ -5,14 +5,12 @@
 import qualified ASCII
 import ASCII.QQ
 
-import Control.Applicative
 import qualified Data.Char as Unicode
 import qualified Data.Foldable as Foldable
 import qualified Data.Function as Function
 import qualified Data.Functor.Identity as I
 import qualified Data.List as List
 import qualified System.Exit as Exit
-import qualified Data.IORef as Ref
 import qualified GHC.Stack as Stack
 
 main :: IO ()
@@ -65,13 +63,13 @@ main = runTest $ foldl1 (<>) $
   , ASCII.letterCase ASCII.ExclamationMark === Nothing
 
   -- There are 128 characters in total.
-  , length allChars === 128
+  , length ASCII.all === 128
 
   -- There are 33 control codes.
-  , length controlCodes === 33
+  , length ASCII.controlCodes === 33
 
   -- There are 95 printable characters.
-  , length printChars === 95
+  , length ASCII.printableCharacters === 95
 
   -- Space is a printable character (perhaps surprisingly, given that it is invisible).
   , ASCII.charGroup ASCII.Space === ASCII.Printable
@@ -80,7 +78,7 @@ main = runTest $ foldl1 (<>) $
   , ASCII.charGroup ASCII.HorizontalTab === ASCII.Control
 
   -- Space is the first printable character.
-  , firstPrintChar === ASCII.Space
+  , Foldable.minimumBy (compare `Function.on` ASCII.encodeChar @Int) ASCII.printableCharacters === ASCII.Space
 
   -- Small letter A (a) is a printable character.
   , ASCII.charGroup ASCII.SmallLetterA === ASCII.Printable
@@ -89,7 +87,7 @@ main = runTest $ foldl1 (<>) $
   , ASCII.charGroup ASCII.Tilde === ASCII.Printable
 
   -- Tilde is the last printable character.
-  , lastPrintChar === ASCII.Tilde
+  , Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) ASCII.printableCharacters === ASCII.Tilde
 
   -- Null is the first character.
   , minBound === ASCII.Null
@@ -101,7 +99,7 @@ main = runTest $ foldl1 (<>) $
   , ASCII.charGroup ASCII.UnitSeparator === ASCII.Control
 
   -- UnitSeparator is the last control code that appears in the ASCII chart before the printable characters.
-  , lastControlCharBeforePrint === ASCII.UnitSeparator
+  , Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) ASCII.all) === ASCII.UnitSeparator
 
   -- Delete is the last character.
   , maxBound === ASCII.Delete
@@ -110,7 +108,7 @@ main = runTest $ foldl1 (<>) $
   , ASCII.charGroup ASCII.Delete === ASCII.Control
 
   -- Delete is the only control code that appears in the ASCII chart /after/ the printable characters.
-  , afterPrintChars === [ASCII.Delete]
+  , (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) ASCII.all === [ASCII.Delete]
 
   -- The Show output for [ascii|cat|] is: ASCII.fromUnicodeSub "cat" (In this test case, the quotes are escaped, so it's a bit difficult to read.)
   , show [ascii|cat|] === "ASCII.fromUnicodeSub \"cat\""
@@ -124,25 +122,9 @@ main = runTest $ foldl1 (<>) $
     -- The Show instance for ASCII.String adds parens appropriately based on context.
   , show (I.Identity [ascii|cat|]) === "Identity (ASCII.fromUnicodeSub \"cat\")"
 
-  , for classificationFunctions $ \(name, f, g) -> note "f" name $
-        for allChars $ \x -> note "x" (show x) $
-            f x === g (ASCII.toUnicode x)
+  , for classificationFunctions $ \(name, f, g) -> for ASCII.all $ \x -> ("ASCII." ++ name ++ " " ++ show x, f x) =#= ("Data.Char." ++ name ++ " " ++ show x, g (ASCII.toUnicode x))
 
   ]
-
-allChars = [minBound .. maxBound]
-
-controlCodes = filter (ASCII.inGroup ASCII.Control) allChars
-
-printChars = filter (ASCII.inGroup ASCII.Printable) allChars
-
-firstPrintChar = Foldable.minimumBy (compare `Function.on` ASCII.encodeChar @Int) printChars
-
-lastPrintChar = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) printChars
-
-lastControlCharBeforePrint = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) allChars)
-
-afterPrintChars = (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) allChars
 
 classificationFunctions :: [(String, ASCII.Char -> Bool, Unicode.Char -> Bool)]
 classificationFunctions =
@@ -170,11 +152,12 @@ runTest (Test f) =
         [] -> Exit.exitSuccess
         xs -> Foldable.for_ xs putStrLn >> Exit.exitFailure
 
-type Note = (String, String)
+type Note = String
 type Notes = [Note]
 type Failure = String
+type Failures = [Failure]
 
-newtype Test = Test (Notes -> [Failure])
+newtype Test = Test (Notes -> Failures)
 
 instance Semigroup Test
   where
@@ -183,24 +166,27 @@ instance Semigroup Test
 success :: Test
 success = Test $ const []
 
+failure :: Stack.HasCallStack => Test
+failure = Test $ \ns -> [List.intercalate "; " ([unwords ["Line", show lineNumber]] ++ ns)]
+
 for :: [a] -> (a -> Test) -> Test
 for xs f = foldl1 (<>) (List.map f xs)
 
-note :: String -> String -> Test -> Test
-note k v (Test f) = Test $ \n -> f ((k, v) : n)
+note :: String -> Test -> Test
+note n (Test f) = Test $ \ns -> f (ns ++ [n])
 
-(===) :: (Stack.HasCallStack) => (Eq a, Show a) => a -> a -> Test
+(===) :: Stack.HasCallStack => (Eq a, Show a) => a -> a -> Test
 (===) x y | x == y = success
-(===) x y = Test $ \ns ->
-    [
-        List.intercalate "; "
-          (
-            [unwords ["Line", show lineNumber] :: String] ++
-            (map (\(k, v) -> unwords [k, "=", v]) ns :: [String]) ++
-            [unwords [show x, "/=", show y] :: String]
-            :: [String]
-          )
-    ]
+(===) x y =
+    note (unwords [show x, "/=", show y]) $
+    failure
+
+(=#=) :: Stack.HasCallStack => (Eq a, Show a) => (String, a) -> (String, a) -> Test
+(=#=) (_, v1) (_, v2) | v1 == v2 = success
+(=#=) (k1, v1) (k2, v2) =
+    note (k1 ++ " = " ++ show v1) $
+    note (k2 ++ " = " ++ show v2) $
+    failure
 
 lineNumber :: Stack.HasCallStack => Int
 lineNumber = (Stack.srcLocStartLine . snd . last . Stack.getCallStack) Stack.callStack
