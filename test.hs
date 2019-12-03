@@ -1,173 +1,206 @@
 {-# OPTIONS_GHC -Wall #-}
 
-{-# LANGUAGE ImplicitParams, LambdaCase, QuasiQuotes, TypeApplications #-}
+{-# LANGUAGE LambdaCase, QuasiQuotes, TypeApplications #-}
 
 import qualified ASCII
 import ASCII.QQ
 
+import Control.Applicative
 import qualified Data.Char as Unicode
 import qualified Data.Foldable as Foldable
 import qualified Data.Function as Function
 import qualified Data.Functor.Identity as I
+import qualified Data.List as List
 import qualified System.Exit as Exit
 import qualified Data.IORef as Ref
 import qualified GHC.Stack as Stack
 
-tests :: (?failed :: Failed) => IO ()
-tests =
-  do
-    ASCII.decodeCharSub @Int 0 === ASCII.Null
-    ASCII.decodeCharSub @Int 65 === ASCII.CapitalLetterA
-    ASCII.decodeCharSub @Int 97 === ASCII.SmallLetterA
-    ASCII.decodeCharSub @Int 127 === ASCII.Delete
+main :: IO ()
+main = runTest $ foldl1 (<>) $
 
-    ASCII.decodeCharSub @Int (-1) === ASCII.Substitute
-    ASCII.decodeCharSub @Int 128 === ASCII.Substitute
-    ASCII.decodeCharSub @Int 11243228 === ASCII.Substitute
+  [ ASCII.decodeCharSub @Int 0 === ASCII.Null
+  , ASCII.decodeCharSub @Int 65 === ASCII.CapitalLetterA
+  , ASCII.decodeCharSub @Int 97 === ASCII.SmallLetterA
+  , ASCII.decodeCharSub @Int 127 === ASCII.Delete
 
-    ASCII.decodeChar @Int 0 === Just ASCII.Null
-    ASCII.decodeChar @Int 65 === Just ASCII.CapitalLetterA
-    ASCII.decodeChar @Int 97 === Just ASCII.SmallLetterA
-    ASCII.decodeChar @Int 127 === Just ASCII.Delete
+  , ASCII.decodeCharSub @Int (-1) === ASCII.Substitute
+  , ASCII.decodeCharSub @Int 128 === ASCII.Substitute
+  , ASCII.decodeCharSub @Int 11243228 === ASCII.Substitute
 
-    ASCII.decodeChar @Int (-1) === Nothing
-    ASCII.decodeChar @Int 128 === Nothing
-    ASCII.decodeChar @Int 11243228 === Nothing
+  , ASCII.decodeChar @Int 0 === Just ASCII.Null
+  , ASCII.decodeChar @Int 65 === Just ASCII.CapitalLetterA
+  , ASCII.decodeChar @Int 97 === Just ASCII.SmallLetterA
+  , ASCII.decodeChar @Int 127 === Just ASCII.Delete
 
-    [ascii|Cat|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT]
+  , ASCII.decodeChar @Int (-1) === Nothing
+  , ASCII.decodeChar @Int 128 === Nothing
+  , ASCII.decodeChar @Int 11243228 === Nothing
 
-    ASCII.equalsIgnoringCase [ascii|Cat|] [ascii|CAT|] === True
-    ASCII.equalsIgnoringCase [ascii|Cat|] [ascii|CAP|] === False
+  , [ascii|Cat|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT]
 
-    ASCII.toCase ASCII.UpperCase ASCII.SmallLetterX === ASCII.CapitalLetterX
-    ASCII.toCase ASCII.LowerCase ASCII.SmallLetterX === ASCII.SmallLetterX
-    ASCII.toCase ASCII.UpperCase ASCII.CapitalLetterX === ASCII.CapitalLetterX
-    ASCII.toCase ASCII.LowerCase ASCII.CapitalLetterX === ASCII.SmallLetterX
+  , ASCII.equalsIgnoringCase [ascii|Cat|] [ascii|CAT|] === True
+  , ASCII.equalsIgnoringCase [ascii|Cat|] [ascii|CAP|] === False
 
-    -- Changing the case of an exclamation mark character has no effect because it is not a letter.
-    ASCII.toCase ASCII.LowerCase ASCII.ExclamationMark === ASCII.ExclamationMark
+  , ASCII.toCase ASCII.UpperCase ASCII.SmallLetterX === ASCII.CapitalLetterX
+  , ASCII.toCase ASCII.LowerCase ASCII.SmallLetterX === ASCII.SmallLetterX
+  , ASCII.toCase ASCII.UpperCase ASCII.CapitalLetterX === ASCII.CapitalLetterX
+  , ASCII.toCase ASCII.LowerCase ASCII.CapitalLetterX === ASCII.SmallLetterX
 
-    -- Convert "Cat!" to upper case, and you get "CAT!".
-    ASCII.toCase ASCII.UpperCase [ascii|Cat!|] === [ascii|CAT!|]
+  -- Changing the case of an exclamation mark character has no effect because it is not a letter.
+  , ASCII.toCase ASCII.LowerCase ASCII.ExclamationMark === ASCII.ExclamationMark
 
-    -- Convert "Cat!" to lower case, and you get "cat!".
-    ASCII.toCase ASCII.LowerCase [ascii|Cat!|] === [ascii|cat!|]
+  -- Convert "Cat!" to upper case, and you get "CAT!".
+  , ASCII.toCase ASCII.UpperCase [ascii|Cat!|] === [ascii|CAT!|]
 
-    -- Small letter A (a) is lower case.
-    ASCII.letterCase ASCII.SmallLetterA === Just ASCII.LowerCase
+  -- Convert "Cat!" to lower case, and you get "cat!".
+  , ASCII.toCase ASCII.LowerCase [ascii|Cat!|] === [ascii|cat!|]
 
-    -- Capital letter A (A) is upper case.
-    ASCII.letterCase ASCII.CapitalLetterA === Just ASCII.UpperCase
+  -- Small letter A (a) is lower case.
+  , ASCII.letterCase ASCII.SmallLetterA === Just ASCII.LowerCase
 
-    -- The exclamation mark character does not have a case because it is not a letter.
-    ASCII.letterCase ASCII.ExclamationMark === Nothing
+  -- Capital letter A (A) is upper case.
+  , ASCII.letterCase ASCII.CapitalLetterA === Just ASCII.UpperCase
 
-    -- There are 128 characters in total.
-    let allChars = [minBound .. maxBound]
-    length allChars === 128
+  -- The exclamation mark character does not have a case because it is not a letter.
+  , ASCII.letterCase ASCII.ExclamationMark === Nothing
 
-    -- There are 33 control codes.
-    let controlCodes = filter (ASCII.inGroup ASCII.Control) allChars
-    length controlCodes === 33
+  -- There are 128 characters in total.
+  , length allChars === 128
 
-    -- There are 95 printable characters.
-    let printChars = filter (ASCII.inGroup ASCII.Printable) allChars
-    length printChars === 95
+  -- There are 33 control codes.
+  , length controlCodes === 33
 
-    -- Space is a printable character (perhaps surprisingly, given that it is invisible).
-    ASCII.charGroup ASCII.Space === ASCII.Printable
+  -- There are 95 printable characters.
+  , length printChars === 95
 
-    -- Tab is a control code (perhaps surprisingly, given that space is a printable character).
-    ASCII.charGroup ASCII.HorizontalTab === ASCII.Control
+  -- Space is a printable character (perhaps surprisingly, given that it is invisible).
+  , ASCII.charGroup ASCII.Space === ASCII.Printable
 
-    -- Space is the first printable character.
-    let firstPrintChar = Foldable.minimumBy (compare `Function.on` ASCII.encodeChar @Int) printChars
-    firstPrintChar === ASCII.Space
+  -- Tab is a control code (perhaps surprisingly, given that space is a printable character).
+  , ASCII.charGroup ASCII.HorizontalTab === ASCII.Control
 
-    -- Small letter A (a) is a printable character.
-    ASCII.charGroup ASCII.SmallLetterA === ASCII.Printable
+  -- Space is the first printable character.
+  , firstPrintChar === ASCII.Space
 
-    -- Tilde (~) is a printable character.
-    ASCII.charGroup ASCII.Tilde === ASCII.Printable
+  -- Small letter A (a) is a printable character.
+  , ASCII.charGroup ASCII.SmallLetterA === ASCII.Printable
 
-    -- Tilde is the last printable character.
-    let lastPrintChar = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) printChars
-    lastPrintChar === ASCII.Tilde
+  -- Tilde (~) is a printable character.
+  , ASCII.charGroup ASCII.Tilde === ASCII.Printable
 
-    -- Null is the first character.
-    minBound === ASCII.Null
+  -- Tilde is the last printable character.
+  , lastPrintChar === ASCII.Tilde
 
-    -- Null is a control code.
-    ASCII.charGroup ASCII.Null === ASCII.Control
+  -- Null is the first character.
+  , minBound === ASCII.Null
 
-    -- UnitSeparator is a control code.
-    ASCII.charGroup ASCII.UnitSeparator === ASCII.Control
+  -- Null is a control code.
+  , ASCII.charGroup ASCII.Null === ASCII.Control
 
-    -- UnitSeparator is the last control code that appears in the ASCII chart before the printable characters.
-    let lastControlCharBeforePrint = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) allChars)
-    lastControlCharBeforePrint === ASCII.UnitSeparator
+  -- UnitSeparator is a control code.
+  , ASCII.charGroup ASCII.UnitSeparator === ASCII.Control
 
-    -- Delete is the last character.
-    maxBound === ASCII.Delete
+  -- UnitSeparator is the last control code that appears in the ASCII chart before the printable characters.
+  , lastControlCharBeforePrint === ASCII.UnitSeparator
 
-    -- Delete is a control code.
-    ASCII.charGroup ASCII.Delete === ASCII.Control
+  -- Delete is the last character.
+  , maxBound === ASCII.Delete
 
-    -- Delete is the only control code that appears in the ASCII chart /after/ the printable characters.
-    let afterPrintChars = (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) allChars
-    afterPrintChars === [ASCII.Delete]
+  -- Delete is a control code.
+  , ASCII.charGroup ASCII.Delete === ASCII.Control
 
-    -- The Show output for [ascii|cat|] is: ASCII.fromUnicodeSub "cat" (In this test case, the quotes are escaped, so it's a bit difficult to read.)
-    show [ascii|cat|] === "ASCII.fromUnicodeSub \"cat\""
+  -- Delete is the only control code that appears in the ASCII chart /after/ the printable characters.
+  , afterPrintChars === [ASCII.Delete]
 
-    -- The Show output for the empty string [ascii||] is: ASCII.fromUnicodeSub ""
-    show [ascii||] === "ASCII.fromUnicodeSub \"\""
+  -- The Show output for [ascii|cat|] is: ASCII.fromUnicodeSub "cat" (In this test case, the quotes are escaped, so it's a bit difficult to read.)
+  , show [ascii|cat|] === "ASCII.fromUnicodeSub \"cat\""
 
-    -- The Show output for a string containing a single quotation mark is: ASCII.fromUnicodeSub "\"" (In this test case, the inner quotation mark is doubly-escaped, so it's especially difficult to read.)
-    show [ascii|"|] === "ASCII.fromUnicodeSub \"\\\"\""
+  -- The Show output for the empty string [ascii||] is: ASCII.fromUnicodeSub ""
+  , show [ascii||] === "ASCII.fromUnicodeSub \"\""
+
+  -- The Show output for a string containing a single quotation mark is: ASCII.fromUnicodeSub "\"" (In this test case, the inner quotation mark is doubly-escaped, so it's especially difficult to read.)
+  , show [ascii|"|] === "ASCII.fromUnicodeSub \"\\\"\""
 
     -- The Show instance for ASCII.String adds parens appropriately based on context.
-    show (I.Identity [ascii|cat|]) === "Identity (ASCII.fromUnicodeSub \"cat\")"
+  , show (I.Identity [ascii|cat|]) === "Identity (ASCII.fromUnicodeSub \"cat\")"
 
-    Foldable.for_ classificationFunctions $ \(f, g) ->
-      Foldable.for_ allChars $ \c ->
-        f c === g (ASCII.toUnicode c)
+  , for classificationFunctions $ \(name, f, g) -> note "f" name $
+        for allChars $ \x -> note "x" (show x) $
+            f x === g (ASCII.toUnicode x)
 
-classificationFunctions :: [(ASCII.Char -> Bool, Unicode.Char -> Bool)]
+  ]
+
+allChars = [minBound .. maxBound]
+
+controlCodes = filter (ASCII.inGroup ASCII.Control) allChars
+
+printChars = filter (ASCII.inGroup ASCII.Printable) allChars
+
+firstPrintChar = Foldable.minimumBy (compare `Function.on` ASCII.encodeChar @Int) printChars
+
+lastPrintChar = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) printChars
+
+lastControlCharBeforePrint = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) allChars)
+
+afterPrintChars = (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) allChars
+
+classificationFunctions :: [(String, ASCII.Char -> Bool, Unicode.Char -> Bool)]
 classificationFunctions =
-    [ (ASCII.isControl, Unicode.isControl)
-    , (ASCII.isSpace, Unicode.isSpace)
-    , (ASCII.isLower, Unicode.isLower)
-    , (ASCII.isUpper, Unicode.isUpper)
-    , (ASCII.isAlpha, Unicode.isAlpha)
-    , (ASCII.isAlphaNum, Unicode.isAlphaNum)
-    , (ASCII.isPrint, Unicode.isPrint)
-    , (ASCII.isDigit, Unicode.isDigit)
-    , (ASCII.isOctDigit, Unicode.isOctDigit)
-    , (ASCII.isHexDigit, Unicode.isHexDigit)
-    , (ASCII.isLetter, Unicode.isLetter)
-    , (ASCII.isMark, Unicode.isMark)
-    , (ASCII.isNumber, Unicode.isNumber)
-    , (ASCII.isPunctuation, Unicode.isPunctuation)
-    , (ASCII.isSymbol, Unicode.isSymbol)
-    , (ASCII.isSeparator, Unicode.isSeparator)
+    [ ("isControl", ASCII.isControl, Unicode.isControl)
+    , ("isSpace", ASCII.isSpace, Unicode.isSpace)
+    , ("isLower", ASCII.isLower, Unicode.isLower)
+    , ("isUpper", ASCII.isUpper, Unicode.isUpper)
+    , ("isAlpha", ASCII.isAlpha, Unicode.isAlpha)
+    , ("isAlphaNum", ASCII.isAlphaNum, Unicode.isAlphaNum)
+    , ("isPrint", ASCII.isPrint, Unicode.isPrint)
+    , ("isDigit", ASCII.isDigit, Unicode.isDigit)
+    , ("isOctDigit", ASCII.isOctDigit, Unicode.isOctDigit)
+    , ("isHexDigit", ASCII.isHexDigit, Unicode.isHexDigit)
+    , ("isLetter", ASCII.isLetter, Unicode.isLetter)
+    , ("isMark", ASCII.isMark, Unicode.isMark)
+    , ("isNumber", ASCII.isNumber, Unicode.isNumber)
+    , ("isPunctuation", ASCII.isPunctuation, Unicode.isPunctuation)
+    , ("isSymbol", ASCII.isSymbol, Unicode.isSymbol)
+    , ("isSeparator", ASCII.isSeparator, Unicode.isSeparator)
     ]
 
-main :: IO ()
-main =
-  do
-    failed <- Ref.newIORef False; let ?failed = failed :: Failed
-    tests
-    Ref.readIORef failed >>= \case { True -> Exit.exitFailure; False -> Exit.exitSuccess }
+runTest :: Test -> IO ()
+runTest (Test f) =
+    case f [] of
+        [] -> Exit.exitSuccess
+        xs -> Foldable.for_ xs putStrLn >> Exit.exitFailure
 
-type Failed = Ref.IORef Bool
+type Note = (String, String)
+type Notes = [Note]
+type Failure = String
 
-(===) :: (Stack.HasCallStack, ?failed :: Failed) => (Eq a, Show a) => a -> a -> IO ()
-(===) x y | x == y = mempty
-(===) x y =
-  do
-    putStrLn (unwords ["Line", show lineNumber] ++ ": " ++ unwords [show x, "/=", show y])
-    Ref.writeIORef ?failed True
+newtype Test = Test (Notes -> [Failure])
+
+instance Semigroup Test
+  where
+    Test ta <> Test tb = Test $ \n -> ta n ++ tb n
+
+success :: Test
+success = Test $ const []
+
+for :: [a] -> (a -> Test) -> Test
+for xs f = foldl1 (<>) (List.map f xs)
+
+note :: String -> String -> Test -> Test
+note k v (Test f) = Test $ \n -> f ((k, v) : n)
+
+(===) :: (Stack.HasCallStack) => (Eq a, Show a) => a -> a -> Test
+(===) x y | x == y = success
+(===) x y = Test $ \ns ->
+    [
+        List.intercalate "; "
+          (
+            [unwords ["Line", show lineNumber] :: String] ++
+            (map (\(k, v) -> unwords [k, "=", v]) ns :: [String]) ++
+            [unwords [show x, "/=", show y] :: String]
+            :: [String]
+          )
+    ]
 
 lineNumber :: Stack.HasCallStack => Int
 lineNumber = (Stack.srcLocStartLine . snd . last . Stack.getCallStack) Stack.callStack
