@@ -61,12 +61,16 @@ tests =
     -- The exclamation mark character does not have a case because it is not a letter.
     ASCII.letterCase ASCII.ExclamationMark === Nothing
 
+    -- There are 128 characters in total.
+    let allChars = [minBound .. maxBound]
+    length allChars === 128
+
     -- There are 33 control codes.
-    let controlCodes = filter (ASCII.inGroup ASCII.Control) [minBound .. maxBound]
+    let controlCodes = filter (ASCII.inGroup ASCII.Control) allChars
     length controlCodes === 33
 
     -- There are 95 printable characters.
-    let printChars = filter (ASCII.inGroup ASCII.Printable) [minBound .. maxBound]
+    let printChars = filter (ASCII.inGroup ASCII.Printable) allChars
     length printChars === 95
 
     -- Space is a printable character (perhaps surprisingly, given that it is invisible).
@@ -76,7 +80,7 @@ tests =
     ASCII.charGroup ASCII.HorizontalTab === ASCII.Control
 
     -- Space is the first printable character.
-    let firstPrintChar = Foldable.minimumBy (compare `Function.on` ASCII.encodeChar @Int) (filter (ASCII.inGroup ASCII.Printable) [minBound .. maxBound])
+    let firstPrintChar = Foldable.minimumBy (compare `Function.on` ASCII.encodeChar @Int) printChars
     firstPrintChar === ASCII.Space
 
     -- Small letter A (a) is a printable character.
@@ -86,7 +90,7 @@ tests =
     ASCII.charGroup ASCII.Tilde === ASCII.Printable
 
     -- Tilde is the last printable character.
-    let lastPrintChar = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) (filter (ASCII.inGroup ASCII.Printable) [minBound .. maxBound])
+    let lastPrintChar = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) printChars
     lastPrintChar === ASCII.Tilde
 
     -- Null is the first character.
@@ -99,7 +103,7 @@ tests =
     ASCII.charGroup ASCII.UnitSeparator === ASCII.Control
 
     -- UnitSeparator is the last control code that appears in the ASCII chart before the printable characters.
-    let lastControlCharBeforePrint = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) [minBound .. maxBound])
+    let lastControlCharBeforePrint = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) allChars)
     lastControlCharBeforePrint === ASCII.UnitSeparator
 
     -- Delete is the last character.
@@ -109,7 +113,7 @@ tests =
     ASCII.charGroup ASCII.Delete === ASCII.Control
 
     -- Delete is the only control code that appears in the ASCII chart /after/ the printable characters.
-    let afterPrintChars = (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) [minBound .. maxBound]
+    let afterPrintChars = (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) allChars
     afterPrintChars === [ASCII.Delete]
 
     -- The Show output for [ascii|cat|] is: ASCII.fromUnicodeSub "cat" (In this test case, the quotes are escaped, so it's a bit difficult to read.)
