@@ -49,7 +49,7 @@ module ASCII
   , Group ( .. ), charGroup, inGroup, isControl, isPrint, controlCodes, printableCharacters
 
   -- * Upper/lower case letters
-  , Case (..), isCase, isLower, isUpper, isAlpha, isLetter, letterCase, CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
+  , Case (..), isCase, isLower, isUpper, isAlpha, isLetter, letterCase, letters, capitalLetters, smallLetters, CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
 
   -- * Unicode conversion
   , Unicode, UnicodeConversion ( .. )
@@ -265,6 +265,15 @@ isLetter x = (Bool.||) (isLower x) (isUpper x)
 
 isAlpha :: Char -> Bool
 isAlpha = isLetter
+
+letters :: [Char]
+letters = (List.++) capitalLetters smallLetters
+
+capitalLetters :: [Char]
+capitalLetters = Enum.enumFromTo CapitalLetterA CapitalLetterZ
+
+smallLetters :: [Char]
+smallLetters = Enum.enumFromTo SmallLetterA SmallLetterZ
 
 
 ---  Group  ---

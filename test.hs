@@ -134,6 +134,9 @@ listsAndPredicates :: [(String, [ASCII.Char], ASCII.Char -> Bool)]
 listsAndPredicates =
     [ ("controlCodes", ASCII.controlCodes, ASCII.isControl)
     , ("printableCharacters", ASCII.printableCharacters, ASCII.isPrint)
+    , ("letters", ASCII.letters, ASCII.isLetter)
+    , ("capitalLetters", ASCII.capitalLetters, ASCII.isUpper)
+    , ("smallLetters", ASCII.smallLetters, ASCII.isLower)
     ]
 
 classificationFunctions :: [(String, ASCII.Char -> Bool, Unicode.Char -> Bool)]
