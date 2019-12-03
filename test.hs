@@ -33,9 +33,6 @@ tests =
     ASCII.decodeChar @Int 128 === Nothing
     ASCII.decodeChar @Int 11243228 === Nothing
 
-    minBound === ASCII.Null
-    maxBound === ASCII.Delete
-
     [ascii|Cat|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT]
 
     ASCII.equalsIgnoringCase [ascii|Cat|] [ascii|CAT|] === True
