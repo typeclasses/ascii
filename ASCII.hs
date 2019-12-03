@@ -253,6 +253,7 @@ instance CaseConversion String
 
 ---  Conversions with Unicode types  ---
 
+-- | The 'Unicode' type family associates each of the ASCII types defined in this module to its Unicode counterpart in "Prelude". Use the methods of the 'UnicodeConversion' class to convert to and fro between ASCII and Unicode.
 type family Unicode a = u | u -> a
   where
     Unicode Char = Unicode.Char
@@ -260,9 +261,14 @@ type family Unicode a = u | u -> a
 
 class UnicodeConversion a
   where
+    -- | Widen an ASCII character or string to its corresponding Unicode type.
     toUnicode :: a -> Unicode a
-    fromUnicodeSub :: Unicode a -> a
+
+    -- | Narrow a Unicode character or string to ASCII, returning 'Nothing' if the input contains values that are not included in the ASCII character set.
     fromUnicodeMaybe :: Unicode a -> Maybe a
+
+    -- | Narrow a Unicode character or string to ASCII, using the 'Substitute' character in place of any characters in the input that are not included in the ASCII character set.
+    fromUnicodeSub :: Unicode a -> a
 
 instance UnicodeConversion Char
   where
