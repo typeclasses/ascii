@@ -238,12 +238,14 @@ letterCase _ = May.Nothing
 -- | Returns True for 'LowerCase' letters, from 'SmallLetterA' to 'SmallLetterZ'.
 --
 -- This function is analogous to 'Unicode.isLower' in the "Data.Char" module.
+
 isLower :: Char -> Bool
 isLower = isCase LowerCase
 
 -- | Returns True for 'UpperCase' letters, from 'CapitalLetterA' to 'CapitalLetterZ'.
 --
 -- This function is analogous to 'Unicode.isUpper' in the "Data.Char" module.
+
 isUpper :: Char -> Bool
 isUpper = isCase UpperCase
 
@@ -253,12 +255,14 @@ isUpper = isCase UpperCase
 -- - 'CapitalLetterA' to 'CapitalLetterZ'
 --
 -- This function is analogous to 'Unicode.isLetter' in the "Data.Char" module.
+
 isLetter :: Char -> Bool
 isLetter x = (Bool.||) (isLower x) (isUpper x)
 
 -- | Synonym for 'isLetter'.
 --
 -- This function is analogous to 'Unicode.isAlpha' in the "Data.Char" module.
+
 isAlpha :: Char -> Bool
 isAlpha = isLetter
 
@@ -287,12 +291,14 @@ printableCharacters = Enum.enumFromTo Space Tilde
 -- | Returns True for characters in the 'Control' group.
 --
 -- This function is analogous to 'Unicode.isControl' in the "Data.Char" module.
+
 isControl :: Char -> Bool
 isControl = inGroup Control
 
 -- | Returns True for characters in the 'Printable' group.
 --
 -- This function is analogous to 'Unicode.isPrint' in the "Data.Char" module.
+
 isPrint :: Char -> Bool
 isPrint = inGroup Printable
 
@@ -339,6 +345,7 @@ instance CaseConversion String
 -- | The 'Unicode' type family associates each of the ASCII types defined in this module to its Unicode counterpart in "Prelude". Use the methods of the 'UnicodeConversion' class to convert to and fro between ASCII and Unicode.
 --
 -- The "@| u -> a@" part of this definition is made possible by the @TypeFamilyDependencies@ language extension and signifies that this is an /injective type family/. This tells the compiler that each ASCII type maps to a unique Unicode type, thus allowing the type checker to infer the ASCII type from the Unicode type. (To summarize: it improves type inference.)
+
 type family Unicode a = u | u -> a
   where
     Unicode Char = Unicode.Char
@@ -368,6 +375,44 @@ instance UnicodeConversion String
     fromUnicodeMaybe = fmap pack . traverse fromUnicodeMaybe
 
 
+---  Numeric characters  ---
+
+-- | Returns True for the characters from 'Digit0' to 'Digit9'.
+--
+-- This function is analogous to 'Unicode.isDigit' in the "Data.Char" module.
+
+isDigit :: Char -> Bool
+isDigit x = (Bool.&&) (x >= Digit0) (x <= Digit9)
+
+-- | Returns True for the characters from 'Digit0' to 'Digit7'.
+--
+-- This function is analogous to 'Unicode.isOctDigit' in the "Data.Char" module.
+isOctDigit :: Char -> Bool
+isOctDigit x = (Bool.&&) (x >= Digit0) (x <= Digit7)
+
+-- | Returns True for characters in any of the following ranges:
+--
+-- - 'Digit0' to 'Digit9'
+-- - 'CapitalLetterA' to 'CapitalLetterF'
+-- - 'SmallLetterA' to 'SmallLetterF'
+--
+-- This function is analogous to 'Unicode.isHexDigit' in the "Data.Char" module.
+
+isHexDigit :: Char -> Bool
+isHexDigit x | isDigit x = True
+             | (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterF) = True
+             | (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterF) = True
+isHexDigit _ = False
+
+-- | Synonym for 'isDigit'.
+--
+-- In the "Data.Char" module, 'Unicode.isDigit' selects only the ASCII digits 0 through 9, and 'Unicode.isNumber' selects a wider set of characters because the full Unicode character set contains more numeric characters than just the ASCII digits. In this module, these two functions are redundant, but we include this synonym for compatibility with "Data.Char".
+
+isNumber :: Char -> Bool
+isNumber = isDigit
+
+
+
 ---  Character classification  ---
 
 -- | Returns True for the following characters:
@@ -380,6 +425,7 @@ instance UnicodeConversion String
 -- - 'CarriageReturn'
 --
 -- This function is analogous to 'Unicode.isSpace' in the "Data.Char" module.
+
 isSpace :: Char -> Bool
 isSpace Space = True
 isSpace x = (Bool.&&) (x >= HorizontalTab) (x <= CarriageReturn)
@@ -388,28 +434,10 @@ isSpace x = (Bool.&&) (x >= HorizontalTab) (x <= CarriageReturn)
 isAlphaNum :: Char -> Bool
 isAlphaNum x = (Bool.||) (isAlpha x) (isDigit x)
 
--- | This function is analogous to 'Unicode.isDigit' in the "Data.Char" module.
-isDigit :: Char -> Bool
-isDigit x = (Bool.&&) (x >= Digit0) (x <= Digit9)
-
--- | This function is analogous to 'Unicode.isOctDigit' in the "Data.Char" module.
-isOctDigit :: Char -> Bool
-isOctDigit x = (Bool.&&) (x >= Digit0) (x <= Digit7)
-
--- | This function is analogous to 'Unicode.isHexDigit' in the "Data.Char" module.
-isHexDigit :: Char -> Bool
-isHexDigit x | isDigit x = True
-             | (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterF) = True
-             | (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterF) = True
-isHexDigit _ = False
-
 -- | Selects mark characters, for example accents and the like, which combine with preceding characters. This always returns False because ASCII does not include any mark characters. This function is included only for compatibility with 'Unicode.isMark' in the "Data.Char" module.
+
 isMark :: Char -> Bool
 isMark _ = False
-
--- | This function is analogous to 'Unicode.isNumber' in the "Data.Char" module.
-isNumber :: Char -> Bool
-isNumber = isDigit
 
 -- | Returns True for the following characters:
 --
@@ -438,6 +466,7 @@ isNumber = isDigit
 -- - 'RightCurlyBracket'
 --
 -- This function is analogous to 'Unicode.isPunctuation' in the "Data.Char" module.
+
 isPunctuation :: Char -> Bool
 isPunctuation = (`List.elem` [ExclamationMark, QuotationMark, NumberSign, PercentSign, Ampersand, Apostrophe, LeftParenthesis, RightParenthesis, Asterisk, Comma, HyphenMinus, FullStop, Slash, Colon, Semicolon, QuestionMark, AtSign, LeftSquareBracket, Backslash, RightSquareBracket, Underscore, LeftCurlyBracket, RightCurlyBracket])
 
@@ -454,11 +483,13 @@ isPunctuation = (`List.elem` [ExclamationMark, QuotationMark, NumberSign, Percen
 -- - 'Tilde'
 --
 -- This function is analogous to 'Unicode.isSymbol' in the "Data.Char" module.
+
 isSymbol :: Char -> Bool
 isSymbol = (`List.elem` [DollarSign, PlusSign, LessThanSign, EqualsSign, GreaterThanSign, Caret, GraveAccent, VerticalLine, Tilde])
 
 -- | Returns True if the character is 'Space'.
 --
 -- This function is analogous to 'Unicode.isSeparator' in the "Data.Char" module.
+
 isSeparator :: Char -> Bool
 isSeparator = (== Space)
