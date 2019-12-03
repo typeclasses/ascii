@@ -2,6 +2,16 @@
 
 {-# LANGUAGE NoImplicitPrelude, TemplateHaskell #-}
 
+{- |
+
+Quasi-quoter for writing ASCII 'ASCII.String' literals.
+
+== Recommended import style
+
+> import ASCII.QQ
+
+-}
+
 module ASCII.QQ (ascii) where
 
 import qualified ASCII (pack, unpack, fromUnicodeMaybe)

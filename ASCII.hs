@@ -20,6 +20,10 @@ There is a convenient relationship between ASCII and Unicode: the ASCII characte
 
 We do not elaborate on the semantics of the control characters here, because this information is both obsolete and restricted by copyright law. It is described by a document entitled /"Coded Character Sets - 7-Bit American National Standard Code for Information Interchange (7-Bit ASCII)"/, published by American National Standards Institute (ANSI) and available for purchase [on their website](https://webstore.ansi.org/Standards/INCITS/INCITS1986R2012).
 
+== Recommended import style
+
+> import qualified ASCII
+
 == Relationship to @Data.Char@
 
 The following are drop-in replacements for closely related definitions of the same name in the "Data.Char" module: 'isControl', 'isSpace', 'isLower', 'isUpper', 'isAlpha', 'isAlphaNum', 'isPrint', 'isDigit', 'isOctDigit', 'isHexDigit', 'isLetter', 'isMark', 'isNumber', 'isPunctuation', 'isSymbol', 'isSeparator'.
@@ -193,6 +197,12 @@ instance CharEncoding Word8
 
 
 ---  Strings  --
+
+-- | A strict sequence of ASCII 'Char's, packed as one byte per character.
+--
+-- Convert between String and @['Char']@ with the 'pack' and 'unpack' functions.
+--
+-- The recommended way to write ASCII string literals is with the 'ASCII.QQ.ascii' quasi-quoter in the "ASCII.QQ" module.
 
 newtype String = String { stringArray :: Array.UArray Int Word8 }
     deriving ( Eq, Ord )
