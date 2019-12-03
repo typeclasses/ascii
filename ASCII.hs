@@ -8,6 +8,8 @@
 {-# LANGUAGE TypeFamilyDependencies #-}
     -- For the 'Unicode' type family
 
+{-# LANGUAGE StandaloneDeriving #-}
+
 {- |
 
 The __American Standard Code for Information Interchange__ (ASCII) comprises a set of 128 characters, each represented by 7 bits. 33 of these characters are /control codes/; a few of these are still in use, but most are obsolete relics of the early days of computing. The other 95 are /printable characters/ such as letters and numbers, mostly corresponding to the keys on an American English keyboard.
@@ -128,9 +130,10 @@ data Char =
 
     | LeftCurlyBracket | VerticalLine | RightCurlyBracket | Tilde | Delete
 
-    deriving ( Eq, Ord, Enum, Bounded, Show
-             , TH.Lift  -- requires the DerivingLift language extension
-             )
+    deriving ( Eq, Ord, Enum, Bounded, Show )
+
+-- Requires the DerivingLift language extension. This is used by the "ASCII.QQ" module.
+deriving instance TH.Lift Char
 
 
 ---  Direct usage of the Enum instance  ---
@@ -186,7 +189,7 @@ instance CharEncoding Word8
 ---  Strings  --
 
 newtype String = String { stringArray :: Array.UArray Int Word8 }
-    deriving (Eq, Ord)
+    deriving ( Eq, Ord )
 
 instance Show String
   where
@@ -205,7 +208,7 @@ unpack = List.map (decodeCharIntUnsafe . Num.fromIntegral) . Array.elems . strin
 ---  Case  ---
 
 data Case = UpperCase | LowerCase
-    deriving (Eq, Ord, Enum, Bounded, Show)
+    deriving ( Eq, Ord, Enum, Bounded, Show )
 
 isCase :: Case -> Char -> Bool
 isCase UpperCase x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
@@ -220,7 +223,7 @@ letterCase _ = May.Nothing
 ---  Group  ---
 
 data Group = Control | Printable
-    deriving (Eq, Ord, Enum, Bounded, Show)
+    deriving ( Eq, Ord, Enum, Bounded, Show )
 
 charGroup :: Char -> Group
 charGroup x | (x < Space) = Control
