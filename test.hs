@@ -119,12 +119,22 @@ main = runTest $ foldl1 (<>) $
   -- The Show output for a string containing a single quotation mark is: ASCII.fromUnicodeSub "\"" (In this test case, the inner quotation mark is doubly-escaped, so it's especially difficult to read.)
   , show [ascii|"|] === "ASCII.fromUnicodeSub \"\\\"\""
 
-    -- The Show instance for ASCII.String adds parens appropriately based on context.
+  -- The Show instance for ASCII.String adds parens appropriately based on context.
   , show (I.Identity [ascii|cat|]) === "Identity (ASCII.fromUnicodeSub \"cat\")"
 
+  -- These are functions under the "classification functions" heading in the Data.Char module that have equivalents in the ASCII module. For every ASCII character, each of the two equivalent functions should yield the same results.
   , for classificationFunctions $ \(name, f, g) -> for ASCII.all $ \x -> ("ASCII." ++ name ++ " " ++ show x, f x) =#= ("Data.Char." ++ name ++ " " ++ show x, g (ASCII.toUnicode x))
 
+  -- These are situations where we present the same information in two different forms: Once as a list of all ASCII characters with some classification, and again as a function that tests whether a particular character belongs to the classification. The list should contain exactly the characters for which the corresponding predicate is true, and all of the lists should be sorted in ascending order.
+  , for listsAndPredicates $ \(name, list, predicate) -> note ("ASCII." ++ name) $ list === filter predicate ASCII.all
+
   ]
+
+listsAndPredicates :: [(String, [ASCII.Char], ASCII.Char -> Bool)]
+listsAndPredicates =
+    [ ("controlCodes", ASCII.controlCodes, ASCII.isControl)
+    , ("printableCharacters", ASCII.printableCharacters, ASCII.isPrint)
+    ]
 
 classificationFunctions :: [(String, ASCII.Char -> Bool, Unicode.Char -> Bool)]
 classificationFunctions =
