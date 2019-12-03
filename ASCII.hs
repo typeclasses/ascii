@@ -318,27 +318,44 @@ instance UnicodeConversion String
 -- $characterClassification
 -- This section is identical to the /Character classification/ section of the "Data.Char" module, but for ASCII characters rather than Unicode characters.
 
+-- | Returns True for characters in the 'Control' group.
 isControl :: Char -> Bool
 isControl = inGroup Control
 
+-- | Returns True for characters in the 'Printable' group.
 isPrint :: Char -> Bool
 isPrint = inGroup Printable
 
+-- | Returns True for the following characters:
+--
+-- - 'Space'
+-- - 'HorizontalTab'
+-- - 'LineFeed'
+-- - 'VerticalTab'
+-- - 'FormFeed'
+-- - 'CarriageReturn'
 isSpace :: Char -> Bool
 isSpace Space = True
 isSpace x = (Bool.&&) (x >= HorizontalTab) (x <= CarriageReturn)
 
+-- | Returns True for 'LowerCase' letters, from 'SmallLetterA' to 'SmallLetterZ'.
 isLower :: Char -> Bool
 isLower = isCase LowerCase
 
+-- | Returns True for 'UpperCase' letters, from 'CapitalLetterA' to 'CapitalLetterZ'.
 isUpper :: Char -> Bool
 isUpper = isCase UpperCase
 
-isAlpha :: Char -> Bool
-isAlpha x = (Bool.||) (isLower x) (isUpper x)
-
+-- | Returns True for letters:
+--
+-- - 'SmallLetterA' to 'SmallLetterZ'
+-- - 'CapitalLetterA' to 'CapitalLetterZ'
 isLetter :: Char -> Bool
-isLetter = isAlpha
+isLetter x = (Bool.||) (isLower x) (isUpper x)
+
+-- | Synonym for 'isLetter'.
+isAlpha :: Char -> Bool
+isAlpha = isLetter
 
 isAlphaNum :: Char -> Bool
 isAlphaNum x = (Bool.||) (isAlpha x) (isDigit x)
