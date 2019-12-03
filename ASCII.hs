@@ -182,7 +182,7 @@ newtype String = String { stringArray :: Array.UArray Int Word8 }
 
 instance Show String
   where
-    showsPrec _ str = Show.showString "[ascii|" . Show.showString (toUnicode str) . Show.showString "|]"
+    showsPrec d str = Show.showParen (d > 10) (Show.showString "ASCII.fromUnicodeSub " . Show.showsPrec 11 (toUnicode str))
 
 pack :: [Char] -> String
 pack = String . word8ListArray . List.map encodeChar

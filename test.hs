@@ -5,6 +5,9 @@
 import qualified ASCII
 import ASCII.QQ
 
+import qualified Data.Foldable as Foldable
+import qualified Data.Function as Function
+import qualified Data.Functor.Identity as I
 import qualified System.Exit as Exit
 import qualified Data.IORef as Ref
 import qualified GHC.Stack as Stack
@@ -42,20 +45,87 @@ tests =
     ASCII.toCase ASCII.LowerCase ASCII.SmallLetterX === ASCII.SmallLetterX
     ASCII.toCase ASCII.UpperCase ASCII.CapitalLetterX === ASCII.CapitalLetterX
     ASCII.toCase ASCII.LowerCase ASCII.CapitalLetterX === ASCII.SmallLetterX
+
+    -- Changing the case of an exclamation mark character has no effect because it is not a letter.
     ASCII.toCase ASCII.LowerCase ASCII.ExclamationMark === ASCII.ExclamationMark
 
-    ASCII.toCase ASCII.UpperCase [ascii|Cat|] === [ascii|CAT|]
-    ASCII.toCase ASCII.LowerCase [ascii|Cat|] === [ascii|cat|]
+    -- Convert "Cat!" to upper case, and you get "CAT!".
+    ASCII.toCase ASCII.UpperCase [ascii|Cat!|] === [ascii|CAT!|]
 
+    -- Convert "Cat!" to lower case, and you get "cat!".
+    ASCII.toCase ASCII.LowerCase [ascii|Cat!|] === [ascii|cat!|]
+
+    -- Small letter A (a) is lower case.
     ASCII.letterCase ASCII.SmallLetterA === Just ASCII.LowerCase
+
+    -- Capital letter A (A) is upper case.
     ASCII.letterCase ASCII.CapitalLetterA === Just ASCII.UpperCase
+
+    -- The exclamation mark character does not have a case because it is not a letter.
     ASCII.letterCase ASCII.ExclamationMark === Nothing
 
-    ASCII.charGroup ASCII.Null === ASCII.Control
+    -- There are 33 control codes.
+    let controlCodes = filter (ASCII.inGroup ASCII.Control) [minBound .. maxBound]
+    length controlCodes === 33
+
+    -- There are 95 printable characters.
+    let printChars = filter (ASCII.inGroup ASCII.Printable) [minBound .. maxBound]
+    length printChars === 95
+
+    -- Space is a printable character (perhaps surprisingly, given that it is invisible).
     ASCII.charGroup ASCII.Space === ASCII.Printable
+
+    -- Tab is a control code (perhaps surprisingly, given that space is a printable character).
+    ASCII.charGroup ASCII.HorizontalTab === ASCII.Control
+
+    -- Space is the first printable character.
+    let firstPrintChar = Foldable.minimumBy (compare `Function.on` ASCII.encodeChar @Int) (filter (ASCII.inGroup ASCII.Printable) [minBound .. maxBound])
+    firstPrintChar === ASCII.Space
+
+    -- Small letter A (a) is a printable character.
     ASCII.charGroup ASCII.SmallLetterA === ASCII.Printable
+
+    -- Tilde (~) is a printable character.
     ASCII.charGroup ASCII.Tilde === ASCII.Printable
+
+    -- Tilde is the last printable character.
+    let lastPrintChar = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) (filter (ASCII.inGroup ASCII.Printable) [minBound .. maxBound])
+    lastPrintChar === ASCII.Tilde
+
+    -- Null is the first character.
+    minBound === ASCII.Null
+
+    -- Null is a control code.
+    ASCII.charGroup ASCII.Null === ASCII.Control
+
+    -- UnitSeparator is a control code.
+    ASCII.charGroup ASCII.UnitSeparator === ASCII.Control
+
+    -- UnitSeparator is the last control code that appears in the ASCII chart before the printable characters.
+    let lastControlCharBeforePrint = Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) [minBound .. maxBound])
+    lastControlCharBeforePrint === ASCII.UnitSeparator
+
+    -- Delete is the last character.
+    maxBound === ASCII.Delete
+
+    -- Delete is a control code.
     ASCII.charGroup ASCII.Delete === ASCII.Control
+
+    -- Delete is the only control code that appears in the ASCII chart /after/ the printable characters.
+    let afterPrintChars = (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) [minBound .. maxBound]
+    afterPrintChars === [ASCII.Delete]
+
+    -- The Show output for [ascii|cat|] is: ASCII.fromUnicodeSub "cat" (In this test case, the quotes are escaped, so it's a bit difficult to read.)
+    show [ascii|cat|] === "ASCII.fromUnicodeSub \"cat\""
+
+    -- The Show output for the empty string [ascii||] is: ASCII.fromUnicodeSub ""
+    show [ascii||] === "ASCII.fromUnicodeSub \"\""
+
+    -- The Show output for a string containing a single quotation mark is: ASCII.fromUnicodeSub "\"" (In this test case, the inner quotation mark is doubly-escaped, so it's especially difficult to read.)
+    show [ascii|"|] === "ASCII.fromUnicodeSub \"\\\"\""
+
+    -- The Show instance for ASCII.String adds parens appropriately based on context.
+    show (I.Identity [ascii|cat|]) === "Identity (ASCII.fromUnicodeSub \"cat\")"
 
 main :: IO ()
 main =
