@@ -21,7 +21,7 @@ module ASCII
     Char (..)
 
   -- * Char encoding
-  , CharEncoding (..), substitute
+  , CharEncoding (..)
 
   -- * Strings
   , String
@@ -154,7 +154,7 @@ class CharEncoding a
 
     -- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns the 'Substitute' character for any numbers outside of this range.
     decodeCharSub :: a -> Char
-    decodeCharSub = substitute . decodeChar
+    decodeCharSub = May.fromMaybe Substitute . decodeChar
 
 instance CharEncoding Int
   where
@@ -165,9 +165,6 @@ instance CharEncoding Word8
   where
     encodeChar = Num.fromIntegral . encodeCharInt
     decodeChar = decodeCharInt . Num.fromIntegral
-
-substitute :: Maybe Char -> Char
-substitute = May.fromMaybe Substitute
 
 
 ---  Strings  --
