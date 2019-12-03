@@ -1,6 +1,12 @@
 {-# OPTIONS_GHC -Wall #-}
 
-{-# LANGUAGE NoImplicitPrelude, DeriveLift, TypeFamilyDependencies #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
+{-# LANGUAGE DeriveLift #-}
+    -- For the deriving clause on the 'Char' type
+
+{-# LANGUAGE TypeFamilyDependencies #-}
+    -- For the 'Unicode' type family
 
 {- |
 
@@ -117,7 +123,9 @@ data Char =
 
     | LeftCurlyBracket | VerticalLine | RightCurlyBracket | Tilde | Delete
 
-    deriving (Eq, Ord, Enum, Bounded, Show, TH.Lift)
+    deriving ( Eq, Ord, Enum, Bounded, Show
+             , TH.Lift  -- requires the DerivingLift language extension
+             )
 
 
 ---  Direct usage of the Enum instance  ---
@@ -255,6 +263,8 @@ instance CaseConversion String
 ---  Conversions with Unicode types  ---
 
 -- | The 'Unicode' type family associates each of the ASCII types defined in this module to its Unicode counterpart in "Prelude". Use the methods of the 'UnicodeConversion' class to convert to and fro between ASCII and Unicode.
+--
+-- The "@| u -> a@" part of this definition is made possible by the @TypeFamilyDependencies@ language extension and signifies that this is an /injective type family/. This tells the compiler that each ASCII type maps to a unique Unicode type, thus allowing the type checker to infer the ASCII type from the Unicode type. (To summarize: it improves type inference.)
 type family Unicode a = u | u -> a
   where
     Unicode Char = Unicode.Char
