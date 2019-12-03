@@ -30,7 +30,7 @@ module ASCII
   , pack, unpack
 
   -- * Upper/lower case
-  , Case (..), isCase, CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
+  , Case (..), isCase, letterCase, CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
 
   -- * Unicode conversion
   , Unicode, UnicodeConversion ( .. )
@@ -295,6 +295,10 @@ isCase :: Case -> Char -> Bool
 isCase UpperCase x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
 isCase LowerCase x = (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterZ)
 
+letterCase :: Char -> Maybe Case
+letterCase x | isCase UpperCase x = May.Just UpperCase
+             | isCase LowerCase x = May.Just LowerCase
+letterCase _ = May.Nothing
 
 ---  Case-insensitive equivalence  ---
 
