@@ -91,135 +91,29 @@ import qualified Language.Haskell.TH.Syntax as TH ( Lift )
 ---  Individual characters  ---
 
 data Char =
-      Null
-    | StartOfHeading
-    | StartOfText
-    | EndOfText
-    | EndOfTransmission
-    | Enquiry
-    | Acknowledgement
-    | Bell
-    | Backspace
-    | HorizontalTab
-    | LineFeed
-    | VerticalTab
-    | FormFeed
-    | CarriageReturn
-    | ShiftOut
-    | ShiftIn
-    | DataLinkEscape
-    | DeviceControl1
-    | DeviceControl2
-    | DeviceControl3
-    | DeviceControl4
-    | NegativeAcknowledgement
-    | SynchronousIdle
-    | EndOfTransmissionBlock
-    | Cancel
-    | EndOfMedium
-    | Substitute
-    | Escape
-    | FileSeparator
-    | GroupSeparator
-    | RecordSeparator
-    | UnitSeparator
-    | Space
-    | ExclamationMark
-    | QuotationMark
-    | NumberSign
-    | DollarSign
-    | PercentSign
-    | Ampersand
-    | Apostrophe
-    | LeftParenthesis
-    | RightParenthesis
-    | Asterisk
-    | PlusSign
-    | Comma
-    | HyphenMinus
-    | FullStop
-    | Slash
-    | Digit0
-    | Digit1
-    | Digit2
-    | Digit3
-    | Digit4
-    | Digit5
-    | Digit6
-    | Digit7
-    | Digit8
-    | Digit9
-    | Colon
-    | Semicolon
-    | LessThanSign
-    | EqualsSign
-    | GreaterThanSign
-    | QuestionMark
-    | AtSign
-    | CapitalLetterA
-    | CapitalLetterB
-    | CapitalLetterC
-    | CapitalLetterD
-    | CapitalLetterE
-    | CapitalLetterF
-    | CapitalLetterG
-    | CapitalLetterH
-    | CapitalLetterI
-    | CapitalLetterJ
-    | CapitalLetterK
-    | CapitalLetterL
-    | CapitalLetterM
-    | CapitalLetterN
-    | CapitalLetterO
-    | CapitalLetterP
-    | CapitalLetterQ
-    | CapitalLetterR
-    | CapitalLetterS
-    | CapitalLetterT
-    | CapitalLetterU
-    | CapitalLetterV
-    | CapitalLetterW
-    | CapitalLetterX
-    | CapitalLetterY
-    | CapitalLetterZ
-    | LeftSquareBracket
-    | Backslash
-    | RightSquareBracket
-    | Caret
-    | Underscore
-    | GraveAccent
-    | SmallLetterA
-    | SmallLetterB
-    | SmallLetterC
-    | SmallLetterD
-    | SmallLetterE
-    | SmallLetterF
-    | SmallLetterG
-    | SmallLetterH
-    | SmallLetterI
-    | SmallLetterJ
-    | SmallLetterK
-    | SmallLetterL
-    | SmallLetterM
-    | SmallLetterN
-    | SmallLetterO
-    | SmallLetterP
-    | SmallLetterQ
-    | SmallLetterR
-    | SmallLetterS
-    | SmallLetterT
-    | SmallLetterU
-    | SmallLetterV
-    | SmallLetterW
-    | SmallLetterX
-    | SmallLetterY
-    | SmallLetterZ
-    | LeftCurlyBracket
-    | VerticalLine
-    | RightCurlyBracket
-    | Tilde
-    | Delete
-  deriving (Eq, Ord, Enum, Bounded, Show, TH.Lift)
+      Null | StartOfHeading | StartOfText | EndOfText | EndOfTransmission | Enquiry | Acknowledgement | Bell | Backspace | HorizontalTab | LineFeed | VerticalTab | FormFeed | CarriageReturn | ShiftOut | ShiftIn| DataLinkEscape
+
+    | DeviceControl1 | DeviceControl2 | DeviceControl3 | DeviceControl4
+
+    | NegativeAcknowledgement | SynchronousIdle | EndOfTransmissionBlock | Cancel | EndOfMedium | Substitute | Escape
+
+    | FileSeparator | GroupSeparator | RecordSeparator | UnitSeparator
+
+    | Space | ExclamationMark | QuotationMark | NumberSign | DollarSign | PercentSign | Ampersand | Apostrophe | LeftParenthesis | RightParenthesis | Asterisk | PlusSign | Comma | HyphenMinus | FullStop | Slash
+
+    | Digit0 | Digit1 | Digit2 | Digit3 | Digit4 | Digit5 | Digit6 | Digit7 | Digit8 | Digit9
+
+    | Colon | Semicolon | LessThanSign | EqualsSign | GreaterThanSign | QuestionMark | AtSign
+
+    | CapitalLetterA | CapitalLetterB | CapitalLetterC | CapitalLetterD | CapitalLetterE | CapitalLetterF | CapitalLetterG | CapitalLetterH | CapitalLetterI | CapitalLetterJ | CapitalLetterK | CapitalLetterL | CapitalLetterM | CapitalLetterN | CapitalLetterO | CapitalLetterP | CapitalLetterQ | CapitalLetterR | CapitalLetterS | CapitalLetterT | CapitalLetterU | CapitalLetterV | CapitalLetterW | CapitalLetterX | CapitalLetterY | CapitalLetterZ
+
+    | LeftSquareBracket | Backslash | RightSquareBracket | Caret | Underscore | GraveAccent
+
+    | SmallLetterA | SmallLetterB | SmallLetterC | SmallLetterD | SmallLetterE | SmallLetterF | SmallLetterG | SmallLetterH | SmallLetterI | SmallLetterJ | SmallLetterK | SmallLetterL | SmallLetterM | SmallLetterN | SmallLetterO | SmallLetterP | SmallLetterQ | SmallLetterR | SmallLetterS | SmallLetterT | SmallLetterU | SmallLetterV | SmallLetterW | SmallLetterX | SmallLetterY | SmallLetterZ
+
+    | LeftCurlyBracket | VerticalLine | RightCurlyBracket | Tilde | Delete
+
+    deriving (Eq, Ord, Enum, Bounded, Show, TH.Lift)
 
 
 ---  Direct usage of the Enum instance  ---
@@ -275,7 +169,7 @@ substitute = May.fromMaybe Substitute
 ---  Strings  --
 
 newtype String = String { stringArray :: Array.UArray Int Word8 }
-  deriving (Eq, Ord)
+    deriving (Eq, Ord)
 
 instance Show String
   where
@@ -294,7 +188,7 @@ unpack = List.map (decodeCharIntUnsafe . Num.fromIntegral) . Array.elems . strin
 ---  Case  ---
 
 data Case = UpperCase | LowerCase
-  deriving (Eq, Ord, Enum, Bounded, Show)
+    deriving (Eq, Ord, Enum, Bounded, Show)
 
 isCase :: Case -> Char -> Bool
 isCase UpperCase x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
@@ -309,7 +203,7 @@ letterCase _ = May.Nothing
 ---  Group  ---
 
 data Group = Control | Printable
-  deriving (Eq, Ord, Enum, Bounded, Show)
+    deriving (Eq, Ord, Enum, Bounded, Show)
 
 charGroup :: Char -> Group
 charGroup x | (x < Space) = Control
