@@ -347,11 +347,10 @@ isNumber :: Char -> Bool
 isNumber = isDigit
 
 isPunctuation :: Char -> Bool
-isPunctuation = (`List.elem` [Colon, Semicolon]) -- todo
+isPunctuation = (`List.elem` [ExclamationMark, QuotationMark, NumberSign, PercentSign, Ampersand, Apostrophe, LeftParenthesis, RightParenthesis, Asterisk, Comma, HyphenMinus, FullStop, Slash, Colon, Semicolon, QuestionMark, AtSign, LeftSquareBracket, Backslash, RightSquareBracket, Underscore, LeftCurlyBracket, RightCurlyBracket])
 
 isSymbol :: Char -> Bool
-isSymbol = (`List.elem` []) -- todo
+isSymbol = (`List.elem` [DollarSign, PlusSign, LessThanSign, EqualsSign, GreaterThanSign, Caret, GraveAccent, VerticalLine, Tilde])
 
 isSeparator :: Char -> Bool
-isSeparator Space = True
-isSeparator _ = False
+isSeparator = (== Space)
