@@ -90,6 +90,10 @@ import qualified Language.Haskell.TH.Syntax as TH ( Lift )
 
 ---  Individual characters  ---
 
+-- | A character in the ASCII character set.
+--
+-- This type has 128 nullary constructors, listed in order according to each character's 7-bit numeric code. Its derived 'Enum' instance can therefore be used to convert a 'Char' to its ASCII code and vice versa; but since 'Enum.toEnum' is a partial function, we recommend instead using 'decodeChar', which cannot produce runtime errors.
+
 data Char =
       Null | StartOfHeading | StartOfText | EndOfText | EndOfTransmission | Enquiry | Acknowledgement | Bell | Backspace | HorizontalTab | LineFeed | VerticalTab | FormFeed | CarriageReturn | ShiftOut | ShiftIn| DataLinkEscape
 
