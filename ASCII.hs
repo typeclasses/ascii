@@ -44,6 +44,10 @@ module ASCII
   -- * Unicode conversion
   , Unicode, UnicodeConversion ( .. )
 
+  -- * Character classification
+  -- $characterClassification
+  , isControl, isSpace, isLower, isUpper, isAlpha, isAlphaNum, isPrint, isDigit, isOctDigit, isHexDigit, isLetter, isMark, isNumber, isPunctuation, isSymbol, isSeparator
+
   ) where
 
 import Prelude ( Bounded, Ord (..), fmap )
@@ -292,3 +296,62 @@ instance UnicodeConversion String
     toUnicode = List.map toUnicode . unpack
     fromUnicodeSub = pack . List.map fromUnicodeSub
     fromUnicodeMaybe = fmap pack . traverse fromUnicodeMaybe
+
+
+---  Character classification  ---
+
+-- $characterClassification
+-- This section is identical to the /Character classification/ section of the "Data.Char" module, but for ASCII characters rather than Unicode characters.
+
+isControl :: Char -> Bool
+isControl = inGroup Control
+
+isPrint :: Char -> Bool
+isPrint = inGroup Printable
+
+isSpace :: Char -> Bool
+isSpace Space = True
+isSpace x = (Bool.&&) (x >= HorizontalTab) (x <= CarriageReturn)
+
+isLower :: Char -> Bool
+isLower = isCase LowerCase
+
+isUpper :: Char -> Bool
+isUpper = isCase UpperCase
+
+isAlpha :: Char -> Bool
+isAlpha x = (Bool.||) (isLower x) (isUpper x)
+
+isLetter :: Char -> Bool
+isLetter = isAlpha
+
+isAlphaNum :: Char -> Bool
+isAlphaNum x = (Bool.||) (isAlpha x) (isDigit x)
+
+isDigit :: Char -> Bool
+isDigit x = (Bool.&&) (x >= Digit0) (x <= Digit9)
+
+isOctDigit :: Char -> Bool
+isOctDigit x = (Bool.&&) (x >= Digit0) (x <= Digit7)
+
+isHexDigit :: Char -> Bool
+isHexDigit x | isDigit x = True
+             | (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterF) = True
+             | (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterF) = True
+isHexDigit _ = False
+
+isMark :: Char -> Bool
+isMark _ = False
+
+isNumber :: Char -> Bool
+isNumber = isDigit
+
+isPunctuation :: Char -> Bool
+isPunctuation = (`List.elem` [Colon, Semicolon]) -- todo
+
+isSymbol :: Char -> Bool
+isSymbol = (`List.elem` []) -- todo
+
+isSeparator :: Char -> Bool
+isSeparator Space = True
+isSeparator _ = False

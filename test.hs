@@ -5,6 +5,7 @@
 import qualified ASCII
 import ASCII.QQ
 
+import qualified Data.Char as Unicode
 import qualified Data.Foldable as Foldable
 import qualified Data.Function as Function
 import qualified Data.Functor.Identity as I
@@ -127,6 +128,30 @@ tests =
 
     -- The Show instance for ASCII.String adds parens appropriately based on context.
     show (I.Identity [ascii|cat|]) === "Identity (ASCII.fromUnicodeSub \"cat\")"
+
+    Foldable.for_ classificationFunctions $ \(f, g) ->
+      Foldable.for_ allChars $ \c ->
+        f c === g (ASCII.toUnicode c)
+
+classificationFunctions :: [(ASCII.Char -> Bool, Unicode.Char -> Bool)]
+classificationFunctions =
+    [ (ASCII.isControl, Unicode.isControl)
+    , (ASCII.isSpace, Unicode.isSpace)
+    , (ASCII.isLower, Unicode.isLower)
+    , (ASCII.isUpper, Unicode.isUpper)
+    , (ASCII.isAlpha, Unicode.isAlpha)
+    , (ASCII.isAlphaNum, Unicode.isAlphaNum)
+    , (ASCII.isPrint, Unicode.isPrint)
+    , (ASCII.isDigit, Unicode.isDigit)
+    , (ASCII.isOctDigit, Unicode.isOctDigit)
+    , (ASCII.isHexDigit, Unicode.isHexDigit)
+    , (ASCII.isLetter, Unicode.isLetter)
+    , (ASCII.isMark, Unicode.isMark)
+    , (ASCII.isNumber, Unicode.isNumber)
+    , (ASCII.isPunctuation, Unicode.isPunctuation)
+    , (ASCII.isSymbol, Unicode.isSymbol)
+    , (ASCII.isSeparator, Unicode.isSeparator)
+    ]
 
 main :: IO ()
 main =
