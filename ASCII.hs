@@ -258,7 +258,7 @@ word8ToCharUnsafe = intToCharUnsafe . Num.fromIntegral
 --
 -- We describe this as the "generic" string type because the @bytes@ type parameter specifies how the bytes are represented. The @bytes@ type should belong to the 'BA.ByteArray' class. The 'String' type alias represents our recommendation of 'BS.ByteString' as the standard choice for this type parameter.
 
-newtype GenericString bytes = String { stringBytes :: bytes }
+newtype GenericString bytes = StringUnsafe { stringBytes :: bytes }
     deriving ( Eq, Ord )
 
 -- | A strict sequence of ASCII 'Char's, packed as one byte per character.
@@ -274,7 +274,7 @@ instance (BA.ByteArray bytes) => Show (GenericString bytes)
     showsPrec d str = Show.showParen (d > 10) (Show.showString "ASCII.toStringSub " . Show.showsPrec 11 (fromString @Unicode.String str))
 
 pack :: (BA.ByteArray bytes) => [Char] -> GenericString bytes
-pack = String . BA.pack . List.map fromChar
+pack = StringUnsafe . BA.pack . List.map fromChar
 
 unpack :: (BA.ByteArrayAccess bytes) => GenericString bytes -> [Char]
 unpack = List.map (intToCharUnsafe . Num.fromIntegral) . BA.unpack . stringBytes
@@ -571,11 +571,11 @@ isSeparator = (== Space)
 
 -- | The empty string.
 empty :: (BA.ByteArray bytes) => GenericString bytes
-empty = String BA.empty
+empty = StringUnsafe BA.empty
 
 -- | A string consisting of a single character.
 singleton :: (BA.ByteArray bytes) => Char -> GenericString bytes
-singleton = String . BA.singleton . charToWord8
+singleton = StringUnsafe . BA.singleton . charToWord8
 
 -- | Determine whether a string is empty.
 null :: BA.ByteArrayAccess bytes => GenericString bytes -> Bool
@@ -592,7 +592,7 @@ length = BA.length . stringBytes
 -- @ASCII.replicate 5 ASCII.CapitalLetterA@ = @[ASCII.string|AAAAA|]@
 
 replicate :: (BA.ByteArray bytes) => Int -> Char -> GenericString bytes
-replicate n = String . BA.replicate n . charToWord8
+replicate n = StringUnsafe . BA.replicate n . charToWord8
 
 -- | Analogous to 'List.take' from the "Data.List" module.
 --
@@ -601,7 +601,7 @@ replicate n = String . BA.replicate n . charToWord8
 -- @ASCII.take 3 [ASCII.string|December|]@ = @[ASCII.string|Dec|]@
 
 take :: (BA.ByteArray bytes) => Int -> GenericString bytes -> GenericString bytes
-take n = String . BA.take n . stringBytes
+take n = StringUnsafe . BA.take n . stringBytes
 
 -- | Analogous to 'List.drop' from the "Data.List" module.
 --
@@ -610,7 +610,7 @@ take n = String . BA.take n . stringBytes
 -- @ASCII.drop 3 [ASCII.string|December|]@ = @[ASCII.string|ember|]@
 
 drop :: (BA.ByteArray bytes) => Int -> GenericString bytes -> GenericString bytes
-drop n = String . BA.drop n . stringBytes
+drop n = StringUnsafe . BA.drop n . stringBytes
 
 -- | Analogous to 'List.span' from the "Data.List" module.
 --
@@ -619,7 +619,7 @@ drop n = String . BA.drop n . stringBytes
 -- @ASCII.span ASCII.isLower [ASCII.string|oneTWOthree|]@ = @([ASCII.string|one|], [ASCII.string|TWOthree|])@
 
 span :: (BA.ByteArray bytes) => (Char -> Bool) -> GenericString bytes -> (GenericString bytes, GenericString bytes)
-span f = (\(x, y) -> (String x, String y)) . BA.span (f . word8ToCharUnsafe) . stringBytes
+span f = (\(x, y) -> (StringUnsafe x, StringUnsafe y)) . BA.span (f . word8ToCharUnsafe) . stringBytes
 
 -- | Analogous to 'List.reverse' from the "Data.List" module.
 --
@@ -628,7 +628,7 @@ span f = (\(x, y) -> (String x, String y)) . BA.span (f . word8ToCharUnsafe) . s
 -- @ASCII.reverse [ASCII.string|fish|]@ = @[ASCII.string|hsif|]@
 
 reverse :: (BA.ByteArray bytes) => GenericString bytes -> GenericString bytes
-reverse = String . BA.reverse . stringBytes
+reverse = StringUnsafe . BA.reverse . stringBytes
 
 -- | Analogous to 'List.any' from the "Data.List" module.
 --
@@ -659,7 +659,7 @@ all f = BA.all (f . word8ToCharUnsafe) . stringBytes
 -- @ASCII.append [ASCII.string|One|] [ASCII.string|Two|]@ = @[ASCII.string|OneTwo|]@
 
 append :: (BA.ByteArray bytes) => GenericString bytes -> GenericString bytes -> GenericString bytes
-append x y = String (BA.append (stringBytes x) (stringBytes y))
+append x y = StringUnsafe (BA.append (stringBytes x) (stringBytes y))
 
 -- | Concatenation of a list of strings.
 --
@@ -668,7 +668,7 @@ append x y = String (BA.append (stringBytes x) (stringBytes y))
 -- @ASCII.concat [ [ASCII.string|One|], [ASCII.string|Two|], [ASCII.string|Three|] ]@ = @[ASCII.string|OneTwoThree|]@
 
 concat :: (BA.ByteArrayAccess inputBytes, BA.ByteArray outputBytes) => [GenericString inputBytes] -> GenericString outputBytes
-concat = String . BA.concat . List.map stringBytes
+concat = StringUnsafe . BA.concat . List.map stringBytes
 
 -- | Prepend a character to the beginning of a string, analogous to the @(:)@ operator which is also sometimes called "cons".
 --
@@ -677,7 +677,7 @@ concat = String . BA.concat . List.map stringBytes
 -- @ASCII.cons ASCII.CapitalLetterC [ASCII.string|at|]@ = @[ASCII.string|Cat|]@
 
 cons :: (BA.ByteArray bytes) => Char -> GenericString bytes -> GenericString bytes
-cons x xs = String (BA.cons (charToWord8 x) (stringBytes xs))
+cons x xs = StringUnsafe (BA.cons (charToWord8 x) (stringBytes xs))
 
 -- | Appends a character to the end of a string. Because this function is similar to 'cons' but in the reverse direction, its name is "cons" spelled backwards.
 --
@@ -686,7 +686,7 @@ cons x xs = String (BA.cons (charToWord8 x) (stringBytes xs))
 -- @ASCII.snoc [ASCII.string|Ca|] ASCII.SmallLetterT@ = @[ASCII.string|Cat|]@
 
 snoc :: (BA.ByteArray bytes) => GenericString bytes -> Char -> GenericString bytes
-snoc xs x = String (BA.snoc (stringBytes xs) (charToWord8 x))
+snoc xs x = StringUnsafe (BA.snoc (stringBytes xs) (charToWord8 x))
 
 -- | Analogous to 'List.uncons' from the "Data.List" module.
 --
@@ -697,7 +697,7 @@ snoc xs x = String (BA.snoc (stringBytes xs) (charToWord8 x))
 -- @ASCII.uncons [ASCII.string|Cat|]@ = @Just (ASCII.CapitalLetterC, [ASCII.string|at|])@
 
 uncons :: (BA.ByteArray bytes) => GenericString bytes -> Maybe (Char, GenericString bytes)
-uncons = fmap (\(x, xs) -> (word8ToCharUnsafe x, String xs)) . BA.uncons . stringBytes
+uncons = fmap (\(x, xs) -> (word8ToCharUnsafe x, StringUnsafe xs)) . BA.uncons . stringBytes
 
 
 ---  Quasi-quotation  ---
