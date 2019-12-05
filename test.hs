@@ -15,23 +15,23 @@ import qualified GHC.Stack as Stack
 main :: IO ()
 main = runTest $ foldl1 (<>) $
 
-  [ ASCII.decodeCharSub @Int 0 === ASCII.Null
-  , ASCII.decodeCharSub @Int 65 === ASCII.CapitalLetterA
-  , ASCII.decodeCharSub @Int 97 === ASCII.SmallLetterA
-  , ASCII.decodeCharSub @Int 127 === ASCII.Delete
+  [ ASCII.toCharSub @Int 0 === ASCII.Null
+  , ASCII.toCharSub @Int 65 === ASCII.CapitalLetterA
+  , ASCII.toCharSub @Int 97 === ASCII.SmallLetterA
+  , ASCII.toCharSub @Int 127 === ASCII.Delete
 
-  , ASCII.decodeCharSub @Int (-1) === ASCII.Substitute
-  , ASCII.decodeCharSub @Int 128 === ASCII.Substitute
-  , ASCII.decodeCharSub @Int 11243228 === ASCII.Substitute
+  , ASCII.toCharSub @Int (-1) === ASCII.Substitute
+  , ASCII.toCharSub @Int 128 === ASCII.Substitute
+  , ASCII.toCharSub @Int 11243228 === ASCII.Substitute
 
-  , ASCII.decodeChar @Int 0 === Just ASCII.Null
-  , ASCII.decodeChar @Int 65 === Just ASCII.CapitalLetterA
-  , ASCII.decodeChar @Int 97 === Just ASCII.SmallLetterA
-  , ASCII.decodeChar @Int 127 === Just ASCII.Delete
+  , ASCII.toCharMaybe @Int 0 === Just ASCII.Null
+  , ASCII.toCharMaybe @Int 65 === Just ASCII.CapitalLetterA
+  , ASCII.toCharMaybe @Int 97 === Just ASCII.SmallLetterA
+  , ASCII.toCharMaybe @Int 127 === Just ASCII.Delete
 
-  , ASCII.decodeChar @Int (-1) === Nothing
-  , ASCII.decodeChar @Int 128 === Nothing
-  , ASCII.decodeChar @Int 11243228 === Nothing
+  , ASCII.toCharMaybe @Int (-1) === Nothing
+  , ASCII.toCharMaybe @Int 128 === Nothing
+  , ASCII.toCharMaybe @Int 11243228 === Nothing
 
   , [ASCII.bytes|Cat|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT]
 
@@ -77,7 +77,7 @@ main = runTest $ foldl1 (<>) $
   , ASCII.charGroup ASCII.HorizontalTab === ASCII.Control
 
   -- Space is the first printable character.
-  , Foldable.minimumBy (compare `Function.on` ASCII.encodeChar @Int) ASCII.printableCharacters === ASCII.Space
+  , Foldable.minimumBy (compare `Function.on` ASCII.fromChar @Int) ASCII.printableCharacters === ASCII.Space
 
   -- Small letter A (a) is a printable character.
   , ASCII.charGroup ASCII.SmallLetterA === ASCII.Printable
@@ -86,7 +86,7 @@ main = runTest $ foldl1 (<>) $
   , ASCII.charGroup ASCII.Tilde === ASCII.Printable
 
   -- Tilde is the last printable character.
-  , Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) ASCII.printableCharacters === ASCII.Tilde
+  , Foldable.maximumBy (compare `Function.on` ASCII.fromChar @Int) ASCII.printableCharacters === ASCII.Tilde
 
   -- Null is the first character.
   , minBound === ASCII.Null
@@ -98,7 +98,7 @@ main = runTest $ foldl1 (<>) $
   , ASCII.charGroup ASCII.UnitSeparator === ASCII.Control
 
   -- UnitSeparator is the last control code that appears in the ASCII chart before the printable characters.
-  , Foldable.maximumBy (compare `Function.on` ASCII.encodeChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) ASCII.all) === ASCII.UnitSeparator
+  , Foldable.maximumBy (compare `Function.on` ASCII.fromChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) ASCII.all) === ASCII.UnitSeparator
 
   -- Delete is the last character.
   , maxBound === ASCII.Delete
@@ -109,25 +109,30 @@ main = runTest $ foldl1 (<>) $
   -- Delete is the only control code that appears in the ASCII chart /after/ the printable characters.
   , (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) ASCII.all === [ASCII.Delete]
 
-  -- The Show output for [ASCII.bytes|cat|] is: ASCII.fromUnicodeSub "cat" (In this test case, the quotes are escaped, so it's a bit difficult to read.)
-  , show [ASCII.bytes|cat|] === "ASCII.fromUnicodeSub \"cat\""
+  -- The Show output for [ASCII.bytes|cat|] is: ASCII.toStringSub "cat" (In this test case, the quotes are escaped, so it's a bit difficult to read.)
+  , show [ASCII.bytes|cat|] === "ASCII.toStringSub \"cat\""
 
-  -- The Show output for the empty string [ASCII.bytes||] is: ASCII.fromUnicodeSub ""
-  , show [ASCII.bytes||] === "ASCII.fromUnicodeSub \"\""
+  -- The Show output for the empty string [ASCII.bytes||] is: ASCII.toStringSub ""
+  , show [ASCII.bytes||] === "ASCII.toStringSub \"\""
 
-  -- The Show output for a string containing a single quotation mark is: ASCII.fromUnicodeSub "\"" (In this test case, the inner quotation mark is doubly-escaped, so it's especially difficult to read.)
-  , show [ASCII.bytes|"|] === "ASCII.fromUnicodeSub \"\\\"\""
+  -- The Show output for a string containing a single quotation mark is: ASCII.toStringSub "\"" (In this test case, the inner quotation mark is doubly-escaped, so it's especially difficult to read.)
+  , show [ASCII.bytes|"|] === "ASCII.toStringSub \"\\\"\""
 
   -- The Show instance for ASCII.String adds parens appropriately based on context.
-  , show (I.Identity [ASCII.bytes|cat|]) === "Identity (ASCII.fromUnicodeSub \"cat\")"
+  , show (I.Identity [ASCII.bytes|cat|]) === "Identity (ASCII.toStringSub \"cat\")"
 
   -- These are functions under the "classification functions" heading in the Data.Char module that have equivalents in the ASCII module. For every ASCII character, each of the two equivalent functions should yield the same results.
-  , for classificationFunctions $ \(name, f, g) -> for ASCII.all $ \x -> ("ASCII." ++ name ++ " " ++ show x, f x) =#= ("Data.Char." ++ name ++ " " ++ show x, g (ASCII.toUnicode x))
+  , for classificationFunctions $ \(name, f, g) -> for ASCII.all $ \x -> ("ASCII." ++ name ++ " " ++ show x, f x) =#= ("Data.Char." ++ name ++ " " ++ show x, g (ASCII.fromChar @Unicode.Char x))
 
   -- These are situations where we present the same information in two different forms: Once as a list of all ASCII characters with some classification, and again as a function that tests whether a particular character belongs to the classification. The list should contain exactly the characters for which the corresponding predicate is true, and all of the lists should be sorted in ascending order.
   , for listsAndPredicates $ \(name, list, predicate) -> note ("ASCII." ++ name) $ list === filter predicate ASCII.all
 
-  , case [ASCII.char|~|] of [ASCII.char|~|] -> success; _ -> failure
+  , case [ASCII.char|~|] of
+      [ASCII.char|@|] -> failure
+      [ASCII.char|~|] -> success
+      _               -> failure
+
+  , [ASCII.list|Cat|] === [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT]
 
   ]
 
@@ -168,7 +173,7 @@ runTest :: Test -> IO ()
 runTest (Test f) =
     case f [] of
         [] -> Exit.exitSuccess
-        xs -> Foldable.for_ xs putStrLn >> Exit.exitFailure
+        xs -> Foldable.traverse_ putStrLn (List.intersperse "" xs) >> Exit.exitFailure
 
 type Note = String
 type Notes = [Note]
@@ -185,7 +190,7 @@ success :: Test
 success = Test $ const []
 
 failure :: Stack.HasCallStack => Test
-failure = Test $ \ns -> [List.intercalate "; " ([unwords ["Line", show lineNumber]] ++ ns)]
+failure = Test $ \ns -> [List.intercalate "\n" ([unwords ["❌ Detected a problem at line", show lineNumber, "of the test program."]] ++ ns)]
 
 for :: [a] -> (a -> Test) -> Test
 for xs f = foldl1 (<>) (List.map f xs)

@@ -5,9 +5,6 @@
 {-# LANGUAGE DeriveLift #-}
     -- For the deriving clause on the 'Char' type
 
-{-# LANGUAGE TypeFamilies #-}
-    -- For the 'Unicode' type family
-
 {-# LANGUAGE StandaloneDeriving #-}
 
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -19,6 +16,8 @@
 {-# LANGUAGE TypeApplications #-}
 
 {-# LANGUAGE DeriveGeneric #-}
+
+{-# LANGUAGE FlexibleInstances #-}
 
 {- |
 
@@ -46,20 +45,14 @@ module ASCII
   -- * Characters
     Char (..), all
 
-  -- * Char encoding
-  , CharEncoding (..)
-
   -- * Strings
-  , String
+  , String, GenericString
 
   -- * String-[Char] conversions
   , pack, unpack
 
   -- * Quasi-quoters
-  , char
-  -- todo, list, string
-  , bytes
-  -- todo, bytestring
+  , char, list, string, bytes
 
   -- * Character groups
   , Group ( .. ), charGroup, inGroup, isControl, isPrint, controlCodes, printableCharacters
@@ -67,8 +60,8 @@ module ASCII
   -- * Upper/lower case letters
   , Case (..), isCase, isLower, isUpper, isAlpha, isLetter, letterCase, letters, capitalLetters, smallLetters, CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
 
-  -- * Unicode conversion
-  , Unicode, UnicodeConversion ( .. )
+  -- * ASCII swimming in larger worlds
+  , CharWidening (..), StringWidening (..)
 
   -- * Numeric characters
   , isDigit, isOctDigit, isHexDigit, isNumber
@@ -124,7 +117,8 @@ import Data.Maybe ( Maybe )
 import qualified Data.Maybe as May ( Maybe ( .. ), fromMaybe, maybe )
 
 -- Tightly-packed sequences of bytes.
-import qualified Data.ByteArray as Bytes
+import qualified Data.ByteArray as BA
+import qualified Data.ByteString as BS
 
 -- For defining the expression-context quasi-quoters.
 import Language.Haskell.TH.Syntax ( Q )
@@ -144,7 +138,7 @@ import qualified Generics.Deriving.ConNames as G
 
 -- | A character in the ASCII character set.
 --
--- This type has 128 nullary constructors, listed in order according to each character's 7-bit numeric code. Its derived 'Enum' instance can therefore be used to convert a 'Char' to its ASCII code and vice versa; but since 'Enum.toEnum' is a partial function, we recommend instead using 'decodeChar', which cannot produce runtime errors.
+-- This type has 128 nullary constructors, listed in order according to each character's 7-bit numeric code. Its derived 'Enum' instance can therefore be used to convert a 'Char' to its ASCII code and vice versa; but since 'Enum.toEnum' is a partial function, we recommend instead using 'charToInt', which cannot produce runtime errors.
 
 data Char =
       Null | StartOfHeading | StartOfText | EndOfText | EndOfTransmission | Enquiry | Acknowledgement | Bell | Backspace | HorizontalTab | LineFeed | VerticalTab | FormFeed | CarriageReturn | ShiftOut | ShiftIn| DataLinkEscape
@@ -183,71 +177,113 @@ deriving instance G.Generic Char
 all :: [Char]
 all = Enum.enumFromTo minBound maxBound
 
-decodeCharIntUnsafe :: Int -> Char
-decodeCharIntUnsafe = Enum.toEnum
+intToCharUnsafe :: Int -> Char
+intToCharUnsafe = Enum.toEnum
 
-encodeCharInt :: Char -> Int
-encodeCharInt = Enum.fromEnum
+charToInt :: Char -> Int
+charToInt = Enum.fromEnum
 
 
 ---  Safe bound-checked usage of the Enum instance  ---
 
-decodeCharInt :: Int -> Maybe Char
+intToCharMaybe :: Int -> Maybe Char
 
-decodeCharInt x | x < 0   = May.Nothing
-                | x > 127 = May.Nothing
+intToCharMaybe x | x < 0   = May.Nothing
+                 | x > 127 = May.Nothing
 
-decodeCharInt x = May.Just (decodeCharIntUnsafe x)
+intToCharMaybe x = May.Just (intToCharUnsafe x)
 
 
----  Character encoding  ---
+---  Character widening  ---
 
--- Conversions between a 'Char' and its corresponding number between 0 and 127.
-class CharEncoding a
+-- Conversions between a 'Char' and some other larger type.
+--
+-- Instances should follow these rules:
+--
+-- - @toCharMaybe (fromChar c)@ = @Just c@
+-- - If @toCharMaybe x@ = @Just c@, then @toCharSub x@ = @c@
+-- - If @toCharMaybe x@ = @Nothing@, then @toCharSub x@ = 'Substitute'
+
+class CharWidening a
   where
-    {-# MINIMAL encodeChar, decodeChar #-}
+    {-# MINIMAL fromChar, toCharMaybe #-}
 
-    -- | Converts an ASCII 'Char' to its corresponding number between 0 and 127.
-    encodeChar :: Char -> a
+    fromChar :: Char -> a
 
-    -- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns 'Nothing' for any numbers outside of this range.
-    decodeChar :: a -> Maybe Char
+    -- | Returns 'Nothing' for any value that does not represent an ASCII character.
+    toCharMaybe :: a -> Maybe Char
 
-    -- | Converts a number between 0 and 127 to its corresponding ASCII 'Char'. Returns the 'Substitute' character for any numbers outside of this range.
-    decodeCharSub :: a -> Char
-    decodeCharSub = May.fromMaybe Substitute . decodeChar
+    -- | Returns the 'Substitute' character for any value that does not represent an ASCII character.
+    toCharSub :: a -> Char
+    toCharSub = May.fromMaybe Substitute . toCharMaybe
 
-instance CharEncoding Int
+-- | Representation of an ASCII 'Char' as an 'Int' between 0 and 127.
+instance CharWidening Int
   where
-    encodeChar = encodeCharInt
-    decodeChar = decodeCharInt
+    fromChar = charToInt
+    toCharMaybe = intToCharMaybe
 
-instance CharEncoding Word8
+-- | Representation of an ASCII 'Char' as a byte where the first bit is always 0.
+instance CharWidening Word8
   where
-    encodeChar = Num.fromIntegral . encodeCharInt
-    decodeChar = decodeCharInt . Num.fromIntegral
+    fromChar = Num.fromIntegral . charToInt
+    toCharMaybe = intToCharMaybe . Num.fromIntegral
+
+-- | Representation of an ASCII 'Char' as one of the first 128 Unicode 'Unicode.Char's.
+instance CharWidening Unicode.Char
+  where
+    fromChar = Unicode.chr . charToInt
+    toCharMaybe = intToCharMaybe . Unicode.ord
 
 
 ---  Strings  --
 
 -- | A strict sequence of ASCII 'Char's, packed as one byte per character.
 --
--- Convert between String and @['Char']@ with the 'pack' and 'unpack' functions.
---
--- The recommended way to write ASCII string literals is with the 'ASCII.QQ.ascii' quasi-quoter in the "ASCII.QQ" module.
+-- We describe this as the "generic" string type because the @bytes@ type parameter specifies how the bytes are represented. The @bytes@ type should belong to the 'BA.ByteArray' class. The 'String' type alias represents our recommendation of 'BS.ByteString' as the standard choice for this type parameter.
 
-newtype String bytes = String { stringBytes :: bytes }
+newtype GenericString bytes = String { stringBytes :: bytes }
     deriving ( Eq, Ord )
 
-instance (Bytes.ByteArray bytes) => Show (String bytes)
+-- | A strict sequence of ASCII 'Char's, packed as one byte per character.
+--
+-- The recommended way to write ASCII string literals is with the 'string' quasi-quoter.
+--
+-- Convert between a 'String' and a list of @'Char'@s with the 'pack' and 'unpack' functions.
+
+type String = GenericString BS.ByteString
+
+instance (BA.ByteArray bytes) => Show (GenericString bytes)
   where
-    showsPrec d str = Show.showParen (d > 10) (Show.showString "ASCII.fromUnicodeSub " . Show.showsPrec 11 (toUnicode str))
+    showsPrec d str = Show.showParen (d > 10) (Show.showString "ASCII.toStringSub " . Show.showsPrec 11 (fromString @Unicode.String str))
 
-pack :: (Bytes.ByteArray bytes) => [Char] -> String bytes
-pack = String . Bytes.pack . List.map encodeChar
+pack :: (BA.ByteArray bytes) => [Char] -> GenericString bytes
+pack = String . BA.pack . List.map fromChar
 
-unpack :: (Bytes.ByteArrayAccess bytes) => String bytes -> [Char]
-unpack = List.map (decodeCharIntUnsafe . Num.fromIntegral) . Bytes.unpack . stringBytes
+unpack :: (BA.ByteArrayAccess bytes) => GenericString bytes -> [Char]
+unpack = List.map (intToCharUnsafe . Num.fromIntegral) . BA.unpack . stringBytes
+
+
+---  String widening  ---
+
+-- | The 'GenericString' equivalent of 'CharWidening'.
+--
+-- Instances should follow the following rules:
+--
+-- - @toStringMaybe (fromString s)@ = @Just s@
+-- - If @toStringMaybe x@ = @Just s@, then @toStringSub x@ = @s@
+
+class StringWidening a
+  where
+    fromString :: (BA.ByteArrayAccess bytes) => GenericString bytes -> a
+    toStringMaybe :: (BA.ByteArray bytes) => a -> Maybe (GenericString bytes)
+    toStringSub :: (BA.ByteArray bytes) => a -> GenericString bytes
+
+instance StringWidening [Unicode.Char]
+  where
+    fromString = List.map fromChar . unpack
+    toStringMaybe = fmap pack . traverse @[] (toCharMaybe @Unicode.Char)
+    toStringSub = pack . List.map (toCharSub @Unicode.Char)
 
 
 ---  Case  ---
@@ -357,7 +393,7 @@ instance CaseInsensitiveEquivalence Char
   where
     caseInsensitiveEquivalence = Contra.contramap (toCase LowerCase) Eq.defaultEquivalence
 
-instance (Bytes.ByteArrayAccess bytes) => CaseInsensitiveEquivalence (String bytes)
+instance (BA.ByteArrayAccess bytes) => CaseInsensitiveEquivalence (GenericString bytes)
   where
     caseInsensitiveEquivalence = Contra.contramap (List.map (toCase LowerCase) . unpack) Eq.defaultEquivalence
 
@@ -370,45 +406,12 @@ class CaseConversion a
 
 instance CaseConversion Char
   where
-    toCase LowerCase x = if (isCase UpperCase x) then decodeCharIntUnsafe ((Num.+) (encodeCharInt x) 32) else x
-    toCase UpperCase x = if (isCase LowerCase x) then decodeCharIntUnsafe ((Num.-) (encodeCharInt x) 32) else x
+    toCase LowerCase x = if (isCase UpperCase x) then intToCharUnsafe ((Num.+) (charToInt x) 32) else x
+    toCase UpperCase x = if (isCase LowerCase x) then intToCharUnsafe ((Num.-) (charToInt x) 32) else x
 
-instance (Bytes.ByteArray bytes) => CaseConversion (String bytes)
+instance (BA.ByteArray bytes) => CaseConversion (GenericString bytes)
   where
     toCase c = pack . List.map (toCase c) . unpack
-
-
----  Conversions with Unicode types  ---
-
--- | The 'Unicode' type family associates each of the ASCII types defined in this module to its Unicode counterpart in "Prelude". Use the methods of the 'UnicodeConversion' class to convert to and fro between ASCII and Unicode.
-
-type family Unicode a = u
-  where
-    Unicode Char = Unicode.Char
-    Unicode (String bytes) = Unicode.String
-
-class UnicodeConversion a
-  where
-    -- | Widen an ASCII character or string to its corresponding Unicode type.
-    toUnicode :: a -> Unicode a
-
-    -- | Narrow a Unicode character or string to ASCII, returning 'Nothing' if the input contains values that are not included in the ASCII character set.
-    fromUnicodeMaybe :: Unicode a -> Maybe a
-
-    -- | Narrow a Unicode character or string to ASCII, using the 'Substitute' character in place of any characters in the input that are not included in the ASCII character set.
-    fromUnicodeSub :: Unicode a -> a
-
-instance UnicodeConversion Char
-  where
-    toUnicode = Unicode.chr . encodeCharInt
-    fromUnicodeSub = decodeCharSub . Unicode.ord
-    fromUnicodeMaybe = decodeChar . Unicode.ord
-
-instance (Bytes.ByteArray bytes) => UnicodeConversion (String bytes)
-  where
-    toUnicode = List.map toUnicode . unpack
-    fromUnicodeSub = pack . List.map fromUnicodeSub
-    fromUnicodeMaybe = fmap pack . traverse fromUnicodeMaybe
 
 
 ---  Numeric characters  ---
@@ -553,13 +556,6 @@ isSeparator = (== Space)
 failQ :: Unicode.String -> Q a
 failQ = MonadFail.fail
 
-charPat :: Char -> Q TH.Pat
-charPat c = TH.ConP <$> lookupConName <*> return []
-  where
-    conName = G.conNameOf c
-    lookupConName = TH.lookupValueName (List.concat ["ASCII.", conName]) >>= May.maybe lookupFailed return
-    lookupFailed = failQ (List.concat ["TH.lookupValueName \"ASCII.", conName, "\" failed. This means there is a mistake in the ascii library."])
-
 char :: QQ.QuasiQuoter
 char =
   QQ.QuasiQuoter
@@ -573,43 +569,28 @@ char =
     requireOne str = case str of [] -> tooShort; [x] -> return x; _ -> tooLong
 
     requireAscii :: Unicode.Char -> Q Char
-    requireAscii = May.maybe notAscii return . fromUnicodeMaybe
+    requireAscii = (May.maybe notAscii return) . (toCharMaybe @Unicode.Char)
 
     wrongContext = failQ "The ASCII.char quasi-quoter may only be used in an expression or pattern context."
     tooShort = failQ "The ASCII.char quasi-quoter cannot be empty; it must contain a character."
     tooLong = failQ "The ASCII.char quasi-quoter may only be given a single character."
     notAscii = failQ "The ASCII.char quasi-quoter only works with an ASCII character."
 
-bytes :: QQ.QuasiQuoter
-bytes =
-  QQ.QuasiQuoter
-    { QQ.quoteExp = requireAscii >=> \x -> [e|ASCII.pack $(TH.lift (ASCII.unpack x)) :: ASCII.String Bytes.Bytes|]
-    , QQ.quotePat = \_ -> wrongContext
-    , QQ.quoteType = \_ -> wrongContext
-    , QQ.quoteDec = \_ -> wrongContext
-    }
+charPat :: Char -> Q TH.Pat
+charPat c = TH.ConP <$> lookupConName <*> return []
   where
-    requireAscii :: Unicode.String -> Q (String Bytes.Bytes)
-    requireAscii = May.maybe notAscii return . fromUnicodeMaybe
+    conName = G.conNameOf c
+    lookupConName = TH.lookupValueName (List.concat ["ASCII.", conName]) >>= May.maybe lookupFailed return
+    lookupFailed = failQ (List.concat ["TH.lookupValueName \"ASCII.", conName, "\" failed. This means there is a mistake in the ascii library."])
 
-    wrongContext = failQ "The ASCII.bytes quasi-quoter may only be used in an expression context."
-    notAscii = failQ "The ASCII.bytes quasi-quoter only works with ASCII characters."
-
--- todo
--- list :: QQ.QuasiQuoter
-
-{- | Produces an expression representing a 'ASCII.String' value corresponding to the quasiquoted string.
-
--- todo: update these examples
+{- | Produces an expression representing a 'String' value corresponding to the quasiquoted string.
 
 > >>> :set -XQuasiQuotes
 >
 > >>> import qualified ASCII
 >
-> >>> import ASCII.QQ
->
-> >>> ASCII.unpack [ASCII.string|Hi!|]
-> [CapitalLetterH,SmallLetterI,ExclamationMark]
+> >>> [ASCII.string|Hi!|]
+> ASCII.toStringSub "Hi!"
 
 The expression fails to compile if the quasiquoted string contains characters that cannot be represented in the ASCII character set.
 
@@ -621,20 +602,47 @@ The expression fails to compile if the quasiquoted string contains characters th
 
 -}
 
--- string :: QQ.QuasiQuoter
--- string =
---   QQ.QuasiQuoter
---     { QQ.quoteExp  = \str ->
---           case ASCII.fromUnicodeMaybe str of
---               May.Nothing -> failQ "The ASCII.string quasi-quoter cannot be used with non-ASCII characters."
---               May.Just (x :: ASCII.String Bytes.Bytes) -> lift x
---     , QQ.quotePat  = wrongContext
---     , QQ.quoteType = wrongContext
---     , QQ.quoteDec  = wrongContext
---     }
---   where
---     wrongContext :: Unicode.String -> Q a
---     wrongContext _ = failQ "The ASCII.string quasi-quoter may only be used in an expression context."
+string :: QQ.QuasiQuoter
+string =
+  QQ.QuasiQuoter
+    { QQ.quoteExp = requireAscii >=> \x -> [e|ASCII.pack $(TH.lift (ASCII.unpack x)) :: ASCII.String|]
+    , QQ.quotePat = \_ -> wrongContext
+    , QQ.quoteType = \_ -> wrongContext
+    , QQ.quoteDec = \_ -> wrongContext
+    }
+  where
+    requireAscii :: Unicode.String -> Q String
+    requireAscii = (May.maybe notAscii return) . (toStringMaybe @Unicode.String)
 
---     failQ :: Unicode.String -> Q a
---     failQ = MonadFail.fail
+    wrongContext = failQ "The ASCII.string quasi-quoter may only be used in an expression context."
+    notAscii = failQ "The ASCII.string quasi-quoter only works with ASCII characters."
+
+bytes :: QQ.QuasiQuoter
+bytes =
+  QQ.QuasiQuoter
+    { QQ.quoteExp = requireAscii >=> \x -> [e|ASCII.pack $(TH.lift (ASCII.unpack x)) :: GenericString BA.Bytes|]
+    , QQ.quotePat = \_ -> wrongContext
+    , QQ.quoteType = \_ -> wrongContext
+    , QQ.quoteDec = \_ -> wrongContext
+    }
+  where
+    requireAscii :: Unicode.String -> Q (GenericString BA.Bytes)
+    requireAscii = (May.maybe notAscii return) . (toStringMaybe @Unicode.String)
+
+    wrongContext = failQ "The ASCII.bytes quasi-quoter may only be used in an expression context."
+    notAscii = failQ "The ASCII.bytes quasi-quoter only works with ASCII characters."
+
+list :: QQ.QuasiQuoter
+list =
+  QQ.QuasiQuoter
+    { QQ.quoteExp = requireAscii >=> TH.lift @[Char]
+    , QQ.quotePat = \_ -> wrongContext
+    , QQ.quoteType = \_ -> wrongContext
+    , QQ.quoteDec = \_ -> wrongContext
+    }
+  where
+    requireAscii :: Unicode.String -> Q [Char]
+    requireAscii = (May.maybe notAscii return) . traverse (toCharMaybe @Unicode.Char)
+
+    wrongContext = failQ "The ASCII.list quasi-quoter may only be used in an expression context."
+    notAscii = failQ "The ASCII.list quasi-quoter only works with ASCII characters."
