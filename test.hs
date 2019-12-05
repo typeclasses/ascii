@@ -33,10 +33,10 @@ main = runTest $ foldl1 (<>) $
   , ASCII.toCharMaybe @Int 128 === Nothing
   , ASCII.toCharMaybe @Int 11243228 === Nothing
 
-  , [ASCII.bytes|Cat|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT]
+  , [ASCII.string|Cat|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT]
 
-  , ASCII.equalsIgnoringCase [ASCII.bytes|Cat|] [ASCII.bytes|CAT|] === True
-  , ASCII.equalsIgnoringCase [ASCII.bytes|Cat|] [ASCII.bytes|CAP|] === False
+  , ASCII.equalsIgnoringCase [ASCII.string|Cat|] [ASCII.string|CAT|] === True
+  , ASCII.equalsIgnoringCase [ASCII.string|Cat|] [ASCII.string|CAP|] === False
 
   , ASCII.toCase ASCII.UpperCase ASCII.SmallLetterX === ASCII.CapitalLetterX
   , ASCII.toCase ASCII.LowerCase ASCII.SmallLetterX === ASCII.SmallLetterX
@@ -47,10 +47,10 @@ main = runTest $ foldl1 (<>) $
   , ASCII.toCase ASCII.LowerCase ASCII.ExclamationMark === ASCII.ExclamationMark
 
   -- Convert "Cat!" to upper case, and you get "CAT!".
-  , ASCII.toCase ASCII.UpperCase [ASCII.bytes|Cat!|] === [ASCII.bytes|CAT!|]
+  , ASCII.toCase ASCII.UpperCase [ASCII.string|Cat!|] === [ASCII.string|CAT!|]
 
   -- Convert "Cat!" to lower case, and you get "cat!".
-  , ASCII.toCase ASCII.LowerCase [ASCII.bytes|Cat!|] === [ASCII.bytes|cat!|]
+  , ASCII.toCase ASCII.LowerCase [ASCII.string|Cat!|] === [ASCII.string|cat!|]
 
   -- Small letter A (a) is lower case.
   , ASCII.letterCase ASCII.SmallLetterA === Just ASCII.LowerCase
@@ -109,17 +109,17 @@ main = runTest $ foldl1 (<>) $
   -- Delete is the only control code that appears in the ASCII chart /after/ the printable characters.
   , (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) ASCII.all === [ASCII.Delete]
 
-  -- The Show output for [ASCII.bytes|cat|] is: ASCII.toStringSub "cat" (In this test case, the quotes are escaped, so it's a bit difficult to read.)
-  , show [ASCII.bytes|cat|] === "ASCII.toStringSub \"cat\""
+  -- The Show output for [ASCII.string|cat|] is: ASCII.toStringSub "cat" (In this test case, the quotes are escaped, so it's a bit difficult to read.)
+  , show [ASCII.string|cat|] === "ASCII.toStringSub \"cat\""
 
-  -- The Show output for the empty string [ASCII.bytes||] is: ASCII.toStringSub ""
-  , show [ASCII.bytes||] === "ASCII.toStringSub \"\""
+  -- The Show output for the empty string [ASCII.string||] is: ASCII.toStringSub ""
+  , show [ASCII.string||] === "ASCII.toStringSub \"\""
 
   -- The Show output for a string containing a single quotation mark is: ASCII.toStringSub "\"" (In this test case, the inner quotation mark is doubly-escaped, so it's especially difficult to read.)
-  , show [ASCII.bytes|"|] === "ASCII.toStringSub \"\\\"\""
+  , show [ASCII.string|"|] === "ASCII.toStringSub \"\\\"\""
 
   -- The Show instance for ASCII.String adds parens appropriately based on context.
-  , show (I.Identity [ASCII.bytes|cat|]) === "Identity (ASCII.toStringSub \"cat\")"
+  , show (I.Identity [ASCII.string|cat|]) === "Identity (ASCII.toStringSub \"cat\")"
 
   -- These are functions under the "classification functions" heading in the Data.Char module that have equivalents in the ASCII module. For every ASCII character, each of the two equivalent functions should yield the same results.
   , for classificationFunctions $ \(name, f, g) -> for ASCII.all $ \x -> ("ASCII." ++ name ++ " " ++ show x, f x) =#= ("Data.Char." ++ name ++ " " ++ show x, g (ASCII.fromChar @Unicode.Char x))
@@ -127,12 +127,14 @@ main = runTest $ foldl1 (<>) $
   -- These are situations where we present the same information in two different forms: Once as a list of all ASCII characters with some classification, and again as a function that tests whether a particular character belongs to the classification. The list should contain exactly the characters for which the corresponding predicate is true, and all of the lists should be sorted in ascending order.
   , for listsAndPredicates $ \(name, list, predicate) -> note ("ASCII." ++ name) $ list === filter predicate ASCII.all
 
+  -- Some very straightforward checks that all the quasi-quote expressions compile and produce the values they're supposed to.
   , case [ASCII.char|~|] of
       [ASCII.char|@|] -> failure
       [ASCII.char|~|] -> success
       _               -> failure
-
-  , [ASCII.list|Cat|] === [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT]
+  , [ASCII.list|Cat!|] === [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT, ASCII.ExclamationMark]
+  , [ASCII.string|Cat!|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT, ASCII.ExclamationMark]
+  , [ASCII.bytes|Cat!|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT, ASCII.ExclamationMark]
 
   ]
 
