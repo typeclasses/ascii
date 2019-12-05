@@ -43,7 +43,7 @@ module ASCII
   (
 
   -- * Characters
-    Char (..), all
+    Char ( .. ), allCharacters
 
   -- * Strings
   , String, GenericString
@@ -58,10 +58,10 @@ module ASCII
   , Group ( .. ), charGroup, inGroup, isControl, isPrint, controlCodes, printableCharacters
 
   -- * Upper/lower case letters
-  , Case (..), isCase, isLower, isUpper, isAlpha, isLetter, letterCase, letters, capitalLetters, smallLetters, CaseInsensitiveEquivalence ( .. ), CaseConversion ( .. )
+  , Case ( UpperCase, LowerCase ), isCase, isLower, isUpper, isAlpha, isLetter, letterCase, letters, capitalLetters, smallLetters, CaseInsensitiveEquivalence ( caseInsensitiveEquivalence, equalsIgnoringCase ), CaseConversion ( toCase )
 
   -- * ASCII swimming in larger worlds
-  , CharWidening (..), StringWidening (..)
+  , CharWidening ( fromChar, toCharMaybe, toCharSub ), StringWidening ( fromString, toStringMaybe, toStringSub )
 
   -- * Numeric characters
   , isDigit, isOctDigit, isHexDigit, isNumber
@@ -69,6 +69,9 @@ module ASCII
 
   -- * Miscellaneous character classifications
   , isSpace, isAlphaNum, isMark, isPunctuation, isSymbol, isSeparator
+
+  -- * String functions
+  , empty, singleton, null, length, replicate, take, drop, span, reverse, any, all, append, concat, cons, snoc, uncons
 
   ) where
 
@@ -138,7 +141,7 @@ import qualified Generics.Deriving.ConNames as G
 
 -- | A character in the ASCII character set.
 --
--- This type has 128 nullary constructors, listed in order according to each character's 7-bit numeric code. Its derived 'Enum' instance can therefore be used to convert a 'Char' to its ASCII code and vice versa; but since 'Enum.toEnum' is a partial function, we recommend instead using 'charToInt', which cannot produce runtime errors.
+-- This type has 128 nullary constructors, listed in order according to each character's 7-bit numeric code. Its derived 'Enum' instance can therefore be used to convert a 'Char' to its ASCII code and vice versa; but since 'Enum.toEnum' is a partial function, we recommend instead using 'fromChar', which cannot produce runtime errors.
 
 data Char =
       Null | StartOfHeading | StartOfText | EndOfText | EndOfTransmission | Enquiry | Acknowledgement | Bell | Backspace | HorizontalTab | LineFeed | VerticalTab | FormFeed | CarriageReturn | ShiftOut | ShiftIn| DataLinkEscape
@@ -174,8 +177,8 @@ deriving instance G.Generic Char
 
 ---  Direct usage of the Enum instance  ---
 
-all :: [Char]
-all = Enum.enumFromTo minBound maxBound
+allCharacters :: [Char]
+allCharacters = Enum.enumFromTo minBound maxBound
 
 intToCharUnsafe :: Int -> Char
 intToCharUnsafe = Enum.toEnum
@@ -192,6 +195,7 @@ intToCharMaybe x | x < 0   = May.Nothing
                  | x > 127 = May.Nothing
 
 intToCharMaybe x = May.Just (intToCharUnsafe x)
+
 
 
 ---  Character widening  ---
@@ -226,14 +230,26 @@ instance CharWidening Int
 -- | Representation of an ASCII 'Char' as a byte where the first bit is always 0.
 instance CharWidening Word8
   where
-    fromChar = Num.fromIntegral . charToInt
-    toCharMaybe = intToCharMaybe . Num.fromIntegral
+    fromChar = charToWord8
+    toCharMaybe = word8ToCharMaybe
 
 -- | Representation of an ASCII 'Char' as one of the first 128 Unicode 'Unicode.Char's.
 instance CharWidening Unicode.Char
   where
     fromChar = Unicode.chr . charToInt
     toCharMaybe = intToCharMaybe . Unicode.ord
+
+
+---  Word8 Char conversions  ---
+
+charToWord8 :: Char -> Word8
+charToWord8 = Num.fromIntegral . charToInt
+
+word8ToCharMaybe :: Word8 -> Maybe Char
+word8ToCharMaybe = intToCharMaybe . Num.fromIntegral
+
+word8ToCharUnsafe :: Word8 -> Char
+word8ToCharUnsafe = intToCharUnsafe . Num.fromIntegral
 
 
 ---  Strings  --
@@ -551,7 +567,140 @@ isSeparator :: Char -> Bool
 isSeparator = (== Space)
 
 
----  Quasi-quotation  --
+---  String functions  ---
+
+-- | The empty string.
+empty :: (BA.ByteArray bytes) => GenericString bytes
+empty = String BA.empty
+
+-- | A string consisting of a single character.
+singleton :: (BA.ByteArray bytes) => Char -> GenericString bytes
+singleton = String . BA.singleton . charToWord8
+
+-- | Determine whether a string is empty.
+null :: BA.ByteArrayAccess bytes => GenericString bytes -> Bool
+null = BA.null . stringBytes
+
+-- | The number of characters in a string.
+length :: BA.ByteArrayAccess bytes => GenericString bytes -> Int
+length = BA.length . stringBytes
+
+-- | Analogous to 'List.replicate' from the "Data.List" module.
+--
+-- ==== Examples
+--
+-- @ASCII.replicate 5 ASCII.CapitalLetterA@ = @[ASCII.string|AAAAA|]@
+
+replicate :: (BA.ByteArray bytes) => Int -> Char -> GenericString bytes
+replicate n = String . BA.replicate n . charToWord8
+
+-- | Analogous to 'List.take' from the "Data.List" module.
+--
+-- ==== Examples
+--
+-- @ASCII.take 3 [ASCII.string|December|]@ = @[ASCII.string|Dec|]@
+
+take :: (BA.ByteArray bytes) => Int -> GenericString bytes -> GenericString bytes
+take n = String . BA.take n . stringBytes
+
+-- | Analogous to 'List.drop' from the "Data.List" module.
+--
+-- ==== Examples
+--
+-- @ASCII.drop 3 [ASCII.string|December|]@ = @[ASCII.string|ember|]@
+
+drop :: (BA.ByteArray bytes) => Int -> GenericString bytes -> GenericString bytes
+drop n = String . BA.drop n . stringBytes
+
+-- | Analogous to 'List.span' from the "Data.List" module.
+--
+-- ==== Examples
+--
+-- @ASCII.span ASCII.isLower [ASCII.string|oneTWOthree|]@ = @([ASCII.string|one|], [ASCII.string|TWOthree|])@
+
+span :: (BA.ByteArray bytes) => (Char -> Bool) -> GenericString bytes -> (GenericString bytes, GenericString bytes)
+span f = (\(x, y) -> (String x, String y)) . BA.span (f . word8ToCharUnsafe) . stringBytes
+
+-- | Analogous to 'List.reverse' from the "Data.List" module.
+--
+-- ==== Examples
+--
+-- @ASCII.reverse [ASCII.string|fish|]@ = @[ASCII.string|hsif|]@
+
+reverse :: (BA.ByteArray bytes) => GenericString bytes -> GenericString bytes
+reverse = String . BA.reverse . stringBytes
+
+-- | Analogous to 'List.any' from the "Data.List" module.
+--
+-- ==== Examples
+--
+-- @ASCII.any ASCII.isDigit [ASCII.string|fish|]@ = @False@
+--
+-- @ASCII.any ASCII.isDigit [ASCII.string|fish2|]@ = @True@
+
+any :: (BA.ByteArrayAccess bytes) => (Char -> Bool) -> GenericString bytes -> Bool
+any f = BA.any (f . word8ToCharUnsafe) . stringBytes
+
+-- | Analogous to 'List.all' from the "Data.List" module.
+--
+-- ==== Examples
+--
+-- @ASCII.all ASCII.isLetter [ASCII.string|fish|]@ = @True@
+--
+-- @ASCII.all ASCII.isLetter [ASCII.string|fish2|]@ = @False@
+
+all :: (BA.ByteArrayAccess bytes) => (Char -> Bool) -> GenericString bytes -> Bool
+all f = BA.all (f . word8ToCharUnsafe) . stringBytes
+
+-- | Concatenation of two strings.
+--
+-- ==== Examples
+--
+-- @ASCII.append [ASCII.string|One|] [ASCII.string|Two|]@ = @[ASCII.string|OneTwo|]@
+
+append :: (BA.ByteArray bytes) => GenericString bytes -> GenericString bytes -> GenericString bytes
+append x y = String (BA.append (stringBytes x) (stringBytes y))
+
+-- | Concatenation of a list of strings.
+--
+-- ==== Examples
+--
+-- @ASCII.concat [ [ASCII.string|One|], [ASCII.string|Two|], [ASCII.string|Three|] ]@ = @[ASCII.string|OneTwoThree|]@
+
+concat :: (BA.ByteArrayAccess inputBytes, BA.ByteArray outputBytes) => [GenericString inputBytes] -> GenericString outputBytes
+concat = String . BA.concat . List.map stringBytes
+
+-- | Prepend a character to the beginning of a string, analogous to the @(:)@ operator which is also sometimes called "cons".
+--
+-- ==== Examples
+--
+-- @ASCII.cons ASCII.CapitalLetterC [ASCII.string|at|]@ = @[ASCII.string|Cat|]@
+
+cons :: (BA.ByteArray bytes) => Char -> GenericString bytes -> GenericString bytes
+cons x xs = String (BA.cons (charToWord8 x) (stringBytes xs))
+
+-- | Appends a character to the end of a string. Because this function is similar to 'cons' but in the reverse direction, its name is "cons" spelled backwards.
+--
+-- ==== Examples
+--
+-- @ASCII.snoc [ASCII.string|Ca|] ASCII.SmallLetterT@ = @[ASCII.string|Cat|]@
+
+snoc :: (BA.ByteArray bytes) => GenericString bytes -> Char -> GenericString bytes
+snoc xs x = String (BA.snoc (stringBytes xs) (charToWord8 x))
+
+-- | Analogous to 'List.uncons' from the "Data.List" module.
+--
+-- ==== Examples
+--
+-- @ASCII.uncons [ASCII.string||]@ = @Nothing@
+--
+-- @ASCII.uncons [ASCII.string|Cat|]@ = @Just (ASCII.CapitalLetterC, [ASCII.string|at|])@
+
+uncons :: (BA.ByteArray bytes) => GenericString bytes -> Maybe (Char, GenericString bytes)
+uncons = fmap (\(x, xs) -> (word8ToCharUnsafe x, String xs)) . BA.uncons . stringBytes
+
+
+---  Quasi-quotation  ---
 
 failQ :: Unicode.String -> Q a
 failQ = MonadFail.fail

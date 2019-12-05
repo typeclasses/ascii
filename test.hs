@@ -62,7 +62,7 @@ main = runTest $ foldl1 (<>) $
   , ASCII.letterCase ASCII.ExclamationMark === Nothing
 
   -- There are 128 characters in total.
-  , length ASCII.all === 128
+  , length ASCII.allCharacters === 128
 
   -- There are 33 control codes.
   , length ASCII.controlCodes === 33
@@ -98,7 +98,7 @@ main = runTest $ foldl1 (<>) $
   , ASCII.charGroup ASCII.UnitSeparator === ASCII.Control
 
   -- UnitSeparator is the last control code that appears in the ASCII chart before the printable characters.
-  , Foldable.maximumBy (compare `Function.on` ASCII.fromChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) ASCII.all) === ASCII.UnitSeparator
+  , Foldable.maximumBy (compare `Function.on` ASCII.fromChar @Int) (takeWhile (ASCII.inGroup ASCII.Control) ASCII.allCharacters) === ASCII.UnitSeparator
 
   -- Delete is the last character.
   , maxBound === ASCII.Delete
@@ -107,7 +107,7 @@ main = runTest $ foldl1 (<>) $
   , ASCII.charGroup ASCII.Delete === ASCII.Control
 
   -- Delete is the only control code that appears in the ASCII chart /after/ the printable characters.
-  , (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) ASCII.all === [ASCII.Delete]
+  , (dropWhile (ASCII.inGroup ASCII.Printable) . dropWhile (ASCII.inGroup ASCII.Control)) ASCII.allCharacters === [ASCII.Delete]
 
   -- The Show output for [ASCII.string|cat|] is: ASCII.toStringSub "cat" (In this test case, the quotes are escaped, so it's a bit difficult to read.)
   , show [ASCII.string|cat|] === "ASCII.toStringSub \"cat\""
@@ -122,10 +122,10 @@ main = runTest $ foldl1 (<>) $
   , show (I.Identity [ASCII.string|cat|]) === "Identity (ASCII.toStringSub \"cat\")"
 
   -- These are functions under the "classification functions" heading in the Data.Char module that have equivalents in the ASCII module. For every ASCII character, each of the two equivalent functions should yield the same results.
-  , for classificationFunctions $ \(name, f, g) -> for ASCII.all $ \x -> ("ASCII." ++ name ++ " " ++ show x, f x) =#= ("Data.Char." ++ name ++ " " ++ show x, g (ASCII.fromChar @Unicode.Char x))
+  , for classificationFunctions $ \(name, f, g) -> for ASCII.allCharacters $ \x -> ("ASCII." ++ name ++ " " ++ show x, f x) =#= ("Data.Char." ++ name ++ " " ++ show x, g (ASCII.fromChar @Unicode.Char x))
 
   -- These are situations where we present the same information in two different forms: Once as a list of all ASCII characters with some classification, and again as a function that tests whether a particular character belongs to the classification. The list should contain exactly the characters for which the corresponding predicate is true, and all of the lists should be sorted in ascending order.
-  , for listsAndPredicates $ \(name, list, predicate) -> note ("ASCII." ++ name) $ list === filter predicate ASCII.all
+  , for listsAndPredicates $ \(name, list, predicate) -> note ("ASCII." ++ name) $ list === filter predicate ASCII.allCharacters
 
   -- Some very straightforward checks that all the quasi-quote expressions compile and produce the values they're supposed to.
   , case [ASCII.char|~|] of
@@ -135,6 +135,23 @@ main = runTest $ foldl1 (<>) $
   , [ASCII.list|Cat!|] === [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT, ASCII.ExclamationMark]
   , [ASCII.string|Cat!|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT, ASCII.ExclamationMark]
   , [ASCII.bytes|Cat!|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT, ASCII.ExclamationMark]
+
+  -- Examples from the "string functions" documentation
+  , ASCII.replicate 5 ASCII.CapitalLetterA === [ASCII.string|AAAAA|]
+  , ASCII.take 3 [ASCII.string|December|] === [ASCII.string|Dec|]
+  , ASCII.drop 3 [ASCII.string|December|] === [ASCII.string|ember|]
+  , ASCII.span ASCII.isLower [ASCII.string|oneTWOthree|] === ([ASCII.string|one|], [ASCII.string|TWOthree|])
+  , ASCII.reverse [ASCII.string|fish|] === [ASCII.string|hsif|]
+  , ASCII.any ASCII.isDigit [ASCII.string|fish|] === False
+  , ASCII.any ASCII.isDigit [ASCII.string|fish2|] === True
+  , ASCII.all ASCII.isLetter [ASCII.string|fish|] === True
+  , ASCII.all ASCII.isLetter [ASCII.string|fish2|] === False
+  , ASCII.append [ASCII.string|One|] [ASCII.string|Two|] === [ASCII.string|OneTwo|]
+  , ASCII.concat [ [ASCII.string|One|], [ASCII.string|Two|], [ASCII.string|Three|] ] === [ASCII.string|OneTwoThree|]
+  , ASCII.cons ASCII.CapitalLetterC [ASCII.string|at|] === [ASCII.string|Cat|]
+  , ASCII.snoc [ASCII.string|Ca|] ASCII.SmallLetterT === [ASCII.string|Cat|]
+  , ASCII.uncons [ASCII.string||] === Nothing
+  , ASCII.uncons [ASCII.string|Cat|] === Just (ASCII.CapitalLetterC, [ASCII.string|at|])
 
   ]
 
@@ -174,7 +191,7 @@ classificationFunctions =
 runTest :: Test -> IO ()
 runTest (Test f) =
     case f [] of
-        [] -> Exit.exitSuccess
+        [] -> putStrLn "All ASCII tests passed." >> Exit.exitSuccess
         xs -> Foldable.traverse_ putStrLn (List.intersperse "" xs) >> Exit.exitFailure
 
 type Note = String
