@@ -447,6 +447,18 @@ isPrint = inGroup Printable
 
 ---  Case-insensitive equivalence  ---
 
+-- | @\"Cat"@ and @"cat"@ are not /equal/, because 'CapitalLetterC' and 'SmallLetterC' are different characters.
+--
+-- @([ASCII.string|Cat|] == [ASCII.string|cat|])@ = False
+--
+-- But they are /sort of/ equal, if we ignore the cases of the letters. For case-insensitive applications, we can compare strings using 'equalsIgnoringCase' instead of '=='.
+--
+-- @ASCII.equalsIgnoringCase [ASCII.string|Cat|] [ASCII.string|cat|]@ = @True@
+--
+-- This sort of notion is called an /equivalence relation/, and we can do the same thing using 'caseInsensitiveEquivalence'.
+--
+-- @getEquivalence ASCII.caseInsensitiveEquivalence [ASCII.string|Cat|] [ASCII.string|cat|]@ = @True@
+
 class CaseInsensitiveEquivalence a
   where
     {-# MINIMAL caseInsensitiveEquivalence | equalsIgnoringCase #-}

@@ -7,6 +7,7 @@ import qualified ASCII
 import qualified Data.Char as Unicode
 import qualified Data.Foldable as Foldable
 import qualified Data.Function as Function
+import qualified Data.Functor.Contravariant as Eq
 import qualified Data.Functor.Identity as I
 import qualified Data.List as List
 import qualified System.Exit as Exit
@@ -35,8 +36,11 @@ main = runTest $ foldl1 (<>) $
 
   , [ASCII.string|Cat|] === ASCII.pack [ASCII.CapitalLetterC, ASCII.SmallLetterA, ASCII.SmallLetterT]
 
+  , (==)                     [ASCII.string|Cat|] [ASCII.string|CAT|] === False
   , ASCII.equalsIgnoringCase [ASCII.string|Cat|] [ASCII.string|CAT|] === True
   , ASCII.equalsIgnoringCase [ASCII.string|Cat|] [ASCII.string|CAP|] === False
+  , Eq.getEquivalence ASCII.caseInsensitiveEquivalence [ASCII.string|Cat|] [ASCII.string|CAT|] === True
+  , Eq.getEquivalence ASCII.caseInsensitiveEquivalence [ASCII.string|Cat|] [ASCII.string|CAP|] === False
 
   , ASCII.toCase ASCII.UpperCase ASCII.SmallLetterX === ASCII.CapitalLetterX
   , ASCII.toCase ASCII.LowerCase ASCII.SmallLetterX === ASCII.SmallLetterX
