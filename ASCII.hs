@@ -31,11 +31,19 @@ We do not elaborate on the semantics of the control characters here, because thi
 
 == Recommended import style
 
+We recommend using a qualified import for the "ASCII" module.
+
 > import qualified ASCII
+
+All examples given in this documentation will assume that the module has been imported in this fashion.
 
 == Relationship to @Data.Char@
 
 The following are drop-in replacements for closely related definitions of the same name in the "Data.Char" module: 'isControl', 'isSpace', 'isLower', 'isUpper', 'isAlpha', 'isAlphaNum', 'isPrint', 'isDigit', 'isOctDigit', 'isHexDigit', 'isLetter', 'isMark', 'isNumber', 'isPunctuation', 'isSymbol', 'isSeparator'.
+
+== Relationship to @Data.List@
+
+The following are drop-in replacements for closely related definitions of the same name in the "Data.List" module: 'null', 'length', 'replicate', 'take', 'drop', 'span', 'reverse', 'any', 'all', 'concat', 'uncons'.
 
 -}
 
@@ -52,13 +60,13 @@ module ASCII
   , pack, unpack
 
   -- * Quasi-quoters
-  , char, list, string, bytes
+  , string, bytes, list, char
 
   -- * Character groups
   , Group ( .. ), charGroup, inGroup, isControl, isPrint, controlCodes, printableCharacters
 
   -- * Upper/lower case letters
-  , Case ( UpperCase, LowerCase ), isCase, isLower, isUpper, isAlpha, isLetter, letterCase, letters, capitalLetters, smallLetters, CaseInsensitiveEquivalence ( caseInsensitiveEquivalence, equalsIgnoringCase ), CaseConversion ( toCase )
+  , Case ( UpperCase, LowerCase ), letterCase, isCase, isLower, isUpper, isAlpha, isLetter, letters, capitalLetters, smallLetters, CaseInsensitiveEquivalence ( caseInsensitiveEquivalence, equalsIgnoringCase ), CaseConversion ( toCase )
 
   -- * ASCII swimming in larger worlds
   , CharWidening ( fromChar, toCharMaybe, toCharSub ), StringWidening ( fromString, toStringMaybe, toStringSub )
@@ -177,6 +185,7 @@ deriving instance G.Generic Char
 
 ---  Direct usage of the Enum instance  ---
 
+-- | All 128 ASCII characters, listed in order from 'Null' to 'Delete'.
 allCharacters :: [Char]
 allCharacters = Enum.enumFromTo minBound maxBound
 
@@ -266,6 +275,8 @@ newtype GenericString bytes = StringUnsafe { stringBytes :: bytes }
 -- The recommended way to write ASCII string literals is with the 'string' quasi-quoter.
 --
 -- Convert between a 'String' and a list of @'Char'@s with the 'pack' and 'unpack' functions.
+--
+-- The underlying representation is the 'BS.ByteString' type. If this is not to your liking, you can instead use 'GenericString' with a different type parameter.
 
 type String = GenericString BS.ByteString
 
@@ -273,9 +284,15 @@ instance (BA.ByteArray bytes) => Show (GenericString bytes)
   where
     showsPrec d str = Show.showParen (d > 10) (Show.showString "ASCII.toStringSub " . Show.showsPrec 11 (fromString @Unicode.String str))
 
+-- | /Packing/ a list of characters means converting it into a format where all of the data is represented compactly in one contiguous address space. A packed 'String' is likely to take up less memory, and some operations may be more efficiently performed in bulk rather than by looping over a character at a time.
+--
+-- The inverse of @pack@ is 'unpack'.
 pack :: (BA.ByteArray bytes) => [Char] -> GenericString bytes
 pack = StringUnsafe . BA.pack . List.map fromChar
 
+-- | Converts a 'String' into a list of 'Char's.
+--
+-- The inverse of @unpack@ is 'pack'.
 unpack :: (BA.ByteArrayAccess bytes) => GenericString bytes -> [Char]
 unpack = List.map (intToCharUnsafe . Num.fromIntegral) . BA.unpack . stringBytes
 
@@ -304,12 +321,34 @@ instance StringWidening [Unicode.Char]
 
 ---  Case  ---
 
-data Case = UpperCase | LowerCase
+data Case =
+    UpperCase -- ^ The letters from 'CapitalLetterA' to 'CapitalLetterZ'.
+  | LowerCase -- ^ The letters from 'SmallLetterA' to 'SmallLetterZ'.
     deriving ( Eq, Ord, Enum, Bounded, Show )
+
+-- | Determines whether a character is a letter of a particular case.
+--
+-- === Examples
+--
+-- @ASCII.isCase ASCII.UpperCase [ASCII.char|R|]@ = @True@
+--
+-- @ASCII.isCase ASCII.UpperCase [ASCII.char|r|]@ = @False@
+--
+-- @ASCII.isCase ASCII.UpperCase [ASCII.char|$|]@ = @False@
 
 isCase :: Case -> Char -> Bool
 isCase UpperCase x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
 isCase LowerCase x = (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterZ)
+
+-- | Determines whether a character is a letter, and if so, whether it is upper or lower case.
+--
+-- ==== Examples
+--
+-- @ASCII.letterCase [ASCII.char|R|]@ = @Just UpperCase@
+--
+-- @ASCII.letterCase [ASCII.char|r|]@ = @Just LowerCase@
+--
+-- @ASCII.letterCase [ASCII.char|$|]@ = @Nothing@
 
 letterCase :: Char -> Maybe Case
 letterCase x | isCase UpperCase x = May.Just UpperCase
@@ -347,34 +386,47 @@ isLetter x = (Bool.||) (isLower x) (isUpper x)
 isAlpha :: Char -> Bool
 isAlpha = isLetter
 
+-- | The complete list of letters: 'CapitalLetterA', 'CapitalLetterB', 'CapitalLetterC', 'CapitalLetterD', 'CapitalLetterE', 'CapitalLetterF', 'CapitalLetterG', 'CapitalLetterH', 'CapitalLetterI', 'CapitalLetterJ', 'CapitalLetterK', 'CapitalLetterL', 'CapitalLetterM', 'CapitalLetterN', 'CapitalLetterO', 'CapitalLetterP', 'CapitalLetterQ', 'CapitalLetterR', 'CapitalLetterS', 'CapitalLetterT', 'CapitalLetterU', 'CapitalLetterV', 'CapitalLetterW', 'CapitalLetterX', 'CapitalLetterY', 'CapitalLetterZ', 'SmallLetterA', 'SmallLetterB', 'SmallLetterC', 'SmallLetterD', 'SmallLetterE', 'SmallLetterF', 'SmallLetterG', 'SmallLetterH', 'SmallLetterI', 'SmallLetterJ', 'SmallLetterK', 'SmallLetterL', 'SmallLetterM', 'SmallLetterN', 'SmallLetterO', 'SmallLetterP', 'SmallLetterQ', 'SmallLetterR', 'SmallLetterS', 'SmallLetterT', 'SmallLetterU', 'SmallLetterV', 'SmallLetterW', 'SmallLetterX', 'SmallLetterY', 'SmallLetterZ'.
 letters :: [Char]
 letters = (List.++) capitalLetters smallLetters
 
+-- | The complete list of capital letters: 'CapitalLetterA', 'CapitalLetterB', 'CapitalLetterC', 'CapitalLetterD', 'CapitalLetterE', 'CapitalLetterF', 'CapitalLetterG', 'CapitalLetterH', 'CapitalLetterI', 'CapitalLetterJ', 'CapitalLetterK', 'CapitalLetterL', 'CapitalLetterM', 'CapitalLetterN', 'CapitalLetterO', 'CapitalLetterP', 'CapitalLetterQ', 'CapitalLetterR', 'CapitalLetterS', 'CapitalLetterT', 'CapitalLetterU', 'CapitalLetterV', 'CapitalLetterW', 'CapitalLetterX', 'CapitalLetterY', 'CapitalLetterZ'.
 capitalLetters :: [Char]
 capitalLetters = Enum.enumFromTo CapitalLetterA CapitalLetterZ
 
+-- | The complete list of small letters: 'SmallLetterA', 'SmallLetterB', 'SmallLetterC', 'SmallLetterD', 'SmallLetterE', 'SmallLetterF', 'SmallLetterG', 'SmallLetterH', 'SmallLetterI', 'SmallLetterJ', 'SmallLetterK', 'SmallLetterL', 'SmallLetterM', 'SmallLetterN', 'SmallLetterO', 'SmallLetterP', 'SmallLetterQ', 'SmallLetterR', 'SmallLetterS', 'SmallLetterT', 'SmallLetterU', 'SmallLetterV', 'SmallLetterW', 'SmallLetterX', 'SmallLetterY', 'SmallLetterZ'.
 smallLetters :: [Char]
 smallLetters = Enum.enumFromTo SmallLetterA SmallLetterZ
 
 
 ---  Group  ---
 
-data Group = Control | Printable
+-- | ASCII characters are broadly categorized into two groups: /control codes/ and /printable characters/.
+
+data Group =
+    Control -- ^ 33 of the ASCII characters are control codes. A few of these are still in use, but most are obsolete relics of the early days of computing.
+  | Printable -- ^ 95 of the ASCII characters are /printable characters/ such as letters and numbers, mostly corresponding to the keys on an American English keyboard.
     deriving ( Eq, Ord, Enum, Bounded, Show )
 
+-- | Determine which group a particular character belongs to.
 charGroup :: Char -> Group
 charGroup x | (x < Space) = Control
 charGroup Delete = Control
 charGroup _ = Printable
 
+-- | Test whether a character belongs to a particular group.
 inGroup :: Group -> Char -> Bool
 inGroup g x = charGroup x == g
 
 -- | A list of all characters in the 'Control' group.
+--
+-- The complete list of control codes: 'Null', 'StartOfHeading', 'StartOfText', 'EndOfText', 'EndOfTransmission', 'Enquiry', 'Acknowledgement', 'Bell', 'Backspace', 'HorizontalTab', 'LineFeed', 'VerticalTab', 'FormFeed', 'CarriageReturn', 'ShiftOut', 'ShiftIn', 'DataLinkEscape', 'DeviceControl1', 'DeviceControl2', 'DeviceControl3', 'DeviceControl4', 'NegativeAcknowledgement', 'SynchronousIdle', 'EndOfTransmissionBlock', 'Cancel', 'EndOfMedium', 'Substitute', 'Escape', 'FileSeparator', 'GroupSeparator', 'RecordSeparator', 'UnitSeparator', 'Delete'.
 controlCodes :: [Char]
 controlCodes = (List.++) (Enum.enumFromTo Null UnitSeparator) [Delete]
 
 -- | A list of all characters in the 'Printable' group.
+--
+-- The complete list of printable characters: 'Space', 'ExclamationMark', 'QuotationMark', 'NumberSign', 'DollarSign', 'PercentSign', 'Ampersand', 'Apostrophe', 'LeftParenthesis', 'RightParenthesis', 'Asterisk', 'PlusSign', 'Comma', 'HyphenMinus', 'FullStop', 'Slash', 'Digit0', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Colon', 'Semicolon', 'LessThanSign', 'EqualsSign', 'GreaterThanSign', 'QuestionMark', 'AtSign', 'CapitalLetterA', 'CapitalLetterB', 'CapitalLetterC', 'CapitalLetterD', 'CapitalLetterE', 'CapitalLetterF', 'CapitalLetterG', 'CapitalLetterH', 'CapitalLetterI', 'CapitalLetterJ', 'CapitalLetterK', 'CapitalLetterL', 'CapitalLetterM', 'CapitalLetterN', 'CapitalLetterO', 'CapitalLetterP', 'CapitalLetterQ', 'CapitalLetterR', 'CapitalLetterS', 'CapitalLetterT', 'CapitalLetterU', 'CapitalLetterV', 'CapitalLetterW', 'CapitalLetterX', 'CapitalLetterY', 'CapitalLetterZ', 'LeftSquareBracket', 'Backslash', 'RightSquareBracket', 'Caret', 'Underscore', 'GraveAccent', 'SmallLetterA', 'SmallLetterB', 'SmallLetterC', 'SmallLetterD', 'SmallLetterE', 'SmallLetterF', 'SmallLetterG', 'SmallLetterH', 'SmallLetterI', 'SmallLetterJ', 'SmallLetterK', 'SmallLetterL', 'SmallLetterM', 'SmallLetterN', 'SmallLetterO', 'SmallLetterP', 'SmallLetterQ', 'SmallLetterR', 'SmallLetterS', 'SmallLetterT', 'SmallLetterU', 'SmallLetterV', 'SmallLetterW', 'SmallLetterX', 'SmallLetterY', 'SmallLetterZ', 'LeftCurlyBracket', 'VerticalLine', 'RightCurlyBracket', 'Tilde'.
 printableCharacters :: [Char]
 printableCharacters = Enum.enumFromTo Space Tilde
 
@@ -416,6 +468,16 @@ instance (BA.ByteArrayAccess bytes) => CaseInsensitiveEquivalence (GenericString
 
 ---  Case conversion  ---
 
+-- | 'toCase' maps a single letter character, or each letter character in a string, to its upper or lower case equivalent.
+--
+-- For example, @'toCase' 'UpperCase'@ transforms small letters to capital letters.
+--
+-- @ASCII.toCase ASCII.UpperCase ASCII.SmallLetterX@ = @ASCII.CapitalLetterX@
+--
+-- @ASCII.toCase ASCII.UpperCase [ASCII.string|Cat!|]@ = @[ASCII.string|CAT!|]@
+--
+-- Characters that are not letters, such as the exclamation mark in \"Cat!", are unmodified by 'toCase'.
+
 class CaseConversion a
   where
     toCase :: Case -> a -> a
@@ -439,6 +501,7 @@ instance (BA.ByteArray bytes) => CaseConversion (GenericString bytes)
 isDigit :: Char -> Bool
 isDigit x = (Bool.&&) (x >= Digit0) (x <= Digit9)
 
+-- | The complete list of digits: 'Digit0', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9'.
 digits :: [Char]
 digits = Enum.enumFromTo Digit0 Digit9
 
@@ -448,6 +511,7 @@ digits = Enum.enumFromTo Digit0 Digit9
 isOctDigit :: Char -> Bool
 isOctDigit x = (Bool.&&) (x >= Digit0) (x <= Digit7)
 
+-- | The complete list of octal digits: 'Digit0', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7'.
 octDigits :: [Char]
 octDigits = Enum.enumFromTo Digit0 Digit7
 
@@ -465,6 +529,7 @@ isHexDigit x | isDigit x = True
              | (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterF) = True
 isHexDigit _ = False
 
+-- | The complete list of hex digits: 'Digit0', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'CapitalLetterA', 'CapitalLetterB', 'CapitalLetterC', 'CapitalLetterD', 'CapitalLetterE', 'CapitalLetterF', 'SmallLetterA', 'SmallLetterB', 'SmallLetterC', 'SmallLetterD', 'SmallLetterE', 'SmallLetterF'.
 hexDigits :: [Char]
 hexDigits =
   List.concat
@@ -705,6 +770,37 @@ uncons = fmap (\(x, xs) -> (word8ToCharUnsafe x, StringUnsafe xs)) . BA.uncons .
 failQ :: Unicode.String -> Q a
 failQ = MonadFail.fail
 
+{- | Produces an expression representing a 'Char' value.
+
+> >>> :set -XQuasiQuotes
+>
+> >>> [ASCII.char|e|]
+> SmallLetterE
+
+The quasi-quoted string must consist of a single character within the ASCII character set.
+
+> >>> [ASCII.string|abc|]
+>
+> error:
+>     • The ASCII.char quasi-quoter may only be given a single character.
+
+> >>> [ASCII.char|λ|]
+>
+> error:
+>     • The ASCII.char quasi-quoter only works with an ASCII character.
+
+This quasi-quoter may also be used in a pattern context.
+
+> >>> :{
+>   > case ASCII.Tilde of
+>   >     [ASCII.char|@|] -> False
+>   >     [ASCII.char|~|] -> True
+>   >     _               -> False
+>   > :}
+> True
+
+-}
+
 char :: QQ.QuasiQuoter
 char =
   QQ.QuasiQuoter
@@ -736,8 +832,6 @@ charPat c = TH.ConP <$> lookupConName <*> return []
 
 > >>> :set -XQuasiQuotes
 >
-> >>> import qualified ASCII
->
 > >>> [ASCII.string|Hi!|]
 > ASCII.toStringSub "Hi!"
 
@@ -745,9 +839,8 @@ The expression fails to compile if the quasiquoted string contains characters th
 
 > >>> [ASCII.string|helloλ|]
 >
-> interactive>:4:8: error:
->     • The ascii quasi-quoter cannot be used with non-ASCII characters.
->     • In the quasi-quotation: [ascii|helloλ|]
+> error:
+>     • The ASCII.string quasi-quoter only works with ASCII characters.
 
 -}
 
@@ -766,6 +859,8 @@ string =
     wrongContext = failQ "The ASCII.string quasi-quoter may only be used in an expression context."
     notAscii = failQ "The ASCII.string quasi-quoter only works with ASCII characters."
 
+-- | The same as 'string', but produces a value of type @'GenericString' 'BA.Bytes'@.
+
 bytes :: QQ.QuasiQuoter
 bytes =
   QQ.QuasiQuoter
@@ -780,6 +875,22 @@ bytes =
 
     wrongContext = failQ "The ASCII.bytes quasi-quoter may only be used in an expression context."
     notAscii = failQ "The ASCII.bytes quasi-quoter only works with ASCII characters."
+
+{- | Produces an expression representing a list of ASCII 'Char's corresponding to the quasiquoted string.
+
+> >>> :set -XQuasiQuotes
+>
+> >>> [ASCII.list|Hi!|]
+> [CapitalLetterH,SmallLetterI,ExclamationMark]
+
+The expression fails to compile if the quasiquoted string contains characters that cannot be represented in the ASCII character set.
+
+> >>> [ASCII.list|Hiλ|]
+>
+> error:
+>     • The ASCII.list quasi-quoter only works with ASCII characters.
+
+-}
 
 list :: QQ.QuasiQuoter
 list =
