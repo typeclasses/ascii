@@ -124,8 +124,8 @@ import Data.Bool ( Bool ( .. ) )
 import Data.Traversable ( traverse )
 
 -- Maybe is the type of a decoding result, because decoding can fail.
-import Data.Maybe ( Maybe )
-import qualified Data.Maybe as May ( Maybe ( .. ), fromMaybe, maybe )
+import Data.Maybe ( Maybe ( .. ) )
+import qualified Data.Maybe as Maybe ( fromMaybe, maybe )
 
 -- Tightly-packed sequences of bytes.
 import qualified Data.ByteArray as BA
@@ -203,10 +203,10 @@ charToInt = Enum.fromEnum
 
 intToCharMaybe :: Int -> Maybe Char
 
-intToCharMaybe x | x < 0   = May.Nothing
-                 | x > 127 = May.Nothing
+intToCharMaybe x | x < 0   = Nothing
+                 | x > 127 = Nothing
 
-intToCharMaybe x = May.Just (intToCharUnsafe x)
+intToCharMaybe x = Just (intToCharUnsafe x)
 
 
 
@@ -231,7 +231,7 @@ class CharWidening a
 
     -- | Returns the 'Substitute' character for any value that does not represent an ASCII character.
     toCharSub :: a -> Char
-    toCharSub = May.fromMaybe Substitute . toCharMaybe
+    toCharSub = Maybe.fromMaybe Substitute . toCharMaybe
 
 -- | Representation of an ASCII 'Char' as an 'Int' between 0 and 127.
 instance CharWidening Int
@@ -360,9 +360,9 @@ isCase LowerCase x = (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterZ)
 -- @ASCII.letterCase [ASCII.char|$|]@ = @Nothing@
 
 letterCase :: Char -> Maybe Case
-letterCase x | isCase UpperCase x = May.Just UpperCase
-             | isCase LowerCase x = May.Just LowerCase
-letterCase _ = May.Nothing
+letterCase x | isCase UpperCase x = Just UpperCase
+             | isCase LowerCase x = Just LowerCase
+letterCase _ = Nothing
 
 -- | Returns True for 'LowerCase' letters, from 'SmallLetterA' to 'SmallLetterZ'.
 --
@@ -835,7 +835,7 @@ char =
     requireOne str = case str of [] -> tooShort; [x] -> return x; _ -> tooLong
 
     requireAscii :: Unicode.Char -> Q Char
-    requireAscii = (May.maybe notAscii return) . (toCharMaybe @Unicode.Char)
+    requireAscii = (Maybe.maybe notAscii return) . (toCharMaybe @Unicode.Char)
 
     wrongContext = failQ "The ASCII.char quasi-quoter may only be used in an expression or pattern context."
     tooShort = failQ "The ASCII.char quasi-quoter cannot be empty; it must contain a character."
@@ -846,7 +846,7 @@ charPat :: Char -> Q TH.Pat
 charPat c = TH.ConP <$> lookupConName <*> return []
   where
     conName = G.conNameOf c
-    lookupConName = TH.lookupValueName (List.concat ["ASCII.", conName]) >>= May.maybe lookupFailed return
+    lookupConName = TH.lookupValueName (List.concat ["ASCII.", conName]) >>= Maybe.maybe lookupFailed return
     lookupFailed = failQ (List.concat ["TH.lookupValueName \"ASCII.", conName, "\" failed. This means there is a mistake in the ascii library."])
 
 {- | Produces an expression representing a 'String' value corresponding to the quasiquoted string.
@@ -875,7 +875,7 @@ string =
     }
   where
     requireAscii :: Unicode.String -> Q String
-    requireAscii = (May.maybe notAscii return) . (toStringMaybe @Unicode.String)
+    requireAscii = (Maybe.maybe notAscii return) . (toStringMaybe @Unicode.String)
 
     wrongContext = failQ "The ASCII.string quasi-quoter may only be used in an expression context."
     notAscii = failQ "The ASCII.string quasi-quoter only works with ASCII characters."
@@ -892,7 +892,7 @@ bytes =
     }
   where
     requireAscii :: Unicode.String -> Q (GenericString BA.Bytes)
-    requireAscii = (May.maybe notAscii return) . (toStringMaybe @Unicode.String)
+    requireAscii = (Maybe.maybe notAscii return) . (toStringMaybe @Unicode.String)
 
     wrongContext = failQ "The ASCII.bytes quasi-quoter may only be used in an expression context."
     notAscii = failQ "The ASCII.bytes quasi-quoter only works with ASCII characters."
@@ -923,7 +923,7 @@ list =
     }
   where
     requireAscii :: Unicode.String -> Q [Char]
-    requireAscii = (May.maybe notAscii return) . traverse (toCharMaybe @Unicode.Char)
+    requireAscii = (Maybe.maybe notAscii return) . traverse (toCharMaybe @Unicode.Char)
 
     wrongContext = failQ "The ASCII.list quasi-quoter may only be used in an expression context."
     notAscii = failQ "The ASCII.list quasi-quoter only works with ASCII characters."
