@@ -212,7 +212,7 @@ intToCharMaybe x = Just (intToCharUnsafe x)
 
 ---  Character widening  ---
 
--- Conversions between a 'Char' and some other larger type.
+-- | Conversions between a 'Char' and some other larger type such as the standard Unicode 'Unicode.Char' type in "Data.Char".
 --
 -- Instances should follow these rules:
 --
@@ -224,6 +224,7 @@ class CharWidening a
   where
     {-# MINIMAL fromChar, toCharMaybe #-}
 
+    -- | Converts from 'Char' to some other, larger type such as the standard Unicode 'Unicode.Char' type in "Data.Char".
     fromChar :: Char -> a
 
     -- | Returns 'Nothing' for any value that does not represent an ASCII character.
@@ -311,8 +312,13 @@ unpack = List.map (intToCharUnsafe . Num.fromIntegral) . BA.unpack . stringBytes
 
 class StringWidening a
   where
+    -- | Converts an ASCII string to some other type of string by mapping each ASCII character to its equivalent in some other character set.
     fromString :: (BA.ByteArrayAccess bytes) => GenericString bytes -> a
+
+    -- | Maps each character of the input string to its ASCII equivalent, or returns 'Nothing' if the input string contains any character that does not have an ASCII equivalent.
     toStringMaybe :: (BA.ByteArray bytes) => a -> Maybe (GenericString bytes)
+
+    -- | Maps each character of the input string to its ASCII equivalent, using the 'Substitute' character as the value for any character of the input that does not have an ASCII equivalent.
     toStringSub :: (BA.ByteArray bytes) => a -> GenericString bytes
 
 instance StringWidening [Unicode.Char]
