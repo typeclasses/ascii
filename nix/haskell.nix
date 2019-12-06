@@ -5,4 +5,5 @@ haskellPackages.ghcWithPackages (p: [
     p.generic-deriving
     p.memory
     p.template-haskell
+    p.text
 ])

@@ -144,6 +144,9 @@ import qualified Language.Haskell.TH.Syntax as TH ( Pat ( ConP ), lookupValueNam
 import qualified GHC.Generics as G
 import qualified Generics.Deriving.ConNames as G
 
+-- UTF-16 packed text
+import qualified Data.Text as Text
+
 
 ---  Individual characters  ---
 
@@ -317,6 +320,12 @@ instance StringWidening [Unicode.Char]
     fromString = List.map fromChar . unpack
     toStringMaybe = fmap pack . traverse @[] (toCharMaybe @Unicode.Char)
     toStringSub = pack . List.map (toCharSub @Unicode.Char)
+
+instance StringWidening Text.Text
+  where
+    fromString = Text.pack . fromString
+    toStringMaybe = toStringMaybe . Text.unpack
+    toStringSub = toStringSub . Text.unpack
 
 
 ---  Case  ---
