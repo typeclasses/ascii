@@ -55,6 +55,7 @@ library
       , generic-deriving
       , bytestring
       , text
+      , network
 
 test-suite test
     default-language: Haskell2010
