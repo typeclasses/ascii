@@ -14,7 +14,7 @@ import qualified System.Exit as Exit
 import qualified GHC.Stack as Stack
 
 main :: IO ()
-main = runTest $ foldl1 (<>) $
+main = runTest $ foldl1 (<>)
 
   [ ASCII.toCharSub @Int 0 === ASCII.Null
   , ASCII.toCharSub @Int 65 === ASCII.CapitalLetterA
