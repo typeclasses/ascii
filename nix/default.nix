@@ -2,7 +2,7 @@ rec {
 
   ghcVersion = "ghc865";
 
-  pkgs = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs-channels/tarball/7351aa52acd056df3ed472747e3a003f590e5829") {};
+  pkgs = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs-channels/tarball/e1eedf29e5d22e6824e614d75449b75a2e3455d6") {};
 
   inherit (pkgs) callPackage;
 
@@ -12,6 +12,6 @@ rec {
 
   inherit (haskellPackages) ghcid;
 
-  ghcide = (import (builtins.fetchTarball "https://github.com/hercules-ci/ghcide-nix/tarball/bde3f34356b5154750acbba3d06205f03662a72d") {})."ghcide-${ghcVersion}";
+  ghcide = (import (builtins.fetchTarball "https://github.com/hercules-ci/ghcide-nix/tarball/f0de6033203963f1b40e2ee38fb60d36873449ac") {})."ghcide-${ghcVersion}";
 
 }
