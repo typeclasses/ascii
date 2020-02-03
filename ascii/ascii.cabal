@@ -1,7 +1,7 @@
 cabal-version: 2.0
 
 name: ascii
-version: 0.1.0.0
+version: 1.0.0.0
 synopsis: ...
 category: Data, Text
 
@@ -22,8 +22,8 @@ build-type: Simple
 tested-with: ghc == 8.6.5
 
 extra-source-files:
-    readme.md
-    changelog.md
+    readme.txt
+    changelog.txt
 
 source-repository head
     type:     git
@@ -32,30 +32,20 @@ source-repository head
 library
     default-language: Haskell2010
     hs-source-dirs: src
+    exposed-modules: ASCII
+    build-depends: ascii-char, base, bytestring, generic-deriving, memory, network, template-haskell, text
 
-    exposed-modules:
+    -- This version introduced the Data.Functor.Contravariant module.
+    build-depends: base >= 4.12
 
-        ASCII
+    -- This is the first version that supports base-4.12.
+    build-depends: memory >= 0.14.9
 
-    build-depends:
+    -- This version added the MonadFail instance for Q.
+    build-depends: template-haskell >= 2.11
 
-      -- This version introduced the Data.Functor.Contravariant module.
-        base >= 4.12
-
-      -- This is the first version that supports base-4.12.
-      , memory >= 0.14.9
-
-      -- This version added the MonadFail instance for Q.
-      , template-haskell >= 2.11
-
-      -- These versions and above are untested because they did not yet exist at the time of writing.
-      , memory < 0.16, base < 4.13, template-haskell < 2.16
-
-      -- todo: bounds
-      , generic-deriving
-      , bytestring
-      , text
-      , network
+    -- These versions and above are untested because they did not yet exist at the time of writing.
+    build-depends: base < 4.13, memory < 0.16, template-haskell < 2.16
 
 test-suite test
     default-language: Haskell2010

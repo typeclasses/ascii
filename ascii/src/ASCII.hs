@@ -1,23 +1,6 @@
 {-# OPTIONS_GHC -Wall #-}
 
-{-# LANGUAGE NoImplicitPrelude #-}
-
-{-# LANGUAGE DeriveLift #-}
-    -- For the deriving clause on the 'Char' type
-
-{-# LANGUAGE StandaloneDeriving #-}
-
-{-# LANGUAGE ScopedTypeVariables #-}
-    -- For writing type annotations in a pattern context
-
-{-# LANGUAGE TemplateHaskell #-}
-    -- For defining the quasi-quoters
-
-{-# LANGUAGE TypeApplications #-}
-
-{-# LANGUAGE DeriveGeneric #-}
-
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances, NoImplicitPrelude, TemplateHaskell, TypeApplications #-}
 
 {- |
 
@@ -63,13 +46,14 @@ module ASCII
   , string, bytes, list, char
 
   -- * Character groups
-  , Group ( .. ), charGroup, inGroup, isControl, isPrint, controlCodes, printableCharacters
+  , Group ( Control, Printable ), charGroup, inGroup, isControl, isPrint, controlCodes, printableCharacters
 
   -- * Upper/lower case letters
   , Case ( UpperCase, LowerCase ), letterCase, isCase, isLower, isUpper, isAlpha, isLetter, letters, capitalLetters, smallLetters, CaseInsensitiveEquivalence ( caseInsensitiveEquivalence, equalsIgnoringCase ), CaseConversion ( toCase )
 
   -- * ASCII swimming in larger worlds
-  , CharWidening ( fromChar, toCharMaybe, toCharSub ), StringWidening ( fromString, toStringMaybe, toStringSub )
+  , CharWidening ( fromChar, toCharMaybe, toCharSub )
+  , StringWidening ( fromString, toStringMaybe, toStringSub )
 
   -- * Numeric characters
   , isDigit, isOctDigit, isHexDigit, isNumber
@@ -81,7 +65,21 @@ module ASCII
   -- * String functions
   , empty, singleton, null, length, replicate, take, drop, span, reverse, any, all, append, concat, cons, snoc, uncons
 
+  -- * File handles
+  , ReadHandle, WriteHandle, ReadWriteHandle
+
+  -- * Opening files
+  , readFile, writeFile, appendFile, readWriteFile
+
+  -- * Standard handles
+  , getStdoutUnsafe, getStderrUnsafe, getStdinUnsafe
+
+  -- * Using file handles
+  , hGetChar, HGetChar ( .. ), hGetCharSub, HGetCharSub ( .. ), hGetString, HGetString ( .. ), hGetStringSub, HGetStringSub ( .. )
+
   ) where
+
+import ASCII.Char
 
 import Prelude ( Ord (..), fmap )
 import Control.Applicative ( (<$>), (<*>) )
@@ -96,6 +94,7 @@ import Prelude ( Bounded ( minBound, maxBound ) )
 -- Various types of numbers
 import Data.Int ( Int )
 import Data.Word ( Word8 )
+import Numeric.Natural ( Natural )
 
 -- Miscellaneous number-related functions
 import qualified Prelude as Num ( fromIntegral, (+), (-) )
@@ -141,49 +140,14 @@ import qualified Control.Monad.Fail as MonadFail
 import qualified Language.Haskell.TH.Syntax as TH ( Pat ( ConP ), lookupValueName )
 
 -- Generics
-import qualified GHC.Generics as G
 import qualified Generics.Deriving.ConNames as G
 
 -- UTF-16 packed text
 import qualified Data.Text as Text
 
-
----  Individual characters  ---
-
--- | A character in the ASCII character set.
---
--- This type has 128 nullary constructors, listed in order according to each character's 7-bit numeric code. Its derived 'Enum' instance can therefore be used to convert a 'Char' to its ASCII code and vice versa; but since 'Enum.toEnum' is a partial function, we recommend instead using 'fromChar', which cannot produce runtime errors.
-
-data Char =
-      Null | StartOfHeading | StartOfText | EndOfText | EndOfTransmission | Enquiry | Acknowledgement | Bell | Backspace | HorizontalTab | LineFeed | VerticalTab | FormFeed | CarriageReturn | ShiftOut | ShiftIn| DataLinkEscape
-
-    | DeviceControl1 | DeviceControl2 | DeviceControl3 | DeviceControl4
-
-    | NegativeAcknowledgement | SynchronousIdle | EndOfTransmissionBlock | Cancel | EndOfMedium | Substitute | Escape
-
-    | FileSeparator | GroupSeparator | RecordSeparator | UnitSeparator
-
-    | Space | ExclamationMark | QuotationMark | NumberSign | DollarSign | PercentSign | Ampersand | Apostrophe | LeftParenthesis | RightParenthesis | Asterisk | PlusSign | Comma | HyphenMinus | FullStop | Slash
-
-    | Digit0 | Digit1 | Digit2 | Digit3 | Digit4 | Digit5 | Digit6 | Digit7 | Digit8 | Digit9
-
-    | Colon | Semicolon | LessThanSign | EqualsSign | GreaterThanSign | QuestionMark | AtSign
-
-    | CapitalLetterA | CapitalLetterB | CapitalLetterC | CapitalLetterD | CapitalLetterE | CapitalLetterF | CapitalLetterG | CapitalLetterH | CapitalLetterI | CapitalLetterJ | CapitalLetterK | CapitalLetterL | CapitalLetterM | CapitalLetterN | CapitalLetterO | CapitalLetterP | CapitalLetterQ | CapitalLetterR | CapitalLetterS | CapitalLetterT | CapitalLetterU | CapitalLetterV | CapitalLetterW | CapitalLetterX | CapitalLetterY | CapitalLetterZ
-
-    | LeftSquareBracket | Backslash | RightSquareBracket | Caret | Underscore | GraveAccent
-
-    | SmallLetterA | SmallLetterB | SmallLetterC | SmallLetterD | SmallLetterE | SmallLetterF | SmallLetterG | SmallLetterH | SmallLetterI | SmallLetterJ | SmallLetterK | SmallLetterL | SmallLetterM | SmallLetterN | SmallLetterO | SmallLetterP | SmallLetterQ | SmallLetterR | SmallLetterS | SmallLetterT | SmallLetterU | SmallLetterV | SmallLetterW | SmallLetterX | SmallLetterY | SmallLetterZ
-
-    | LeftCurlyBracket | VerticalLine | RightCurlyBracket | Tilde | Delete
-
-    deriving ( Eq, Ord, Enum, Bounded, Show )
-
--- Requires the DeriveLift language extension.
-deriving instance TH.Lift Char
-
--- Requires the DeriveGeneric language extension.
-deriving instance G.Generic Char
+-- I/O
+import qualified System.IO as IO
+import System.IO (IO)
 
 
 ---  Direct usage of the Enum instance  ---
@@ -332,6 +296,12 @@ instance StringWidening Text.Text
     fromString = Text.pack . fromString
     toStringMaybe = toStringMaybe . Text.unpack
     toStringSub = toStringSub . Text.unpack
+
+instance StringWidening BS.ByteString
+  where
+    fromString = BS.pack . List.map fromChar . unpack
+    toStringMaybe = fmap pack . traverse toCharMaybe . BS.unpack
+    toStringSub = pack . fmap toCharSub . BS.unpack
 
 
 ---  Case  ---
@@ -791,6 +761,108 @@ snoc xs x = StringUnsafe (BA.snoc (stringBytes xs) (charToWord8 x))
 
 uncons :: (BA.ByteArray bytes) => GenericString bytes -> Maybe (Char, GenericString bytes)
 uncons = fmap (\(x, xs) -> (word8ToCharUnsafe x, StringUnsafe xs)) . BA.uncons . stringBytes
+
+
+---  I/O  ---
+
+newtype ReadHandle = ReadHandleUnsafe IO.Handle
+
+newtype WriteHandle = WriteHandleUnsafe IO.Handle
+
+data ReadWriteHandle = ReadWriteHandle ReadHandle WriteHandle
+
+readFile :: IO.FilePath -> (ReadHandle -> IO a) -> IO a
+readFile fp f = IO.withBinaryFile fp IO.ReadMode (\h -> f (ReadHandleUnsafe h))
+
+writeFile :: IO.FilePath -> (WriteHandle -> IO a) -> IO a
+writeFile fp f = IO.withBinaryFile fp IO.WriteMode (\h -> f (WriteHandleUnsafe h))
+
+appendFile :: IO.FilePath -> (WriteHandle -> IO a) -> IO a
+appendFile fp f = IO.withBinaryFile fp IO.AppendMode (\h -> f (WriteHandleUnsafe h))
+
+readWriteFile :: IO.FilePath -> (ReadWriteHandle -> IO a) -> IO a
+readWriteFile fp f = IO.withBinaryFile fp IO.AppendMode (\h -> f (ReadWriteHandle (ReadHandleUnsafe h) (WriteHandleUnsafe h)))
+
+adoptHandleUnsafe :: (IO.Handle -> b) -> IO.Handle -> IO b
+adoptHandleUnsafe f h =
+  do
+    IO.hSetBinaryMode h True
+    return (f h)
+
+getStdoutUnsafe :: IO WriteHandle
+getStdoutUnsafe = adoptHandleUnsafe WriteHandleUnsafe IO.stdout
+
+getStderrUnsafe :: IO WriteHandle
+getStderrUnsafe = adoptHandleUnsafe WriteHandleUnsafe IO.stderr
+
+getStdinUnsafe :: IO ReadHandle
+getStdinUnsafe = adoptHandleUnsafe ReadHandleUnsafe IO.stdin
+
+-- | Reads a character from a handle, blocking until a character is available.
+
+hGetChar :: ReadHandle -> IO HGetChar
+hGetChar (ReadHandleUnsafe h) = fmap f getBS
+  where
+    getBS = BS.hGet h 1
+    f bs = Maybe.maybe HGetChar_End word8HandleRead (bsHead bs)
+
+word8HandleRead :: Word8 -> HGetChar
+word8HandleRead b = Maybe.maybe (HGetChar_Invalid b) HGetChar (toCharMaybe b)
+
+-- | The return type of 'hGetChar'.
+data HGetChar =
+    HGetChar Char -- ^ An ASCII character read from a handle.
+  | HGetChar_End -- ^ The end of the handle has been reached.
+  | HGetChar_Invalid Word8 -- ^ The byte read is not an ASCII character.
+
+hGetCharSub :: ReadHandle -> IO HGetCharSub
+hGetCharSub (ReadHandleUnsafe h) = fmap f getBS
+  where
+    getBS = BS.hGet h 1
+    f bs = Maybe.maybe HGetCharSub_End word8HandleReadSub (bsHead bs)
+
+word8HandleReadSub :: Word8 -> HGetCharSub
+word8HandleReadSub b = HGetCharSub (Maybe.fromMaybe Substitute (toCharMaybe b))
+
+-- | The return type of 'hGetCharSub'.
+data HGetCharSub =
+    HGetCharSub Char -- ^ An ASCII character read from a handle, or 'Substitute' if the byte read from the handle does not represent an ASCII character.
+  | HGetCharSub_End -- ^ The end of the handle has been reached.
+
+bsHead :: BS.ByteString -> Maybe Word8
+bsHead bs = if BS.null bs then Nothing else Just (BS.head bs)
+
+data RequestedSize = ExactSize Natural | MaximumSize Natural
+
+hGetString :: BA.ByteArray s => RequestedSize -> ReadHandle -> IO (HGetString s)
+hGetString rs (ReadHandleUnsafe h) = fmap f getBS
+  where
+    getBS = case rs of
+        ExactSize n -> BS.hGet h (Num.fromIntegral n)
+        MaximumSize n -> BS.hGetSome h (Num.fromIntegral n)
+
+    f bs =
+        if BS.null bs then HGetString_End else
+        case toStringMaybe bs of Nothing -> HGetString_Invalid
+                                 Just s  -> HGetString s
+
+data HGetString s =
+    HGetString (GenericString s) -- ^ Some ASCII characters read from a handle.
+  | HGetString_End -- ^ The end of the handle has been reached.
+  | HGetString_Invalid -- ^ The input contains a byte that is not an ASCII character.
+
+hGetStringSub :: BA.ByteArray s => RequestedSize -> ReadHandle -> IO (HGetStringSub s)
+hGetStringSub rs (ReadHandleUnsafe h) = fmap f getBS
+  where
+    getBS = case rs of
+        ExactSize n -> BS.hGet h (Num.fromIntegral n)
+        MaximumSize n -> BS.hGetSome h (Num.fromIntegral n)
+
+    f bs = if BS.null bs then HGetStringSub_End else HGetStringSub (toStringSub bs)
+
+data HGetStringSub s =
+    HGetStringSub (GenericString s) -- ^ Some ASCII characters read from a handle, with the 'Substitute' character taking the place of any invalid bytes.
+  | HGetStringSub_End -- ^ The end of the handle has been reached.
 
 
 ---  Quasi-quotation  ---
