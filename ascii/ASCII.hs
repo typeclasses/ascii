@@ -11,12 +11,25 @@ We do not elaborate on the semantics of the control characters here, because thi
 -}
 
 module ASCII
-  ( ASCII.Char.Char (..)
+  ( ASCII.Char (..)
 
   -- * Character groups
   , ASCII.Group.Group (..), ASCII.Group.charGroup, ASCII.Group.inGroup
 
+  -- * Char/Int conversions
+  , charToInt, intToCharMaybe, intToCharUnsafe
+
   ) where
 
+import qualified ASCII.Char as ASCII (Char)
 import qualified ASCII.Char
 import qualified ASCII.Group
+
+charToInt :: ASCII.Char -> Int
+charToInt = ASCII.Char.toInt
+
+intToCharMaybe :: Int -> Maybe ASCII.Char
+intToCharMaybe = ASCII.Char.fromIntMaybe
+
+intToCharUnsafe :: Int -> ASCII.Char
+intToCharUnsafe = ASCII.Char.fromIntUnsafe
