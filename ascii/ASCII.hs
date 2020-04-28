@@ -19,6 +19,9 @@ module ASCII
   -- * Character groups
   , ASCII.Group.Group (..), ASCII.Group.charGroup, ASCII.Group.inGroup
 
+  -- * Letter case
+  , ASCII.Case.Case (..), ASCII.Case.letterCase, ASCII.Case.isCase
+
   -- * Char/Int conversions
   , charToInt, intToCharMaybe, intToCharUnsafe
 
@@ -33,7 +36,9 @@ import qualified Prelude
 import Data.Word (Word8)
 
 import qualified ASCII.Char as ASCII (Char)
+
 import qualified ASCII.Char
+import qualified ASCII.Case
 import qualified ASCII.Group
 
 charToInt :: ASCII.Char -> Int

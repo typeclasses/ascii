@@ -40,6 +40,9 @@ library
     build-depends: ascii-group >= 1.0 && <1.1
     reexported-modules: ASCII.Group
 
+    build-depends: ascii-case >= 1.0 && <1.1
+    reexported-modules: ASCII.Case
+
     build-depends: ascii-char-superset >= 1.0 && <1.1
     reexported-modules: ASCII.Char.Superset
 
