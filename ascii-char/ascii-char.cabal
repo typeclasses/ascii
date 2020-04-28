@@ -1,12 +1,12 @@
 cabal-version: 2.0
 
-name: ascii
+name: ascii-char
 version: 1.0.0.0
-synopsis: The ASCII character set and encoding
+synopsis: A Char type representing an ASCII character
 category: Data, Text
 
 description:
-    This package provides a variety of ways to work with ASCII text.
+    This package defines a @Char@ type that has 128 constructors, one for each ASCII character.
 
 license: Apache-2.0
 license-file: license.txt
@@ -27,11 +27,10 @@ source-repository head
 
 library
     default-language: Haskell2010
+    default-extensions: DeriveLift, DeriveGeneric, NoImplicitPrelude, StandaloneDeriving
+    ghc-options: -Wall
 
-    -- Re-export ascii-char
-    build-depends: ascii-char
-    reexported-modules: ASCII.Char
+    build-depends: base              >= 4.11 && < 4.14
+    build-depends: template-haskell  >= 2.11 && < 2.16
 
-    -- The "data-ascii" package was formerly named "ascii", so this package re-exports all of its modules.
-    build-depends: data-ascii
-    reexported-modules: Data.Ascii, Data.Ascii.Blaze, Data.Ascii.ByteString, Data.Ascii.Word8
+    exposed-modules: ASCII.Char
