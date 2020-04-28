@@ -1,6 +1,6 @@
 {- |
 
-The __American Standard Code for Information Interchange__ (ASCII) comprises a set of 128 characters, each represented by 7 bits. 33 of these characters are /'Control' codes/; a few of these are still in use, but most are obsolete relics of the early days of computing. The other 95 are /'Printable' characters/ such as letters and numbers, mostly corresponding to the keys on an American English keyboard.
+The __American Standard Code for Information Interchange__ (ASCII) comprises a set of 128 characters, each represented by 7 bits. 33 of these characters are /'ASCII.Group.Control' codes/; a few of these are still in use, but most are obsolete relics of the early days of computing. The other 95 are /'ASCII.Group.Printable' characters/ such as letters and numbers, mostly corresponding to the keys on an American English keyboard.
 
 Nowadays instead of ASCII we typically work with text using an encoding such as UTF-8 that can represent the entire Unicode character set, which includes over a hundred thousand characters and is not limited to the symbols of any particular writing system or culture. However, ASCII is still relevant to network protocols; for example, we can see it in the specification of [HTTP message headers](https://tools.ietf.org/html/rfc7230#section-1.2).
 
@@ -20,6 +20,8 @@ module ASCII
   , charToInt, intToCharMaybe, intToCharUnsafe
 
   ) where
+
+import Prelude (Maybe, Int)
 
 import qualified ASCII.Char as ASCII (Char)
 import qualified ASCII.Char
