@@ -2,11 +2,11 @@ cabal-version: 2.0
 
 name: ascii
 version: 1.0.0.0
-synopsis: ...
+synopsis: The ASCII character set and encoding
 category: Data, Text
 
 description:
-    ...
+    This package provides a variety of ways to work with ASCII text.
 
 license: Apache-2.0
 license-file: license.txt
