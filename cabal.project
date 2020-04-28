@@ -1,5 +1,6 @@
 packages:
     ./ascii
     ./ascii-char
+    ./ascii-char-superset
     ./ascii-group
     ./data-ascii
