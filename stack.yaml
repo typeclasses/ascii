@@ -1,2 +1,2 @@
 resolver: lts-15.2
-packages: [ ascii ]
+packages: [ ascii, data-ascii ]

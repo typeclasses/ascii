@@ -1,2 +1,3 @@
 packages:
     ./ascii
+    ./data-ascii
