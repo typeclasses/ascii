@@ -43,8 +43,8 @@ library
     build-depends: ascii-case >= 1.0 && <1.1
     reexported-modules: ASCII.Case
 
-    build-depends: ascii-char-superset >= 1.0 && <1.1
-    reexported-modules: ASCII.Char.Superset
+    build-depends: ascii-conversions >= 1.0 && <1.1
+    reexported-modules: ASCII.Conversions
 
     build-depends: data-ascii
     reexported-modules: Data.Ascii, Data.Ascii.Blaze, Data.Ascii.ByteString, Data.Ascii.Word8

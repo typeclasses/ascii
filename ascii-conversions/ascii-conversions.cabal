@@ -1,12 +1,12 @@
 cabal-version: 2.0
 
-name: ascii-char-superset
+name: ascii-conversions
 version: 1.0.0.0
-synopsis: ASCII supersets
+synopsis: ASCII conversions
 category: Data, Text
 
 description:
-    This package defines the @AsciiCharSuperset@ class which describes types which are supersets of the ASCII character set: types that can represent every ASCII character and perhaps more.
+    This package deals with types which are supersets of the ASCII character set: types that can represent every ASCII character and perhaps more.
 
 license: Apache-2.0
 license-file: license.txt
@@ -33,4 +33,4 @@ library
     build-depends: base       >= 4.11 && < 4.14
     build-depends: ascii-char >= 1.0  && < 1.1
 
-    exposed-modules: ASCII.Char.Superset
+    exposed-modules: ASCII.Conversions
