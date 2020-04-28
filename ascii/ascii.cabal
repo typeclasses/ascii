@@ -27,6 +27,11 @@ source-repository head
 
 library
     default-language: Haskell2010
+    ghc-options: -Wall
+
+    build-depends: base >= 4.11 && < 4.14
+
+    exposed-modules: ASCII
 
     -- Re-export ascii-char
     build-depends: ascii-char
