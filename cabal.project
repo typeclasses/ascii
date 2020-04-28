@@ -1,4 +1,5 @@
 packages:
     ./ascii
     ./ascii-char
+    ./ascii-group
     ./data-ascii

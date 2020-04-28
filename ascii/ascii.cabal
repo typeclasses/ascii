@@ -34,8 +34,12 @@ library
     exposed-modules: ASCII
 
     -- Re-export ascii-char
-    build-depends: ascii-char
+    build-depends: ascii-char >= 1.0 && <1.1
     reexported-modules: ASCII.Char
+
+    -- Re-export ascii-group
+    build-depends: ascii-group >= 1.0 && <1.1
+    reexported-modules: ASCII.Group
 
     -- The "data-ascii" package was formerly named "ascii", so this package re-exports all of its modules.
     build-depends: data-ascii

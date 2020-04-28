@@ -91,19 +91,23 @@ install:
   - |
     echo "packages: ./ascii" >> cabal.project
     echo "packages: ./ascii-char" >> cabal.project
+    echo "packages: ./ascii-group" >> cabal.project
     echo "packages: ./data-ascii" >> cabal.project
   - echo 'package ascii' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - echo 'package ascii-char' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
+  - echo 'package ascii-group' >> cabal.project
+  - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - echo 'package data-ascii' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - |
-  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(ascii|ascii-char|data-ascii)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
+  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(ascii|ascii-char|ascii-group|data-ascii)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
   - if [ -f "./ascii/configure.ac" ]; then (cd "./ascii" && autoreconf -i); fi
   - if [ -f "./ascii-char/configure.ac" ]; then (cd "./ascii-char" && autoreconf -i); fi
+  - if [ -f "./ascii-group/configure.ac" ]; then (cd "./ascii-group" && autoreconf -i); fi
   - if [ -f "./data-ascii/configure.ac" ]; then (cd "./data-ascii" && autoreconf -i); fi
   - ${CABAL} v2-freeze $WITHCOMPILER ${TEST} ${BENCH}
   - "cat cabal.project.freeze | sed -E 's/^(constraints: *| *)//' | sed 's/any.//'"
@@ -121,6 +125,7 @@ script:
   - find . -maxdepth 1 -type f -name '*.tar.gz' -exec rm       '{}' \;
   - PKGDIR_ascii="$(find . -maxdepth 1 -type d -regex '.*/ascii-[0-9.]*')"
   - PKGDIR_ascii_char="$(find . -maxdepth 1 -type d -regex '.*/ascii-char-[0-9.]*')"
+  - PKGDIR_ascii_group="$(find . -maxdepth 1 -type d -regex '.*/ascii-group-[0-9.]*')"
   - PKGDIR_data_ascii="$(find . -maxdepth 1 -type d -regex '.*/data-ascii-[0-9.]*')"
   # Generate cabal.project
   - rm -rf cabal.project cabal.project.local cabal.project.freeze
@@ -128,15 +133,18 @@ script:
   - |
     echo "packages: ${PKGDIR_ascii}" >> cabal.project
     echo "packages: ${PKGDIR_ascii_char}" >> cabal.project
+    echo "packages: ${PKGDIR_ascii_group}" >> cabal.project
     echo "packages: ${PKGDIR_data_ascii}" >> cabal.project
   - echo 'package ascii' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - echo 'package ascii-char' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
+  - echo 'package ascii-group' >> cabal.project
+  - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - echo 'package data-ascii' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - |
-  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(ascii|ascii-char|data-ascii)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
+  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(ascii|ascii-char|ascii-group|data-ascii)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
   # Building...
@@ -148,6 +156,7 @@ script:
   # cabal check...
   - (cd ${PKGDIR_ascii} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_ascii_char} && ${CABAL} -vnormal check)
+  - (cd ${PKGDIR_ascii_group} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_data_ascii} && ${CABAL} -vnormal check)
   # haddock...
   - ${CABAL} v2-haddock $WITHCOMPILER --with-haddock $HADDOCK ${TEST} ${BENCH} all
