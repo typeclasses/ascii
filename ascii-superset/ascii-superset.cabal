@@ -2,11 +2,11 @@ cabal-version: 2.0
 
 name: ascii-superset
 version: 1.0.0.0
-synopsis: ASCII supersets
+synopsis: Representing ASCII with refined supersets
 category: Data, Text
 
 description:
-    This package defines the @AsciiSuperset@ class which describes types which are supersets of the ASCII character set: types that can represent every ASCII character and perhaps more.
+    This package defines the @AsciiSuperset@ class which describes what subset of a type is valid as ASCII.
 
 license: Apache-2.0
 license-file: license.txt
@@ -32,5 +32,6 @@ library
 
     build-depends: base       >= 4.11 && < 4.14
     build-depends: ascii-char >= 1.0  && < 1.1
+    build-depends: text       >= 1.2  && < 1.3
 
     exposed-modules: ASCII.Superset

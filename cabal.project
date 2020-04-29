@@ -3,6 +3,5 @@ packages:
     ./ascii-case
     ./ascii-char
     ./ascii-group
-    ./ascii-refinement
     ./ascii-superset
     ./data-ascii

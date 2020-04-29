@@ -1,56 +1,115 @@
-module ASCII.Superset ( AsciiSuperset (..) ) where
+{-# LANGUAGE FlexibleInstances, TypeApplications, TypeFamilies, TypeSynonymInstances #-}
 
-import ASCII.Char (Char)
-import qualified ASCII.Char
+module ASCII.Superset ( AsciiSuperset (..), AsciiSupersetChar (..), AsciiSupersetString (..) ) where
 
-import Prelude (Maybe, (.))
 import qualified Prelude
+import Prelude ((.), (<=), Maybe (..), Bool (..), otherwise, all)
+import Data.Functor (fmap)
+import Data.Traversable (traverse)
+
+import Data.Kind (Type)
 
 import qualified Data.Char as Unicode
-import qualified Data.Maybe as Maybe
-import qualified Data.Word as Word
+import qualified Data.String as Unicode
 
--- | Conversions between a 'Char' and some other larger type such as the standard Unicode 'Unicode.Char' type in "Data.Char".
---
--- Instances should follow these rules:
---
--- - @toCharMaybe (fromChar c)@ = @Just c@
--- - If @toCharMaybe x@ = @Just c@, then @toCharSub x@ = @c@
--- - If @toCharMaybe x@ = @Just c@, then @toCharUnsafe x@ = @c@
--- - If @toCharMaybe x@ = @Nothing@, then @toCharSub x@ = 'Substitute'
+import qualified Data.List as List
+import qualified Data.Maybe as Maybe
+import qualified Data.Text as Text
+
+import qualified ASCII.Char as ASCII
 
 class AsciiSuperset a
   where
-    {-# MINIMAL fromChar, toCharMaybe #-}
 
-    -- | Converts from 'Char' to some other, larger type such as the standard Unicode 'Unicode.Char' type in "Data.Char".
-    fromChar :: Char -> a
+    data AsciiRestricted a :: Type
 
-    -- | Returns 'Nothing' for any value that does not represent an ASCII character.
-    toCharMaybe :: a -> Prelude.Maybe Char
+    {-# MINIMAL validate, substitute, lift #-}
 
-    -- | Returns the 'Substitute' character for any value that does not represent an ASCII character.
-    toCharSub :: a -> Char
-    toCharSub = Maybe.fromMaybe ASCII.Char.Substitute . toCharMaybe
+    restrictUnsafe :: a -> AsciiRestricted a
+    restrictUnsafe = Maybe.fromJust . validate
 
-    -- | Undefined for any value that does not represent an ASCII character.
-    toCharUnsafe :: a -> Char
-    toCharUnsafe = Maybe.fromJust . toCharMaybe
+    validate :: a -> Maybe (AsciiRestricted a)
 
--- | Representation of an ASCII 'Char' as an 'Int' between 0 and 127.
-instance AsciiSuperset Prelude.Int
+    isValid :: a -> Bool
+    isValid = Maybe.isJust . validate
+
+    substitute :: a -> AsciiRestricted a
+
+    lift :: AsciiRestricted a -> a
+
+class AsciiSuperset a => AsciiSupersetChar a
   where
-    fromChar = ASCII.Char.toInt
-    toCharMaybe = ASCII.Char.fromIntMaybe
+    {-# MINIMAL (fromChar | fromCharRestricted), (toChar | toCharUnsafe) #-}
 
--- | Representation of an ASCII 'Char' as a byte where the first bit is always 0.
-instance AsciiSuperset Word.Word8
+    fromChar :: ASCII.Char -> a
+    fromChar = lift . fromCharRestricted
+
+    fromCharRestricted :: ASCII.Char -> AsciiRestricted a
+    fromCharRestricted = restrictUnsafe . fromChar
+
+    toChar :: AsciiRestricted a -> ASCII.Char
+    toChar = toCharUnsafe . lift
+
+    toCharUnsafe :: a -> ASCII.Char
+    toCharUnsafe = toChar . Maybe.fromJust . validate
+
+class AsciiSuperset a => AsciiSupersetString a
   where
-    fromChar = Prelude.fromIntegral . ASCII.Char.toInt
-    toCharMaybe = ASCII.Char.fromIntMaybe . Prelude.fromIntegral
+    {-# MINIMAL (fromCharList | fromCharListRestricted), (toCharList | toCharListUnsafe) #-}
 
--- | Representation of an ASCII 'Char' as one of the first 128 Unicode 'Unicode.Char's.
+    fromCharList :: [ASCII.Char] -> a
+    fromCharList = lift . fromCharListRestricted
+
+    fromCharListRestricted :: [ASCII.Char] -> AsciiRestricted a
+    fromCharListRestricted = restrictUnsafe . fromCharList
+
+    toCharList :: AsciiRestricted a -> [ASCII.Char]
+    toCharList = toCharListUnsafe . lift
+
+    toCharListUnsafe :: a -> [ASCII.Char]
+    toCharListUnsafe = toCharList . Maybe.fromJust . validate
+
 instance AsciiSuperset Unicode.Char
   where
-    fromChar = Unicode.chr . ASCII.Char.toInt
-    toCharMaybe = ASCII.Char.fromIntMaybe . Unicode.ord
+
+    newtype AsciiRestricted Unicode.Char = AsciiCharUnsafe { asciiChar :: Unicode.Char }
+
+    restrictUnsafe = AsciiCharUnsafe
+
+    lift = asciiChar
+
+    isValid = (<= '\DEL')
+
+    validate x   | isValid x = Just (restrictUnsafe x)
+                 | otherwise = Nothing
+
+    substitute x | isValid x = restrictUnsafe x
+                 | otherwise = restrictUnsafe '\SUB'
+
+instance AsciiSupersetChar Unicode.Char
+  where
+
+    toCharUnsafe = ASCII.fromIntUnsafe . Unicode.ord
+
+    fromChar = Unicode.chr . ASCII.toInt
+
+instance AsciiSuperset Unicode.String
+  where
+
+    newtype AsciiRestricted Unicode.String = AsciiStringUnsafe { asciiString :: Unicode.String }
+
+    restrictUnsafe = AsciiStringUnsafe
+
+    lift = asciiString
+
+    isValid = all (isValid @Unicode.Char)
+
+    validate x | isValid x = Just (restrictUnsafe x)
+               | otherwise = Nothing
+
+instance AsciiSupersetString Unicode.String
+  where
+
+    toCharListUnsafe = List.map (toCharUnsafe @Unicode.Char)
+
+    fromCharList = List.map (lift . fromCharRestricted @Unicode.Char)
