@@ -24,15 +24,19 @@ class IsChar a
     fromChar :: ASCII.Char -> a
     toCharUnsafe :: a -> ASCII.Char
 
+toCharSub :: IsChar a => a -> ASCII.Char
+toCharSub x = if isAsciiChar x then toCharUnsafe x else ASCII.Substitute
+
+substituteChar :: IsChar a => a -> a
+substituteChar x = if isAsciiChar x then x else fromChar ASCII.Substitute
+
 class IsString a
   where
     isAsciiString :: a -> Bool
     fromCharList :: [ASCII.Char] -> a
     toCharListUnsafe :: a -> [ASCII.Char]
     toCharListSub :: a -> [ASCII.Char]
-
-toCharSub :: IsChar a => a -> ASCII.Char
-toCharSub x = if isAsciiChar x then toCharUnsafe x else ASCII.Substitute
+    substituteString :: a -> a
 
 instance IsChar Unicode.Char
   where
@@ -64,6 +68,7 @@ instance IsChar a => IsString [a]
     fromCharList = List.map fromChar
     toCharListUnsafe = List.map toCharUnsafe
     toCharListSub = List.map toCharSub
+    substituteString = List.map substituteChar
 
 instance IsString T.Text
   where
@@ -71,6 +76,7 @@ instance IsString T.Text
     fromCharList = T.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . T.unpack
     toCharListSub = toCharListSub . T.unpack
+    substituteString = T.map substituteChar
 
 instance IsString LT.Text
   where
@@ -78,6 +84,7 @@ instance IsString LT.Text
     fromCharList = LT.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . LT.unpack
     toCharListSub = toCharListSub . LT.unpack
+    substituteString = LT.map substituteChar
 
 instance IsString TB.Builder
   where
@@ -85,6 +92,7 @@ instance IsString TB.Builder
     fromCharList = TB.fromString . fromCharList
     toCharListUnsafe = toCharListUnsafe . TB.toLazyText
     toCharListSub = toCharListSub . TB.toLazyText
+    substituteString = TB.fromLazyText . substituteString . TB.toLazyText
 
 instance IsString BS.ByteString
   where
@@ -92,6 +100,7 @@ instance IsString BS.ByteString
     fromCharList = BS.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . BS.unpack
     toCharListSub = toCharListSub . BS.unpack
+    substituteString = BS.map substituteChar
 
 instance IsString LBS.ByteString
   where
@@ -99,6 +108,7 @@ instance IsString LBS.ByteString
     fromCharList = LBS.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . LBS.unpack
     toCharListSub = toCharListSub . LBS.unpack
+    substituteString = LBS.map substituteChar
 
 instance IsString BSB.Builder
   where
@@ -106,3 +116,4 @@ instance IsString BSB.Builder
     fromCharList = BSB.lazyByteString . fromCharList
     toCharListUnsafe = toCharListUnsafe . BSB.toLazyByteString
     toCharListSub = toCharListSub . BSB.toLazyByteString
+    substituteString = BSB.lazyByteString . substituteString . BSB.toLazyByteString

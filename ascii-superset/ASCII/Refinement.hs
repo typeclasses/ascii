@@ -7,7 +7,7 @@ module ASCII.Refinement
   , validateChar, fromChar, toChar, substituteChar
 
   -- * String functions
-  , fromCharList, toCharList
+  , fromCharList, toCharList, substituteString
 
   ) where
 
@@ -39,3 +39,6 @@ fromCharList = asciiUnsafe . S.fromCharList
 
 toCharList :: S.IsString a => ASCII a -> [ASCII.Char]
 toCharList = S.toCharListUnsafe . lift
+
+substituteString :: S.IsString a => a -> ASCII a
+substituteString = asciiUnsafe . S.substituteString
