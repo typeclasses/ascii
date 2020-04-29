@@ -6,7 +6,7 @@ synopsis: Representing ASCII with refined supersets
 category: Data, Text
 
 description:
-    This package defines the @AsciiSuperset@ class which describes what subset of a type is valid as ASCII.
+    This package defines the @AsciiCharSuperset@ and @AsciiStringSuperset@ classes which describe what subset of a type is valid as ASCII, as well as an @ASCII@ type constructor representing a value of a superset that is known to be valid ASCII.
 
 license: Apache-2.0
 license-file: license.txt
@@ -31,7 +31,8 @@ library
     ghc-options: -Wall
 
     build-depends: base       >= 4.11 && < 4.14
+    build-depends: bytestring >= 0.10 && < 0.11
     build-depends: ascii-char >= 1.0  && < 1.1
     build-depends: text       >= 1.2  && < 1.3
 
-    exposed-modules: ASCII.Superset
+    exposed-modules: ASCII.Superset, ASCII.Refinement

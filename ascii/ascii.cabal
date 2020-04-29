@@ -44,7 +44,7 @@ library
     reexported-modules: ASCII.Case
 
     build-depends: ascii-superset >= 1.0 && <1.1
-    reexported-modules: ASCII.Superset
+    reexported-modules: ASCII.Superset, ASCII.Refinement
 
     build-depends: data-ascii
     reexported-modules: Data.Ascii, Data.Ascii.Blaze, Data.Ascii.ByteString, Data.Ascii.Word8

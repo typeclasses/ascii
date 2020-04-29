@@ -1,118 +1,108 @@
-{-# LANGUAGE FlexibleInstances, TypeApplications, TypeFamilies, TypeSynonymInstances #-}
+module ASCII.Superset where
 
-module ASCII.Superset ( AsciiSuperset (..), AsciiSupersetChar (..), AsciiSupersetString (..) ) where
-
-import qualified Prelude
-import Prelude ((.), (<=), Maybe (..), Bool (..), otherwise, all)
-import Data.Functor (fmap)
-import Data.Traversable (traverse)
-
-import Data.Kind (Type)
-
-import qualified Data.Char as Unicode
-import qualified Data.String as Unicode
-
-import qualified Data.List as List
-import qualified Data.Maybe as Maybe
-import qualified Data.Text as Text
+import Data.Bool (Bool, (&&))
+import Data.Function ((.))
+import Data.Ord ((<=), (>=))
 
 import qualified ASCII.Char as ASCII
+import qualified Data.Char as Unicode
+import qualified Data.Word as Word
+import qualified Data.Int as Int
+import qualified Data.List as List
+import qualified Numeric.Natural as Nat
+import qualified Prelude
+import qualified Data.Text as T
+import qualified Data.Text.Lazy as LT
+import qualified Data.Text.Lazy.Builder as TB
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as LBS
+import qualified Data.ByteString.Builder as BSB
 
-class AsciiSuperset a
+class AsciiCharSuperset a
   where
-
-    data AsciiRestricted a :: Type
-
-    {-# MINIMAL validate, substitute, lift #-}
-
-    restrictUnsafe :: a -> AsciiRestricted a
-    restrictUnsafe = Maybe.fromJust . validate
-
-    validate :: a -> Maybe (AsciiRestricted a)
-
-    isValid :: a -> Bool
-    isValid = Maybe.isJust . validate
-
-    substitute :: a -> AsciiRestricted a
-
-    lift :: AsciiRestricted a -> a
-
-class AsciiSuperset a => AsciiSupersetChar a
-  where
-    {-# MINIMAL (fromChar | fromCharRestricted), (toChar | toCharUnsafe) #-}
-
+    isAsciiChar :: a -> Bool
     fromChar :: ASCII.Char -> a
-    fromChar = lift . fromCharRestricted
-
-    fromCharRestricted :: ASCII.Char -> AsciiRestricted a
-    fromCharRestricted = restrictUnsafe . fromChar
-
-    toChar :: AsciiRestricted a -> ASCII.Char
-    toChar = toCharUnsafe . lift
-
     toCharUnsafe :: a -> ASCII.Char
-    toCharUnsafe = toChar . Maybe.fromJust . validate
 
-    toCharSub :: a -> ASCII.Char
-    toCharSub = toChar . substitute
-
-class AsciiSuperset a => AsciiSupersetString a
+class AsciiStringSuperset a
   where
-    {-# MINIMAL (fromCharList | fromCharListRestricted), (toCharList | toCharListUnsafe) #-}
-
+    isAsciiString :: a -> Bool
     fromCharList :: [ASCII.Char] -> a
-    fromCharList = lift . fromCharListRestricted
-
-    fromCharListRestricted :: [ASCII.Char] -> AsciiRestricted a
-    fromCharListRestricted = restrictUnsafe . fromCharList
-
-    toCharList :: AsciiRestricted a -> [ASCII.Char]
-    toCharList = toCharListUnsafe . lift
-
     toCharListUnsafe :: a -> [ASCII.Char]
-    toCharListUnsafe = toCharList . Maybe.fromJust . validate
+    toCharListSub :: a -> [ASCII.Char]
 
-instance AsciiSuperset Unicode.Char
+toCharSub :: AsciiCharSuperset a => a -> ASCII.Char
+toCharSub x = if isAsciiChar x then toCharUnsafe x else ASCII.Substitute
+
+instance AsciiCharSuperset Unicode.Char
   where
-
-    newtype AsciiRestricted Unicode.Char = AsciiCharUnsafe { asciiChar :: Unicode.Char }
-
-    restrictUnsafe = AsciiCharUnsafe
-
-    lift = asciiChar
-
-    isValid = (<= '\DEL')
-
-    validate x   | isValid x = Just (restrictUnsafe x)
-                 | otherwise = Nothing
-
-    substitute x | isValid x = restrictUnsafe x
-                 | otherwise = restrictUnsafe '\SUB'
-
-instance AsciiSupersetChar Unicode.Char
-  where
-
+    isAsciiChar = (<= '\DEL')
+    fromChar = Unicode.chr . ASCII.toInt
     toCharUnsafe = ASCII.fromIntUnsafe . Unicode.ord
 
-    fromChar = Unicode.chr . ASCII.toInt
-
-instance AsciiSuperset Unicode.String
+instance AsciiCharSuperset Nat.Natural
   where
+    isAsciiChar = (<= 127)
+    fromChar = Prelude.fromIntegral . ASCII.toInt
+    toCharUnsafe = ASCII.fromIntUnsafe . Prelude.fromIntegral
 
-    newtype AsciiRestricted Unicode.String = AsciiStringUnsafe { asciiString :: Unicode.String }
-
-    restrictUnsafe = AsciiStringUnsafe
-
-    lift = asciiString
-
-    isValid = all (isValid @Unicode.Char)
-
-    validate x | isValid x = Just (restrictUnsafe x)
-               | otherwise = Nothing
-
-instance AsciiSupersetString Unicode.String
+instance AsciiCharSuperset Int.Int
   where
+    isAsciiChar x = (x >= 0) && (x <= 127)
+    fromChar = ASCII.toInt
+    toCharUnsafe = ASCII.fromIntUnsafe
 
-    toCharListUnsafe = List.map (toCharUnsafe @Unicode.Char)
+instance AsciiCharSuperset Word.Word8
+  where
+    isAsciiChar = (<= 127)
+    fromChar = Prelude.fromIntegral . ASCII.toInt
+    toCharUnsafe = ASCII.fromIntUnsafe . Prelude.fromIntegral
 
-    fromCharList = List.map (lift . fromCharRestricted @Unicode.Char)
+instance AsciiCharSuperset a => AsciiStringSuperset [a]
+  where
+    isAsciiString = List.all isAsciiChar
+    fromCharList = List.map fromChar
+    toCharListUnsafe = List.map toCharUnsafe
+    toCharListSub = List.map toCharSub
+
+instance AsciiStringSuperset T.Text
+  where
+    isAsciiString = T.all isAsciiChar
+    fromCharList = T.pack . fromCharList
+    toCharListUnsafe = toCharListUnsafe . T.unpack
+    toCharListSub = toCharListSub . T.unpack
+
+instance AsciiStringSuperset LT.Text
+  where
+    isAsciiString = LT.all isAsciiChar
+    fromCharList = LT.pack . fromCharList
+    toCharListUnsafe = toCharListUnsafe . LT.unpack
+    toCharListSub = toCharListSub . LT.unpack
+
+instance AsciiStringSuperset TB.Builder
+  where
+    isAsciiString = isAsciiString . TB.toLazyText
+    fromCharList = TB.fromString . fromCharList
+    toCharListUnsafe = toCharListUnsafe . TB.toLazyText
+    toCharListSub = toCharListSub . TB.toLazyText
+
+instance AsciiStringSuperset BS.ByteString
+  where
+    isAsciiString = BS.all isAsciiChar
+    fromCharList = BS.pack . fromCharList
+    toCharListUnsafe = toCharListUnsafe . BS.unpack
+    toCharListSub = toCharListSub . BS.unpack
+
+instance AsciiStringSuperset LBS.ByteString
+  where
+    isAsciiString = LBS.all isAsciiChar
+    fromCharList = LBS.pack . fromCharList
+    toCharListUnsafe = toCharListUnsafe . LBS.unpack
+    toCharListSub = toCharListSub . LBS.unpack
+
+instance AsciiStringSuperset BSB.Builder
+  where
+    isAsciiString = isAsciiString . BSB.toLazyByteString
+    fromCharList = BSB.lazyByteString . fromCharList
+    toCharListUnsafe = toCharListUnsafe . BSB.toLazyByteString
+    toCharListSub = toCharListSub . BSB.toLazyByteString
