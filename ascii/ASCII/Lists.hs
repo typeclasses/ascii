@@ -1,4 +1,4 @@
-module ASCII.Char.Lists ( all, printableCharacters, controlCodes, letters, capitalLetters, smallLetters, digits, octDigits, hexDigits, numbers ) where
+module ASCII.Lists ( all, printableCharacters, controlCodes, letters, capitalLetters, smallLetters, digits, octDigits, hexDigits, numbers ) where
 
 import ASCII.Char (Char (..))
 

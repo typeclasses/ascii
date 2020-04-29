@@ -1,4 +1,4 @@
-module ASCII.Char.Superset ( AsciiCharSuperset (..) ) where
+module ASCII.Superset ( AsciiSuperset (..) ) where
 
 import ASCII.Char (Char)
 import qualified ASCII.Char
@@ -19,7 +19,7 @@ import qualified Data.Word as Word
 -- - If @toCharMaybe x@ = @Just c@, then @toCharUnsafe x@ = @c@
 -- - If @toCharMaybe x@ = @Nothing@, then @toCharSub x@ = 'Substitute'
 
-class AsciiCharSuperset a
+class AsciiSuperset a
   where
     {-# MINIMAL fromChar, toCharMaybe #-}
 
@@ -38,19 +38,19 @@ class AsciiCharSuperset a
     toCharUnsafe = Maybe.fromJust . toCharMaybe
 
 -- | Representation of an ASCII 'Char' as an 'Int' between 0 and 127.
-instance AsciiCharSuperset Prelude.Int
+instance AsciiSuperset Prelude.Int
   where
     fromChar = ASCII.Char.toInt
     toCharMaybe = ASCII.Char.fromIntMaybe
 
 -- | Representation of an ASCII 'Char' as a byte where the first bit is always 0.
-instance AsciiCharSuperset Word.Word8
+instance AsciiSuperset Word.Word8
   where
     fromChar = Prelude.fromIntegral . ASCII.Char.toInt
     toCharMaybe = ASCII.Char.fromIntMaybe . Prelude.fromIntegral
 
 -- | Representation of an ASCII 'Char' as one of the first 128 Unicode 'Unicode.Char's.
-instance AsciiCharSuperset Unicode.Char
+instance AsciiSuperset Unicode.Char
   where
     fromChar = Unicode.chr . ASCII.Char.toInt
     toCharMaybe = ASCII.Char.fromIntMaybe . Unicode.ord

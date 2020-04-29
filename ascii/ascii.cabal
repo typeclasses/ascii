@@ -32,7 +32,7 @@ library
 
     build-depends: base >= 4.11 && < 4.14
 
-    exposed-modules: ASCII, ASCII.Char.Lists, ASCII.Char.Predicates
+    exposed-modules: ASCII, ASCII.Lists, ASCII.Predicates
 
     build-depends: ascii-char >= 1.0 && <1.1
     reexported-modules: ASCII.Char
@@ -43,8 +43,8 @@ library
     build-depends: ascii-case >= 1.0 && <1.1
     reexported-modules: ASCII.Case
 
-    build-depends: ascii-char-superset >= 1.0 && <1.1
-    reexported-modules: ASCII.Char.Superset
+    build-depends: ascii-superset >= 1.0 && <1.1
+    reexported-modules: ASCII.Superset
 
     build-depends: data-ascii
     reexported-modules: Data.Ascii, Data.Ascii.Blaze, Data.Ascii.ByteString, Data.Ascii.Word8

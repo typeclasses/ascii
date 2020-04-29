@@ -1,6 +1,6 @@
 -- | This module defines drop-in replacements for closely related definitions of the same name in the "Data.Char" module.
 
-module ASCII.Char.Predicates
+module ASCII.Predicates
   (
   -- * Group predicates
     isControl, isPrint
