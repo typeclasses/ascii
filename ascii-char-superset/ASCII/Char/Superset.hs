@@ -1,4 +1,4 @@
-module ASCII.Conversions ( AsciiCharSuperset (..) ) where
+module ASCII.Char.Superset ( AsciiCharSuperset (..) ) where
 
 import ASCII.Char (Char)
 import qualified ASCII.Char

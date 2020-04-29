@@ -2,6 +2,6 @@ packages:
     ./ascii
     ./ascii-case
     ./ascii-char
-    ./ascii-conversions
+    ./ascii-char-superset
     ./ascii-group
     ./data-ascii
