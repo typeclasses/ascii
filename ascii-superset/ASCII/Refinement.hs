@@ -4,7 +4,7 @@ module ASCII.Refinement
     ASCII, lift, asciiUnsafe
 
   -- * Character functions
-  , validateChar, fromChar, toChar, substituteChar, toCharSub
+  , validateChar, fromChar, toChar, substituteChar
 
   -- * String functions
   , fromCharList, toCharList
@@ -33,9 +33,6 @@ fromChar = asciiUnsafe . S.fromChar
 
 toChar :: S.IsChar a => ASCII a -> ASCII.Char
 toChar = S.toCharUnsafe . lift
-
-toCharSub :: S.IsChar a => a -> ASCII.Char
-toCharSub x = if S.isAsciiChar x then S.toCharUnsafe x else ASCII.Substitute
 
 fromCharList :: S.IsString a => [ASCII.Char] -> ASCII a
 fromCharList = asciiUnsafe . S.fromCharList
