@@ -28,6 +28,12 @@ module ASCII
   -- * Char/Word8 conversions
   , charToWord8, word8ToCharMaybe, word8ToCharUnsafe
 
+  -- * Lifting into larger character sets
+  , liftChar, liftString
+
+  -- * Refinements of larger character sets
+  , ASCII.Refinement.ASCII, ASCII.Refinement.validateChar, ASCII.Refinement.validateString, ASCII.Refinement.lift
+
   ) where
 
 import Prelude ((.), Maybe, Int)
@@ -40,6 +46,8 @@ import qualified ASCII.Char as ASCII (Char)
 import qualified ASCII.Char
 import qualified ASCII.Case
 import qualified ASCII.Group
+import qualified ASCII.Refinement
+import qualified ASCII.Superset
 
 charToInt :: ASCII.Char -> Int
 charToInt = ASCII.Char.toInt
@@ -58,3 +66,9 @@ word8ToCharMaybe = intToCharMaybe . Prelude.fromIntegral
 
 word8ToCharUnsafe :: Word8 -> ASCII.Char
 word8ToCharUnsafe = intToCharUnsafe . Prelude.fromIntegral
+
+liftChar :: ASCII.Superset.IsChar a => ASCII.Char -> a
+liftChar = ASCII.Superset.fromChar
+
+liftString :: ASCII.Superset.IsString a => [ASCII.Char] -> a
+liftString = ASCII.Superset.fromCharList

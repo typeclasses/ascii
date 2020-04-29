@@ -7,7 +7,7 @@ module ASCII.Refinement
   , validateChar, fromChar, toChar, substituteChar
 
   -- * String functions
-  , fromCharList, toCharList, substituteString
+  , validateString, fromCharList, toCharList, substituteString
 
   ) where
 
@@ -42,3 +42,6 @@ toCharList = S.toCharListUnsafe . lift
 
 substituteString :: S.IsString a => a -> ASCII a
 substituteString = asciiUnsafe . S.substituteString
+
+validateString :: S.IsString a => a -> Maybe (ASCII a)
+validateString x = if S.isAsciiString x then Just (asciiUnsafe x) else Nothing
