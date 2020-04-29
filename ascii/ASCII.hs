@@ -13,25 +13,25 @@ We do not elaborate on the semantics of the control characters here, because thi
 module ASCII
   (
 
-  -- * Character type
+  -- * The ASCII @Char@ type
     ASCII.Char (..)
 
-  -- * Character groups
+  -- * Character classifications
+  -- ** Print and control groups
   , ASCII.Group.Group (..), ASCII.Group.charGroup, ASCII.Group.inGroup
-
-  -- * Letter case
+  -- ** Upper and lower case
   , ASCII.Case.Case (..), ASCII.Case.letterCase, ASCII.Case.isCase
 
-  -- * Char/Int conversions
+  -- * Monomorphic conversions
+  -- ** Int
   , charToInt, intToCharMaybe, intToCharUnsafe
-
-  -- * Char/Word8 conversions
+  -- ** Word8
   , charToWord8, word8ToCharMaybe, word8ToCharUnsafe
 
-  -- * Lifting into larger character sets
+  -- * Larger character sets
+  -- ** Lifting
   , liftChar, liftString
-
-  -- * Refinements of larger character sets
+  -- ** Refinement
   , ASCII.Refinement.ASCII, ASCII.Refinement.validateChar, ASCII.Refinement.validateString, ASCII.Refinement.lift
 
   ) where
