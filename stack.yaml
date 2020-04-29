@@ -1,2 +1,8 @@
 resolver: lts-15.2
-packages: [ ascii, ascii-case, ascii-char, ascii-superset, ascii-group, data-ascii ]
+packages:
+  - ascii
+  - ascii-case
+  - ascii-char
+  - ascii-group
+  - ascii-superset
+  - data-ascii
