@@ -18,89 +18,89 @@ import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Builder as BSB
 
-class AsciiCharSuperset a
+class IsChar a
   where
     isAsciiChar :: a -> Bool
     fromChar :: ASCII.Char -> a
     toCharUnsafe :: a -> ASCII.Char
 
-class AsciiStringSuperset a
+class IsString a
   where
     isAsciiString :: a -> Bool
     fromCharList :: [ASCII.Char] -> a
     toCharListUnsafe :: a -> [ASCII.Char]
     toCharListSub :: a -> [ASCII.Char]
 
-toCharSub :: AsciiCharSuperset a => a -> ASCII.Char
+toCharSub :: IsChar a => a -> ASCII.Char
 toCharSub x = if isAsciiChar x then toCharUnsafe x else ASCII.Substitute
 
-instance AsciiCharSuperset Unicode.Char
+instance IsChar Unicode.Char
   where
     isAsciiChar = (<= '\DEL')
     fromChar = Unicode.chr . ASCII.toInt
     toCharUnsafe = ASCII.fromIntUnsafe . Unicode.ord
 
-instance AsciiCharSuperset Nat.Natural
+instance IsChar Nat.Natural
   where
     isAsciiChar = (<= 127)
     fromChar = Prelude.fromIntegral . ASCII.toInt
     toCharUnsafe = ASCII.fromIntUnsafe . Prelude.fromIntegral
 
-instance AsciiCharSuperset Int.Int
+instance IsChar Int.Int
   where
     isAsciiChar x = (x >= 0) && (x <= 127)
     fromChar = ASCII.toInt
     toCharUnsafe = ASCII.fromIntUnsafe
 
-instance AsciiCharSuperset Word.Word8
+instance IsChar Word.Word8
   where
     isAsciiChar = (<= 127)
     fromChar = Prelude.fromIntegral . ASCII.toInt
     toCharUnsafe = ASCII.fromIntUnsafe . Prelude.fromIntegral
 
-instance AsciiCharSuperset a => AsciiStringSuperset [a]
+instance IsChar a => IsString [a]
   where
     isAsciiString = List.all isAsciiChar
     fromCharList = List.map fromChar
     toCharListUnsafe = List.map toCharUnsafe
     toCharListSub = List.map toCharSub
 
-instance AsciiStringSuperset T.Text
+instance IsString T.Text
   where
     isAsciiString = T.all isAsciiChar
     fromCharList = T.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . T.unpack
     toCharListSub = toCharListSub . T.unpack
 
-instance AsciiStringSuperset LT.Text
+instance IsString LT.Text
   where
     isAsciiString = LT.all isAsciiChar
     fromCharList = LT.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . LT.unpack
     toCharListSub = toCharListSub . LT.unpack
 
-instance AsciiStringSuperset TB.Builder
+instance IsString TB.Builder
   where
     isAsciiString = isAsciiString . TB.toLazyText
     fromCharList = TB.fromString . fromCharList
     toCharListUnsafe = toCharListUnsafe . TB.toLazyText
     toCharListSub = toCharListSub . TB.toLazyText
 
-instance AsciiStringSuperset BS.ByteString
+instance IsString BS.ByteString
   where
     isAsciiString = BS.all isAsciiChar
     fromCharList = BS.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . BS.unpack
     toCharListSub = toCharListSub . BS.unpack
 
-instance AsciiStringSuperset LBS.ByteString
+instance IsString LBS.ByteString
   where
     isAsciiString = LBS.all isAsciiChar
     fromCharList = LBS.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . LBS.unpack
     toCharListSub = toCharListSub . LBS.unpack
 
-instance AsciiStringSuperset BSB.Builder
+instance IsString BSB.Builder
   where
     isAsciiString = isAsciiString . BSB.toLazyByteString
     fromCharList = BSB.lazyByteString . fromCharList

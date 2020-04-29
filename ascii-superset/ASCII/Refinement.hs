@@ -22,23 +22,23 @@ newtype ASCII a = ASCII_Unsafe { lift :: a }
 asciiUnsafe :: a -> ASCII a
 asciiUnsafe = ASCII_Unsafe
 
-validateChar :: S.AsciiCharSuperset a => a -> Maybe (ASCII a)
+validateChar :: S.IsChar a => a -> Maybe (ASCII a)
 validateChar x = if S.isAsciiChar x then Just (asciiUnsafe x) else Nothing
 
-substituteChar :: S.AsciiCharSuperset a => a -> ASCII a
+substituteChar :: S.IsChar a => a -> ASCII a
 substituteChar x = if S.isAsciiChar x then asciiUnsafe x else fromChar ASCII.Substitute
 
-fromChar :: S.AsciiCharSuperset a => ASCII.Char -> ASCII a
+fromChar :: S.IsChar a => ASCII.Char -> ASCII a
 fromChar = asciiUnsafe . S.fromChar
 
-toChar :: S.AsciiCharSuperset a => ASCII a -> ASCII.Char
+toChar :: S.IsChar a => ASCII a -> ASCII.Char
 toChar = S.toCharUnsafe . lift
 
-toCharSub :: S.AsciiCharSuperset a => a -> ASCII.Char
+toCharSub :: S.IsChar a => a -> ASCII.Char
 toCharSub x = if S.isAsciiChar x then S.toCharUnsafe x else ASCII.Substitute
 
-fromCharList :: S.AsciiStringSuperset a => [ASCII.Char] -> ASCII a
+fromCharList :: S.IsString a => [ASCII.Char] -> ASCII a
 fromCharList = asciiUnsafe . S.fromCharList
 
-toCharList :: S.AsciiStringSuperset a => ASCII a -> [ASCII.Char]
+toCharList :: S.IsString a => ASCII a -> [ASCII.Char]
 toCharList = S.toCharListUnsafe . lift
