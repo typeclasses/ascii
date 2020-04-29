@@ -53,6 +53,9 @@ class AsciiSuperset a => AsciiSupersetChar a
     toCharUnsafe :: a -> ASCII.Char
     toCharUnsafe = toChar . Maybe.fromJust . validate
 
+    toCharSub :: a -> ASCII.Char
+    toCharSub = toChar . substitute
+
 class AsciiSuperset a => AsciiSupersetString a
   where
     {-# MINIMAL (fromCharList | fromCharListRestricted), (toCharList | toCharListUnsafe) #-}
