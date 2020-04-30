@@ -1,10 +1,32 @@
-module ASCII.Lists ( all, printableCharacters, controlCodes, letters, capitalLetters, smallLetters, digits, octDigits, hexDigits, numbers ) where
+module ASCII.Lists
+  (
+    -- * Lists
+    -- ** Every character
+      all
+    -- ** Group-related
+    , printableCharacters, controlCodes
+    -- ** Letter-related
+    , letters, capitalLetters, smallLetters
+    -- ** Number-related
+    , digits, octDigits, hexDigits, numbers
+
+    -- * Notes
+    -- $notes
+
+  ) where
 
 import ASCII.Char (Char (..))
 
 import qualified Data.List as List
 import qualified Prelude as Bounded (Bounded (..))
 import qualified Prelude as Enum (Enum (..))
+
+{- $setup
+
+>>> import Data.Eq ((==))
+>>> import Data.List (sort)
+
+-}
 
 -- | All 128 ASCII characters, listed in order from 'Null' to 'Delete'.
 all :: [Char]
@@ -54,3 +76,14 @@ hexDigits =
 -- | Synonym for 'digits'.
 numbers :: [Char]
 numbers = digits
+
+{- $notes
+
+Each list is sorted in ascending order.
+
+>>> lists = [all, printableCharacters, controlCodes, letters, capitalLetters, smallLetters, digits, octDigits, hexDigits, numbers]
+
+>>> Prelude.all (\xs -> sort xs == xs) lists
+True
+
+-}

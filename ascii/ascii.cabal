@@ -32,7 +32,7 @@ library
 
     build-depends: base >= 4.11 && < 4.14
 
-    exposed-modules: ASCII, ASCII.Lists, ASCII.Predicates
+    exposed-modules: ASCII, ASCII.ListsAndPredicates, ASCII.Lists, ASCII.Predicates
 
     build-depends: ascii-char >= 1.0 && <1.1
     reexported-modules: ASCII.Char
