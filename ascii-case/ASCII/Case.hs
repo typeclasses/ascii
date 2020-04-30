@@ -21,11 +21,14 @@ deriving instance Prelude.Show Case
 --
 -- ==== Examples
 --
--- @ASCII.letterCase [ASCII.char|R|]@ = @Just UpperCase@
+-- >>> letterCase CapitalLetterR
+-- Just UpperCase
 --
--- @ASCII.letterCase [ASCII.char|r|]@ = @Just LowerCase@
+-- >>> letterCase SmallLetterR
+-- Just LowerCase
 --
--- @ASCII.letterCase [ASCII.char|$|]@ = @Nothing@
+-- >>> letterCase DollarSign
+-- Nothing
 
 letterCase :: Char -> Maybe Case
 letterCase x | isCase UpperCase x = Just UpperCase
@@ -36,11 +39,14 @@ letterCase x | isCase UpperCase x = Just UpperCase
 --
 -- === Examples
 --
--- @ASCII.isCase ASCII.UpperCase [ASCII.char|R|]@ = @True@
+-- >>> isCase UpperCase CapitalLetterR
+-- True
 --
--- @ASCII.isCase ASCII.UpperCase [ASCII.char|r|]@ = @False@
+-- >>> isCase UpperCase SmallLetterR
+-- False
 --
--- @ASCII.isCase ASCII.UpperCase [ASCII.char|$|]@ = @False@
+-- >>> isCase UpperCase DollarSign
+-- False
 
 isCase :: Case -> Char -> Bool
 isCase UpperCase x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
