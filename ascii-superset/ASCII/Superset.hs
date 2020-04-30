@@ -1,8 +1,11 @@
 module ASCII.Superset where
 
+import Control.Monad (return)
+import Control.Monad.Fail (MonadFail (fail))
 import Data.Bool (Bool, (&&))
 import Data.Function ((.))
 import Data.Ord ((<=), (>=))
+import Data.Maybe (Maybe (..))
 
 import qualified ASCII.Char as ASCII
 import qualified Data.Char as Unicode
@@ -18,17 +21,29 @@ import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Builder as BSB
 
+
+---  Char  ---
+
 class IsChar a
   where
     isAsciiChar :: a -> Bool
     fromChar :: ASCII.Char -> a
     toCharUnsafe :: a -> ASCII.Char
 
+toCharMaybe :: IsChar a => a -> Maybe ASCII.Char
+toCharMaybe = toCharOrFail
+
+toCharOrFail :: (IsChar a, MonadFail m) => a -> m ASCII.Char
+toCharOrFail x = if isAsciiChar x then return (toCharUnsafe x) else fail "Not an ASCII character"
+
 toCharSub :: IsChar a => a -> ASCII.Char
 toCharSub x = if isAsciiChar x then toCharUnsafe x else ASCII.Substitute
 
 substituteChar :: IsChar a => a -> a
 substituteChar x = if isAsciiChar x then x else fromChar ASCII.Substitute
+
+
+---  String  ---
 
 class IsString a
   where
@@ -37,6 +52,15 @@ class IsString a
     toCharListUnsafe :: a -> [ASCII.Char]
     toCharListSub :: a -> [ASCII.Char]
     substituteString :: a -> a
+
+toCharListMaybe :: IsString a => a -> Maybe [ASCII.Char]
+toCharListMaybe = toCharListOrFail
+
+toCharListOrFail :: (IsString a, MonadFail m) => a -> m [ASCII.Char]
+toCharListOrFail x = if isAsciiString x then return (toCharListUnsafe x) else fail "String contains non-ASCII characters"
+
+
+---  Instances  ---
 
 instance IsChar Unicode.Char
   where

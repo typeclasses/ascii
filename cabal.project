@@ -4,4 +4,5 @@ packages:
     ./ascii-char
     ./ascii-group
     ./ascii-superset
+    ./ascii-th
     ./data-ascii
