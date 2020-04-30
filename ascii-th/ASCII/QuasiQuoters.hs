@@ -16,7 +16,7 @@ import Language.Haskell.TH.Quote
 import Language.Haskell.TH.Syntax
 
 import Control.Monad ((>=>), return)
-import Control.Monad.Fail (MonadFail (fail))
+import Control.Monad.Fail (MonadFail, fail)
 
 import Data.Maybe (Maybe (..))
 

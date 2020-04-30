@@ -16,8 +16,8 @@ import Language.Haskell.TH.Syntax ( Q, Exp, Pat, lift )
 import qualified Language.Haskell.TH.Syntax as TH
 
 import Control.Applicative ((<$>), (<*>))
-import Control.Monad.Fail
-import Control.Monad
+import Control.Monad.Fail (fail)
+import Control.Monad ((>>=), return)
 import Data.List ((++))
 import Text.Show (show)
 
