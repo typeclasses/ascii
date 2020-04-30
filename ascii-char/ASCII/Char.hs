@@ -1,4 +1,20 @@
-module ASCII.Char ( Char (..), toInt, fromIntMaybe, fromIntUnsafe ) where
+-- | The 'Char' type has 128 nullary constructors, listed in order according to each character's 7-bit numeric code.
+
+module ASCII.Char
+  (
+    -- * The @Char@ type
+    Char (..)
+
+    -- * Conversions with @Int@
+    , toInt, fromIntMaybe, fromIntUnsafe
+
+    -- * Enumeration
+    , allCharacters
+
+    -- * Notes
+    -- $notes
+
+  ) where
 
 import Prelude ((<), (>), otherwise, Int, Maybe (..))
 
@@ -6,9 +22,13 @@ import qualified Prelude
 import qualified Language.Haskell.TH.Syntax as TH
 import qualified GHC.Generics as G
 
+{- $setup
+
+>>> import Prelude hiding (Char)
+
+-}
+
 -- | A character in the ASCII character set.
---
--- This type has 128 nullary constructors, listed in order according to each character's 7-bit numeric code.
 
 data Char =
       Null | StartOfHeading | StartOfText | EndOfText | EndOfTransmission | Enquiry | Acknowledgement | Bell | Backspace | HorizontalTab | LineFeed | VerticalTab | FormFeed | CarriageReturn | ShiftOut | ShiftIn | DataLinkEscape
@@ -45,13 +65,58 @@ deriving instance TH.Lift Char
 -- Requires the DeriveGeneric language extension.
 deriving instance G.Generic Char
 
+{- | Converts an ASCII character to its corresponding numeric value between 0 and 127.
+
+>>> map toInt [Null, CapitalLetterA, SmallLetterA, Delete]
+[0,65,97,127]
+
+-}
+
 toInt :: Char -> Int
 toInt = Prelude.fromEnum
 
-fromIntUnsafe :: Int -> Char
-fromIntUnsafe = Prelude.toEnum
+{- | Returns 'Just' the ASCII character corresponding to a numeric value between 0 and 127, or 'Nothing' for numbers outside this range.
+
+>>> map fromIntMaybe [-1, 0, 65, 127, 128]
+[Nothing,Just Null,Just CapitalLetterA,Just Delete,Nothing]
+
+-}
 
 fromIntMaybe :: Int -> Maybe Char
 fromIntMaybe x | x < 0     = Nothing
                | x > 127   = Nothing
                | otherwise = Just (fromIntUnsafe x)
+
+{- | The inverse of 'toInt'.
+
+This is marked as /unsafe/ because it is undefined for numbers below 0 or above 127. The safe variant of this function is 'fromIntMaybe'.
+
+>>> map fromIntUnsafe [65, 66, 67]
+[CapitalLetterA,CapitalLetterB,CapitalLetterC]
+
+-}
+
+fromIntUnsafe :: Int -> Char
+fromIntUnsafe = Prelude.toEnum
+
+allCharacters :: [Char]
+allCharacters = Prelude.enumFromTo Prelude.minBound Prelude.maxBound
+
+{- $notes
+
+There are 128 characters in total.
+
+>>> length allCharacters
+128
+
+Null is the first character.
+
+>>> minBound :: Char
+Null
+
+Delete is the last character.
+
+>>> maxBound :: Char
+Delete
+
+-}

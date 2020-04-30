@@ -35,14 +35,8 @@ import qualified Data.String as Unicode
 
 The quasi-quoted string must consist of a single character that is within the ASCII character set.
 
-==== Examples
-
-As an expression:
-
 >>> [char|e|]
 SmallLetterE
-
-As a pattern:
 
 >>> case Tilde of [char|@|] -> 1; [char|~|] -> 2; _ -> 3
 2

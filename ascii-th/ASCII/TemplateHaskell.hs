@@ -34,8 +34,6 @@ import qualified Data.Maybe as Maybe
 
 {- |
 
-==== Examples
-
 >>> $(toCharOrFail 'F' >>= charExp)
 CapitalLetterF
 
@@ -48,8 +46,6 @@ charExp :: ASCII.Char -> Q Exp
 charExp = lift
 
 {- |
-
-==== Examples
 
 >>> :{
 >>> case SmallLetterS of

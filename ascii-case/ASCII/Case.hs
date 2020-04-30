@@ -6,6 +6,12 @@ import Prelude ((<=), (>=), Bool, Maybe (..), otherwise)
 import qualified Prelude
 import qualified Data.Bool as Bool
 
+{- $setup
+
+>>> import Prelude
+
+-}
+
 -- | /Case/ is a property of letters. /A-Z/ are /upper case/ letters, and /a-z/ are /lower case/ letters. No other ASCII characters have case.
 data Case =
     UpperCase -- ^ The letters from 'CapitalLetterA' to 'CapitalLetterZ'.
@@ -19,16 +25,8 @@ deriving instance Prelude.Show Case
 
 -- | Determines whether a character is a letter, and if so, whether it is upper or lower case.
 --
--- ==== Examples
---
--- >>> letterCase CapitalLetterR
--- Just UpperCase
---
--- >>> letterCase SmallLetterR
--- Just LowerCase
---
--- >>> letterCase DollarSign
--- Nothing
+-- >>> map letterCase [CapitalLetterR, SmallLetterR, DollarSign]
+-- [Just UpperCase,Just LowerCase,Nothing]
 
 letterCase :: Char -> Maybe Case
 letterCase x | isCase UpperCase x = Just UpperCase
@@ -37,16 +35,8 @@ letterCase x | isCase UpperCase x = Just UpperCase
 
 -- | Determines whether a character is a letter of a particular case.
 --
--- === Examples
---
--- >>> isCase UpperCase CapitalLetterR
--- True
---
--- >>> isCase UpperCase SmallLetterR
--- False
---
--- >>> isCase UpperCase DollarSign
--- False
+-- >>> map (isCase UpperCase) [CapitalLetterR,SmallLetterR,DollarSign]
+-- [True,False,False]
 
 isCase :: Case -> Char -> Bool
 isCase UpperCase x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
