@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
+
 {- |
 
 The __American Standard Code for Information Interchange__ (ASCII) comprises a set of 128 characters, each represented by 7 bits. 33 of these characters are /'ASCII.Group.Control' codes/; a few of these are still in use, but most are obsolete relics of the early days of computing. The other 95 are /'ASCII.Group.Printable' characters/ such as letters and numbers, mostly corresponding to the keys on an American English keyboard.
@@ -36,13 +38,10 @@ module ASCII
   , charToWord8, word8ToCharMaybe, word8ToCharUnsafe
 
   -- * Polymorphic conversions
-
-  -- ** Lifting
-  -- $lifting
-  , liftChar, liftString
-
-  -- ** Refinement
-  , ASCII.Refinement.ASCII, ASCII.Refinement.lift, ASCII.Refinement.validateChar, ASCII.Refinement.validateString
+  , ASCII.Refinement.ASCII
+  , ASCII.Refinement.validateChar
+  , ASCII.Refinement.validateString
+  , Lift (..)
 
   ) where
 
@@ -61,7 +60,10 @@ import qualified ASCII.Superset
 
 {- $setup
 
->>> import Prelude
+>>> import ASCII.Char (Char (..))
+>>> import Data.List (map)
+>>> import Data.Text (Text)
+>>> import Data.Word (Word8)
 
 -}
 
@@ -79,7 +81,6 @@ These functions convert between the ASCII 'Char' type and 'Int'.
 
 {- |
 
->>> import ASCII.Char
 >>> map charToInt [Null, CapitalLetterA, SmallLetterA, Delete]
 [0,65,97,127]
 
@@ -102,7 +103,6 @@ These functions convert between the ASCII 'Char' type and 'Word8'.
 
 {- |
 
->>> import ASCII.Char
 >>> map charToWord8 [Null, CapitalLetterA, SmallLetterA, Delete]
 [0,65,97,127]
 
@@ -117,24 +117,32 @@ word8ToCharMaybe = intToCharMaybe . Prelude.fromIntegral
 word8ToCharUnsafe :: Word8 -> Char
 word8ToCharUnsafe = intToCharUnsafe . Prelude.fromIntegral
 
-{- $lifting
+{- | Converts from ASCII to any larger type.
 
-These functions convert from ASCII 'Char' type into some other type that represents a superset of ASCII.
+For example, @'lift' \@'Char' \@'Word8' = 'charToWord8'@.
 
--}
-
-{- | Converts from 'Char' to any larger 'Char'-like type.
-
-For example, @'liftChar' \@'Word8' = 'charToWord8'@.
-
->>> import Data.Word
->>> liftChar ASCII.Char.CapitalLetterA :: Word8
+>>> lift CapitalLetterA :: Word8
 65
 
+>>> lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text
+"Hi!"
+
+Due to the highly polymorphic nature of the 'lift' function, often it must used with an explicit type signature or type application to avoid any type ambiguity.
+
 -}
 
-liftChar :: ASCII.Superset.IsChar a => Char -> a
-liftChar = ASCII.Superset.fromChar
+class Lift a b
+  where
+    lift :: a -> b
 
-liftString :: ASCII.Superset.IsString a => [Char] -> a
-liftString = ASCII.Superset.fromCharList
+instance Lift (ASCII.Refinement.ASCII a) a
+  where
+    lift = ASCII.Refinement.lift
+
+instance ASCII.Superset.IsChar a => Lift Char a
+  where
+    lift = ASCII.Superset.fromChar
+
+instance ASCII.Superset.IsString a => Lift [Char] a
+  where
+    lift = ASCII.Superset.fromCharList
