@@ -14,10 +14,44 @@ module ASCII.Refinement
 import qualified ASCII.Char as ASCII
 import qualified ASCII.Superset as S
 
-import Data.Function ((.))
+import qualified Text.Show as Show
+
+import Data.Eq (Eq)
+import Data.Function ((.), ($))
+import Data.Hashable (Hashable)
 import Data.Maybe (Maybe (..))
+import Data.Ord (Ord, (>))
+import Data.Text (Text)
+import Prelude (succ)
+
+{- $setup
+
+>>> :set -XOverloadedStrings
+>>> import Prelude (map)
+
+-}
+
+{- | This type constructor indicates that a value from some ASCII superset is valid ASCII. The type parameter is the ASCII superset, which should be a type with an instance of either 'S.IsChar' or 'S.IsString'.
+
+For example, whereas a 'Text' value may contain a combination of ASCII and non-ASCII characters, a value of type @'ASCII' 'Text'@ may contain only ASCII characters.
+
+>>> map validateString ["Hello", "Cristóbal"] :: [Maybe (ASCII Text)]
+[Just (asciiUnsafe "Hello"),Nothing]
+
+-}
 
 newtype ASCII a = ASCII_Unsafe { lift :: a }
+
+deriving stock instance Eq a => Eq (ASCII a)
+deriving stock instance Ord a => Ord (ASCII a)
+
+deriving newtype instance Hashable a => Hashable (ASCII a)
+
+instance Show.Show a => Show.Show (ASCII a)
+  where
+    showsPrec d x = Show.showParen (d > app_prec) $
+        Show.showString "asciiUnsafe " . Show.showsPrec (succ app_prec) (lift x)
+      where app_prec = 10
 
 asciiUnsafe :: a -> ASCII a
 asciiUnsafe = ASCII_Unsafe

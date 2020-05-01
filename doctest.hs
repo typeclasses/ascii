@@ -7,6 +7,8 @@ args = ghcOptions ++ sourceFiles
 ghcOptions =
   [ "-XDeriveGeneric"
   , "-XDeriveLift"
+  , "-XDerivingStrategies"
+  , "-XGeneralizedNewtypeDeriving"
   , "-XNoImplicitPrelude"
   , "-XQuasiQuotes"
   , "-XStandaloneDeriving"
