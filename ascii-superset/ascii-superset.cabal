@@ -39,4 +39,4 @@ library
     build-depends: hashable   >= 1.2  && < 1.4
     build-depends: text       >= 1.2  && < 1.3
 
-    exposed-modules: ASCII.Superset, ASCII.Refinement
+    exposed-modules: ASCII.Superset, ASCII.Refinement, ASCII.Lift

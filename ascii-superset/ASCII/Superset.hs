@@ -24,39 +24,39 @@ import qualified Data.ByteString.Builder as BSB
 
 ---  Char  ---
 
-class IsChar a
+class IsChar superset
   where
-    isAsciiChar :: a -> Bool
-    fromChar :: ASCII.Char -> a
-    toCharUnsafe :: a -> ASCII.Char
+    isAsciiChar :: superset -> Bool
+    fromChar :: ASCII.Char -> superset
+    toCharUnsafe :: superset -> ASCII.Char
 
-toCharMaybe :: IsChar a => a -> Maybe ASCII.Char
+toCharMaybe :: IsChar superset => superset -> Maybe ASCII.Char
 toCharMaybe = toCharOrFail
 
-toCharOrFail :: (IsChar a, MonadFail m) => a -> m ASCII.Char
+toCharOrFail :: (IsChar superset, MonadFail context) => superset -> context ASCII.Char
 toCharOrFail x = if isAsciiChar x then return (toCharUnsafe x) else fail "Not an ASCII character"
 
-toCharSub :: IsChar a => a -> ASCII.Char
+toCharSub :: IsChar superset => superset -> ASCII.Char
 toCharSub x = if isAsciiChar x then toCharUnsafe x else ASCII.Substitute
 
-substituteChar :: IsChar a => a -> a
+substituteChar :: IsChar superset => superset -> superset
 substituteChar x = if isAsciiChar x then x else fromChar ASCII.Substitute
 
 
 ---  String  ---
 
-class IsString a
+class IsString superset
   where
-    isAsciiString :: a -> Bool
-    fromCharList :: [ASCII.Char] -> a
-    toCharListUnsafe :: a -> [ASCII.Char]
-    toCharListSub :: a -> [ASCII.Char]
-    substituteString :: a -> a
+    isAsciiString :: superset -> Bool
+    fromCharList :: [ASCII.Char] -> superset
+    toCharListUnsafe :: superset -> [ASCII.Char]
+    toCharListSub :: superset -> [ASCII.Char]
+    substituteString :: superset -> superset
 
-toCharListMaybe :: IsString a => a -> Maybe [ASCII.Char]
+toCharListMaybe :: IsString superset => superset -> Maybe [ASCII.Char]
 toCharListMaybe = toCharListOrFail
 
-toCharListOrFail :: (IsString a, MonadFail m) => a -> m [ASCII.Char]
+toCharListOrFail :: (IsString superset, MonadFail context) => superset -> context [ASCII.Char]
 toCharListOrFail x = if isAsciiString x then return (toCharListUnsafe x) else fail "String contains non-ASCII characters"
 
 

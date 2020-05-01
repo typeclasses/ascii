@@ -22,6 +22,7 @@ sourceFiles =
   , "ascii-predicates/ASCII/Lists.hs"
   , "ascii-predicates/ASCII/Predicates.hs"
   , "ascii-predicates/ASCII/ListsAndPredicates.hs"
+  , "ascii-superset/ASCII/Lift.hs"
   , "ascii-superset/ASCII/Refinement.hs"
   , "ascii-superset/ASCII/Superset.hs"
   , "ascii-th/ASCII/QuasiQuoters.hs"

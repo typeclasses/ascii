@@ -47,7 +47,7 @@ library
     reexported-modules: ASCII.Predicates, ASCII.Lists, ASCII.ListsAndPredicates
 
     build-depends: ascii-superset >= 1.0 && < 1.1
-    reexported-modules: ASCII.Superset, ASCII.Refinement
+    reexported-modules: ASCII.Superset, ASCII.Refinement, ASCII.Lift
 
     build-depends: ascii-th >= 1.0 && < 1.1
     reexported-modules: ASCII.TemplateHaskell, ASCII.QuasiQuoters

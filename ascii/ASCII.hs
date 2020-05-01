@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
-
 {- |
 
 The __American Standard Code for Information Interchange__ (ASCII) comprises a set of 128 characters, each represented by 7 bits. 33 of these characters are /'ASCII.Group.Control' codes/; a few of these are still in use, but most are obsolete relics of the early days of computing. The other 95 are /'ASCII.Group.Printable' characters/ such as letters and numbers, mostly corresponding to the keys on an American English keyboard.
@@ -37,11 +35,18 @@ module ASCII
   -- $word8Conversions
   , charToWord8, word8ToCharMaybe, word8ToCharUnsafe
 
-  -- * Polymorphic conversions
+  -- * Refinement type
   , ASCII.Refinement.ASCII
+
+  -- * Polymorphic conversions
+  -- ** Validate
   , ASCII.Refinement.validateChar
   , ASCII.Refinement.validateString
-  , Lift (..)
+  -- ** Lift
+  , lift
+
+  -- * Classes
+  , IsChar, IsString, ASCII.Lift.Lift
 
   ) where
 
@@ -51,12 +56,13 @@ import qualified Prelude
 import Data.Word (Word8)
 
 import ASCII.Char (Char)
+import ASCII.Superset (IsChar, IsString)
 
 import qualified ASCII.Char
 import qualified ASCII.Case
 import qualified ASCII.Group
+import qualified ASCII.Lift
 import qualified ASCII.Refinement
-import qualified ASCII.Superset
 
 {- $setup
 
@@ -119,7 +125,7 @@ word8ToCharUnsafe = intToCharUnsafe . Prelude.fromIntegral
 
 {- | Converts from ASCII to any larger type.
 
-For example, @'lift' \@'Char' \@'Word8' = 'charToWord8'@.
+For example, @(lift \@ASCII.Char \@Word8)@ is the same function as 'charToWord8'.
 
 >>> lift CapitalLetterA :: Word8
 65
@@ -131,18 +137,5 @@ Due to the highly polymorphic nature of the 'lift' function, often it must used 
 
 -}
 
-class Lift a b
-  where
-    lift :: a -> b
-
-instance Lift (ASCII.Refinement.ASCII a) a
-  where
-    lift = ASCII.Refinement.lift
-
-instance ASCII.Superset.IsChar a => Lift Char a
-  where
-    lift = ASCII.Superset.fromChar
-
-instance ASCII.Superset.IsString a => Lift [Char] a
-  where
-    lift = ASCII.Superset.fromCharList
+lift :: ASCII.Lift.Lift ascii superset => ascii -> superset
+lift = ASCII.Lift.lift
