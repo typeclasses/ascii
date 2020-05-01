@@ -1,9 +1,0 @@
-resolver: lts-15.2
-packages:
-  - ascii
-  - ascii-case
-  - ascii-char
-  - ascii-group
-  - ascii-superset
-  - ascii-th
-  - data-ascii
