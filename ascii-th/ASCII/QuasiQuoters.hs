@@ -66,17 +66,29 @@ charList = expPatQQ requireAsciiList charListExp charListPat
 requireOneAscii :: Unicode.String -> Q Char
 requireOneAscii = requireOne >=> requireAscii
 
+oneMaybe :: [a] -> Maybe a
+oneMaybe xs = case xs of [x] -> Just x; _ -> Nothing
+
 requireOne :: Unicode.String -> Q Unicode.Char
-requireOne str = case str of [x] -> return x; _ -> fail "Must be exactly one character."
+requireOne = oneMaybe || "Must be exactly one character."
 
 requireAscii :: Unicode.Char -> Q Char
-requireAscii x = case toCharMaybe x of Just y -> return y; Nothing -> fail "Must be an ASCII character."
+requireAscii = toCharMaybe || "Must be an ASCII character."
 
 requireAsciiList :: Unicode.String -> Q [Char]
-requireAsciiList x = case toCharListMaybe x of Just y -> return y; Nothing -> fail "Must be only ASCII characters."
+requireAsciiList = toCharListMaybe || "Must be only ASCII characters."
+
+(||) :: (a -> Maybe b) -> Unicode.String -> a -> Q b
+f || msg = \a -> case f a of Just b -> return b; Nothing -> fail msg
 
 expPatQQ :: (Unicode.String -> Q a) -> (a -> Q Exp) -> (a -> Q Pat) -> QuasiQuoter
-expPatQQ f a b = QuasiQuoter { quoteExp = f >=> a, quotePat = f >=> b, quoteType = notType, quoteDec = notDec }
+expPatQQ f a b =
+  QuasiQuoter
+    { quoteExp = f >=> a
+    , quotePat = f >=> b
+    , quoteType = notType
+    , quoteDec = notDec
+    }
 
 notType :: MonadFail m => a -> m b
 notType _ = fail "Cannot be used in a type context."
