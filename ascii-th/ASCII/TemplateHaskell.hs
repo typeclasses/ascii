@@ -4,7 +4,10 @@ module ASCII.TemplateHaskell
     -- $setup
 
     -- * Characters
-    charExp, charPat
+      charExp, charPat
+
+    -- * Character lists
+    , charListExp, charListPat
 
   ) where
 
@@ -18,7 +21,10 @@ import qualified Language.Haskell.TH.Syntax as TH
 import Control.Applicative ((<$>), (<*>))
 import Control.Monad.Fail (fail)
 import Control.Monad ((>>=), return)
+import Data.Function ((.))
+import Data.Functor (fmap)
 import Data.List ((++))
+import Data.Traversable (traverse)
 import Text.Show (show)
 
 import qualified Data.Maybe as Maybe
@@ -73,3 +79,28 @@ charPat c = TH.ConP <$> lookupConName <*> return []
     conName = "ASCII.Char." ++ G.conNameOf c
     lookupConName = TH.lookupValueName conName >>= Maybe.maybe lookupFailed return
     lookupFailed = fail ("lookupValueName " ++ show conName ++ " failed.")
+
+{- |
+
+>>> $(charListExp [CapitalLetterH, SmallLetterI])
+[CapitalLetterH,SmallLetterI]
+
+-}
+
+charListExp :: [ASCII.Char] -> Q Exp
+charListExp = lift
+
+{- |
+
+>>> :{
+>>> case [CapitalLetterH, SmallLetterI] of
+>>>     $(charListPat [CapitalLetterH, SmallLetterA]) -> 1
+>>>     $(charListPat [CapitalLetterH, SmallLetterI]) -> 2
+>>>     _                                             -> 3
+>>> :}
+2
+
+-}
+
+charListPat :: [ASCII.Char] -> Q Pat
+charListPat = fmap TH.ListP . traverse charPat
