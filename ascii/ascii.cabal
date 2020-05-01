@@ -32,21 +32,24 @@ library
 
     build-depends: base >= 4.11 && < 4.14
 
-    exposed-modules: ASCII, ASCII.ListsAndPredicates, ASCII.Lists, ASCII.Predicates
+    exposed-modules: ASCII
 
-    build-depends: ascii-char >= 1.0 && <1.1
+    build-depends: ascii-char >= 1.0 && < 1.1
     reexported-modules: ASCII.Char
 
-    build-depends: ascii-group >= 1.0 && <1.1
+    build-depends: ascii-group >= 1.0 && < 1.1
     reexported-modules: ASCII.Group
 
-    build-depends: ascii-case >= 1.0 && <1.1
+    build-depends: ascii-case >= 1.0 && < 1.1
     reexported-modules: ASCII.Case
 
-    build-depends: ascii-superset >= 1.0 && <1.1
+    build-depends: ascii-predicates >= 1.0 && < 1.1
+    reexported-modules: ASCII.Predicates, ASCII.Lists, ASCII.ListsAndPredicates
+
+    build-depends: ascii-superset >= 1.0 && < 1.1
     reexported-modules: ASCII.Superset, ASCII.Refinement
 
-    build-depends: ascii-th >= 1.0 && <1.1
+    build-depends: ascii-th >= 1.0 && < 1.1
     reexported-modules: ASCII.TemplateHaskell, ASCII.QuasiQuoters
 
     build-depends: data-ascii

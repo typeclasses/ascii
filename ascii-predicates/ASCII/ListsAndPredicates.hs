@@ -14,7 +14,8 @@ import ASCII.Predicates
 
 {- $setup
 
->>> import Data.List (filter, (==))
+>>> import Data.Eq ((==))
+>>> import Data.List (filter)
 
 -}
 

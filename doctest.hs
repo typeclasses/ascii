@@ -14,11 +14,12 @@ ghcOptions =
 
 sourceFiles =
   [ "ascii/ASCII.hs"
-  , "ascii/ASCII/Lists.hs"
-  , "ascii/ASCII/Predicates.hs"
   , "ascii-case/ASCII/Case.hs"
   , "ascii-char/ASCII/Char.hs"
   , "ascii-group/ASCII/Group.hs"
+  , "ascii-predicates/ASCII/Lists.hs"
+  , "ascii-predicates/ASCII/Predicates.hs"
+  , "ascii-predicates/ASCII/ListsAndPredicates.hs"
   , "ascii-superset/ASCII/Refinement.hs"
   , "ascii-superset/ASCII/Superset.hs"
   , "ascii-th/ASCII/QuasiQuoters.hs"
