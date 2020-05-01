@@ -42,7 +42,7 @@ module ASCII
   , liftChar, liftString
 
   -- ** Refinement
-  , ASCII.Refinement.ASCII, ASCII.Refinement.validateChar, ASCII.Refinement.validateString, ASCII.Refinement.lift
+  , ASCII.Refinement.ASCII, ASCII.Refinement.lift, ASCII.Refinement.validateChar, ASCII.Refinement.validateString
 
   ) where
 
