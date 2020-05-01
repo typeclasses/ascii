@@ -19,43 +19,49 @@ module ASCII.Predicates
 
   ) where
 
-import Prelude ((<=), (>=), (==), Bool (..), otherwise)
+import Data.Bool (Bool (..), otherwise)
+import Data.Eq ((==))
+import Data.Function ((.))
+import Data.Ord ((<), (<=), (>=))
 
 import qualified Data.Bool as Bool
 import qualified Data.Char as Unicode
 import qualified Data.List as List
 
 import ASCII.Char (Char (..))
-import ASCII.Case (Case (..), isCase)
-import ASCII.Group (Group (..), inGroup)
+import qualified ASCII.Char as Char
 
 -- | Returns True for characters in the 'Control' group.
 --
 -- This function is analogous to 'Unicode.isControl' in the "Data.Char" module.
 
 isControl :: Char -> Bool
-isControl = inGroup Control
+isControl x  =
+    case x of
+        _ | (x < Char.Space) -> True
+        Char.Delete          -> True
+        _                    -> False
 
 -- | Returns True for characters in the 'Printable' group.
 --
 -- This function is analogous to 'Unicode.isPrint' in the "Data.Char" module.
 
 isPrint :: Char -> Bool
-isPrint = inGroup Printable
+isPrint = Bool.not . isControl
 
 -- | Returns True for 'LowerCase' letters, from 'SmallLetterA' to 'SmallLetterZ'.
 --
 -- This function is analogous to 'Unicode.isLower' in the "Data.Char" module.
 
 isLower :: Char -> Bool
-isLower = isCase LowerCase
+isLower x = (Bool.&&) (x >= SmallLetterA) (x <= SmallLetterZ)
 
 -- | Returns True for 'UpperCase' letters, from 'CapitalLetterA' to 'CapitalLetterZ'.
 --
 -- This function is analogous to 'Unicode.isUpper' in the "Data.Char" module.
 
 isUpper :: Char -> Bool
-isUpper = isCase UpperCase
+isUpper x = (Bool.&&) (x >= CapitalLetterA) (x <= CapitalLetterZ)
 
 -- | Returns True for letters:
 --
