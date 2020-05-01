@@ -1,5 +1,3 @@
--- | This module defines drop-in replacements for closely related definitions of the same name in the "Data.Char" module.
-
 module ASCII.Predicates
   (
   -- * Group predicates
@@ -16,6 +14,9 @@ module ASCII.Predicates
 
   -- * Miscellaneous predicates
   , isSpace, isAlphaNum, isMark, isPunctuation, isSymbol, isSeparator
+
+  -- * Notes
+  -- $notes
 
   ) where
 
@@ -192,3 +193,62 @@ isSymbol = (`List.elem` [DollarSign, PlusSign, LessThanSign, EqualsSign, Greater
 
 isSeparator :: Char -> Bool
 isSeparator = (== Space)
+
+{- $notes
+
+This module defines drop-in replacements for closely related definitions of the same name in the "Data.Char" module.
+
+>>> import qualified Data.Char
+>>> import qualified Data.List
+>>> convert = Data.Char.chr . ASCII.Char.toInt
+>>> eq f g = Data.List.all (\x -> f x == g (convert x)) ASCII.Char.allCharacters
+
+>>> eq isControl Data.Char.isControl
+True
+
+>>> eq isSpace Data.Char.isSpace
+True
+
+>>> eq isLower Data.Char.isLower
+True
+
+>>> eq isUpper Data.Char.isUpper
+True
+
+>>> eq isAlpha Data.Char.isAlpha
+True
+
+>>> eq isAlphaNum Data.Char.isAlphaNum
+True
+
+>>> eq isPrint Data.Char.isPrint
+True
+
+>>> eq isDigit Data.Char.isDigit
+True
+
+>>> eq isOctDigit Data.Char.isOctDigit
+True
+
+>>> eq isHexDigit Data.Char.isHexDigit
+True
+
+>>> eq isLetter Data.Char.isLetter
+True
+
+>>> eq isMark Data.Char.isMark
+True
+
+>>> eq isNumber Data.Char.isNumber
+True
+
+>>> eq isPunctuation Data.Char.isPunctuation
+True
+
+>>> eq isSymbol Data.Char.isSymbol
+True
+
+>>> eq isSeparator Data.Char.isSeparator
+True
+
+-}
