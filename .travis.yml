@@ -93,6 +93,7 @@ install:
     echo "packages: ./ascii-case" >> cabal.project
     echo "packages: ./ascii-char" >> cabal.project
     echo "packages: ./ascii-group" >> cabal.project
+    echo "packages: ./ascii-predicates" >> cabal.project
     echo "packages: ./ascii-superset" >> cabal.project
     echo "packages: ./ascii-th" >> cabal.project
     echo "packages: ./data-ascii" >> cabal.project
@@ -104,6 +105,8 @@ install:
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - echo 'package ascii-group' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
+  - echo 'package ascii-predicates' >> cabal.project
+  - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - echo 'package ascii-superset' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - echo 'package ascii-th' >> cabal.project
@@ -111,13 +114,14 @@ install:
   - echo 'package data-ascii' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - |
-  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(ascii|ascii-case|ascii-char|ascii-group|ascii-superset|ascii-th|data-ascii)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
+  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(ascii|ascii-case|ascii-char|ascii-group|ascii-predicates|ascii-superset|ascii-th|data-ascii)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
   - if [ -f "./ascii/configure.ac" ]; then (cd "./ascii" && autoreconf -i); fi
   - if [ -f "./ascii-case/configure.ac" ]; then (cd "./ascii-case" && autoreconf -i); fi
   - if [ -f "./ascii-char/configure.ac" ]; then (cd "./ascii-char" && autoreconf -i); fi
   - if [ -f "./ascii-group/configure.ac" ]; then (cd "./ascii-group" && autoreconf -i); fi
+  - if [ -f "./ascii-predicates/configure.ac" ]; then (cd "./ascii-predicates" && autoreconf -i); fi
   - if [ -f "./ascii-superset/configure.ac" ]; then (cd "./ascii-superset" && autoreconf -i); fi
   - if [ -f "./ascii-th/configure.ac" ]; then (cd "./ascii-th" && autoreconf -i); fi
   - if [ -f "./data-ascii/configure.ac" ]; then (cd "./data-ascii" && autoreconf -i); fi
@@ -139,6 +143,7 @@ script:
   - PKGDIR_ascii_case="$(find . -maxdepth 1 -type d -regex '.*/ascii-case-[0-9.]*')"
   - PKGDIR_ascii_char="$(find . -maxdepth 1 -type d -regex '.*/ascii-char-[0-9.]*')"
   - PKGDIR_ascii_group="$(find . -maxdepth 1 -type d -regex '.*/ascii-group-[0-9.]*')"
+  - PKGDIR_ascii_predicates="$(find . -maxdepth 1 -type d -regex '.*/ascii-predicates-[0-9.]*')"
   - PKGDIR_ascii_superset="$(find . -maxdepth 1 -type d -regex '.*/ascii-superset-[0-9.]*')"
   - PKGDIR_ascii_th="$(find . -maxdepth 1 -type d -regex '.*/ascii-th-[0-9.]*')"
   - PKGDIR_data_ascii="$(find . -maxdepth 1 -type d -regex '.*/data-ascii-[0-9.]*')"
@@ -150,6 +155,7 @@ script:
     echo "packages: ${PKGDIR_ascii_case}" >> cabal.project
     echo "packages: ${PKGDIR_ascii_char}" >> cabal.project
     echo "packages: ${PKGDIR_ascii_group}" >> cabal.project
+    echo "packages: ${PKGDIR_ascii_predicates}" >> cabal.project
     echo "packages: ${PKGDIR_ascii_superset}" >> cabal.project
     echo "packages: ${PKGDIR_ascii_th}" >> cabal.project
     echo "packages: ${PKGDIR_data_ascii}" >> cabal.project
@@ -161,6 +167,8 @@ script:
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - echo 'package ascii-group' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
+  - echo 'package ascii-predicates' >> cabal.project
+  - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - echo 'package ascii-superset' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - echo 'package ascii-th' >> cabal.project
@@ -168,7 +176,7 @@ script:
   - echo 'package data-ascii' >> cabal.project
   - "echo '  ghc-options: -Werror=missing-methods' >> cabal.project"
   - |
-  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(ascii|ascii-case|ascii-char|ascii-group|ascii-superset|ascii-th|data-ascii)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
+  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(ascii|ascii-case|ascii-char|ascii-group|ascii-predicates|ascii-superset|ascii-th|data-ascii)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
   # Building...
@@ -182,6 +190,7 @@ script:
   - (cd ${PKGDIR_ascii_case} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_ascii_char} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_ascii_group} && ${CABAL} -vnormal check)
+  - (cd ${PKGDIR_ascii_predicates} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_ascii_superset} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_ascii_th} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_data_ascii} && ${CABAL} -vnormal check)
