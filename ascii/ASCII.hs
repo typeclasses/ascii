@@ -26,6 +26,7 @@ module ASCII
   , ASCII.Case.Case (..), ASCII.Case.letterCase, ASCII.Case.isCase
 
   -- * Monomorphic conversions
+  -- $monomorphicConversions
 
   -- ** Int
   -- $intConversions
@@ -34,6 +35,22 @@ module ASCII
   -- ** Word8
   -- $word8Conversions
   , charToWord8, word8ToCharMaybe, word8ToCharUnsafe
+
+  -- ** Char
+  -- $unicodeCharConversions
+  , charToUnicode, unicodeToCharMaybe, unicodeToCharUnsafe
+
+  -- ** String
+  -- $unicodeStringConversions
+  , charListToUnicodeString, unicodeStringToCharListMaybe, unicodeStringToCharListUnsafe
+
+  -- ** Text
+  -- $textConversions
+  , charListToText, textToCharListMaybe, textToCharListUnsafe
+
+  -- ** ByteString
+  -- $byteStringConversions
+  , charListToByteString, byteStringToCharListMaybe, byteStringToCharListUnsafe
 
   -- * Refinement type
   , ASCII.Refinement.ASCII
@@ -50,19 +67,23 @@ module ASCII
 
   ) where
 
-import Prelude ((.), Maybe, Int)
-import qualified Prelude
-
+import Data.Int (Int)
+import Data.Maybe (Maybe)
 import Data.Word (Word8)
+
+import qualified Data.ByteString as BS
+import qualified Data.Char as Unicode
+import qualified Data.String as Unicode
+import qualified Data.Text as Text
 
 import ASCII.Char (Char)
 import ASCII.Superset (IsChar, IsString)
 
-import qualified ASCII.Char
 import qualified ASCII.Case
 import qualified ASCII.Group
 import qualified ASCII.Lift
 import qualified ASCII.Refinement
+import qualified ASCII.Superset
 
 {- $setup
 
@@ -76,6 +97,12 @@ import qualified ASCII.Refinement
 {- $groups
 
 ASCII characters are broadly categorized into two groups: /control codes/ and /printable characters/.
+
+-}
+
+{- $monomorphicConversions
+
+These are a few simple monomorphic functions to convert between ASCII and types representing some other character set. This is not intended to be an exhaustive list of all possible conversions.
 
 -}
 
@@ -93,13 +120,13 @@ These functions convert between the ASCII 'Char' type and 'Int'.
 -}
 
 charToInt :: Char -> Int
-charToInt = ASCII.Char.toInt
+charToInt = ASCII.Superset.fromChar
 
 intToCharMaybe :: Int -> Maybe Char
-intToCharMaybe = ASCII.Char.fromIntMaybe
+intToCharMaybe = ASCII.Superset.toCharMaybe
 
 intToCharUnsafe :: Int -> Char
-intToCharUnsafe = ASCII.Char.fromIntUnsafe
+intToCharUnsafe = ASCII.Superset.toCharUnsafe
 
 {- $word8Conversions
 
@@ -115,13 +142,80 @@ These functions convert between the ASCII 'Char' type and 'Word8'.
 -}
 
 charToWord8 :: Char -> Word8
-charToWord8 = Prelude.fromIntegral . ASCII.Char.toInt
+charToWord8 = ASCII.Superset.fromChar
 
 word8ToCharMaybe :: Word8 -> Maybe Char
-word8ToCharMaybe = intToCharMaybe . Prelude.fromIntegral
+word8ToCharMaybe = ASCII.Superset.toCharMaybe
 
 word8ToCharUnsafe :: Word8 -> Char
-word8ToCharUnsafe = intToCharUnsafe . Prelude.fromIntegral
+word8ToCharUnsafe = ASCII.Superset.toCharUnsafe
+
+{- $unicodeCharConversions
+
+These functions convert between the ASCII 'Char' type and the Unicode 'Unicode.Char' type.
+
+-}
+
+charToUnicode :: Char -> Unicode.Char
+charToUnicode = ASCII.Superset.fromChar
+
+unicodeToCharMaybe :: Unicode.Char -> Maybe Char
+unicodeToCharMaybe = ASCII.Superset.toCharMaybe
+
+unicodeToCharUnsafe :: Unicode.Char -> Char
+unicodeToCharUnsafe = ASCII.Superset.toCharUnsafe
+
+{- $unicodeStringConversions
+
+These functions convert between @['Char']@ (a list of ASCII characters) and 'Unicode.String' (a list of Unicode characters).
+
+-}
+
+charListToUnicodeString :: [Char] -> Unicode.String
+charListToUnicodeString = ASCII.Superset.fromCharList
+
+unicodeStringToCharListMaybe :: Unicode.String -> Maybe [Char]
+unicodeStringToCharListMaybe = ASCII.Superset.toCharListMaybe
+
+unicodeStringToCharListUnsafe :: Unicode.String -> [Char]
+unicodeStringToCharListUnsafe = ASCII.Superset.toCharListUnsafe
+
+{- $textConversions
+
+These functions convert between @['Char']@ and 'Text.Text'.
+
+-}
+
+{- |
+
+>>> charListToText [CapitalLetterH,SmallLetterI,ExclamationMark]
+"Hi!"
+
+-}
+
+charListToText :: [Char] -> Text.Text
+charListToText = ASCII.Superset.fromCharList
+
+textToCharListMaybe :: Text.Text -> Maybe [Char]
+textToCharListMaybe = ASCII.Superset.toCharListMaybe
+
+textToCharListUnsafe :: Text.Text -> [Char]
+textToCharListUnsafe = ASCII.Superset.toCharListUnsafe
+
+{- $byteStringConversions
+
+These functions convert between @['Char']@ and 'BS.ByteString'.
+
+-}
+
+charListToByteString :: [Char] -> BS.ByteString
+charListToByteString = ASCII.Superset.fromCharList
+
+byteStringToCharListMaybe :: BS.ByteString -> Maybe [Char]
+byteStringToCharListMaybe = ASCII.Superset.toCharListMaybe
+
+byteStringToCharListUnsafe :: BS.ByteString -> [Char]
+byteStringToCharListUnsafe = ASCII.Superset.toCharListUnsafe
 
 {- | Converts from ASCII to any larger type.
 
@@ -129,6 +223,8 @@ For example, @(lift \@ASCII.Char \@Word8)@ is the same function as 'charToWord8'
 
 >>> lift CapitalLetterA :: Word8
 65
+
+And @(lift \@[ASCII.Char] \@Text)@ is equivalent to 'charListToText'.
 
 >>> lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text
 "Hi!"
