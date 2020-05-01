@@ -14,6 +14,7 @@ module ASCII
   (
 
   -- * The ASCII @Char@ type
+  -- $char
     Char
 
   -- * Character classifications
@@ -23,6 +24,7 @@ module ASCII
   , ASCII.Group.Group (..), ASCII.Group.charGroup, ASCII.Group.inGroup
 
   -- ** Upper/lower case
+  -- $case
   , ASCII.Case.Case (..), ASCII.Case.letterCase, ASCII.Case.isCase
 
   -- * Monomorphic conversions
@@ -53,6 +55,7 @@ module ASCII
   , charListToByteString, byteStringToCharListMaybe, byteStringToCharListUnsafe
 
   -- * Refinement type
+  -- $refinement
   , ASCII.Refinement.ASCII
 
   -- * Polymorphic conversions
@@ -60,6 +63,7 @@ module ASCII
   , ASCII.Refinement.validateChar
   , ASCII.Refinement.validateString
   -- ** Lift
+  -- $lift
   , lift
 
   -- * Classes
@@ -94,15 +98,33 @@ import qualified ASCII.Superset
 
 -}
 
+{- $char
+
+See also: "ASCII.Char"
+
+-}
+
 {- $groups
 
 ASCII characters are broadly categorized into two groups: /control codes/ and /printable characters/.
+
+See also: "ASCII.Group"
+
+-}
+
+{- $case
+
+/Case/ is a property of letters. /A-Z/ are /upper case/ letters, and /a-z/ are /lower case/ letters. No other ASCII characters have case.
+
+See also: "ASCII.Case"
 
 -}
 
 {- $monomorphicConversions
 
-These are a few simple monomorphic functions to convert between ASCII and types representing some other character set. This is not intended to be an exhaustive list of all possible conversions.
+These are a few simple monomorphic functions to convert between ASCII and types representing some other character set.
+
+This is not intended to be an exhaustive list of all possible conversions. For more options, see "ASCII.Superset".
 
 -}
 
@@ -216,6 +238,18 @@ byteStringToCharListMaybe = ASCII.Superset.toCharListMaybe
 
 byteStringToCharListUnsafe :: BS.ByteString -> [Char]
 byteStringToCharListUnsafe = ASCII.Superset.toCharListUnsafe
+
+{- $refinement
+
+See also: "ASCII.Refinement"
+
+-}
+
+{- $lift
+
+See also: "ASCII.Lift"
+
+-}
 
 {- | Converts from ASCII to any larger type.
 

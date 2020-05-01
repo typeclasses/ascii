@@ -1,3 +1,5 @@
+-- | /Case/ is a property of letters. /A-Z/ are /upper case/ letters, and /a-z/ are /lower case/ letters. No other ASCII characters have case.
+
 module ASCII.Case ( Case (..), letterCase, isCase ) where
 
 import ASCII.Char (Char (..))
@@ -12,7 +14,6 @@ import qualified Data.Bool as Bool
 
 -}
 
--- | /Case/ is a property of letters. /A-Z/ are /upper case/ letters, and /a-z/ are /lower case/ letters. No other ASCII characters have case.
 data Case =
     UpperCase -- ^ The letters from 'CapitalLetterA' to 'CapitalLetterZ'.
   | LowerCase -- ^ The letters from 'SmallLetterA' to 'SmallLetterZ'.
