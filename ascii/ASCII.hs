@@ -12,29 +12,27 @@ We do not elaborate on the semantics of the control characters here, because thi
 
 module ASCII (
 
-    {- * The ASCII @Char@ type -} {- $char -} Char,
+    {- * @Char@ -} {- $char -} Char,
 
     {- * Character classifications -}
     {- ** Print/control groups -} {- $groups -} Group (..), charGroup,  inGroup,
     {- ** Upper/lower case     -} {- $case   -} Case (..),  letterCase, isCase,
 
     {- * Monomorphic conversions -} {- $monomorphicConversions -}
-    {- ** Int        -} {- $intConversions           -} charToInt,               intToCharMaybe,               intToCharUnsafe,
-    {- ** Word8      -} {- $word8Conversions         -} charToWord8,             word8ToCharMaybe,             word8ToCharUnsafe,
-    {- ** Char       -} {- $unicodeCharConversions   -} charToUnicode,           unicodeToCharMaybe,           unicodeToCharUnsafe,
-    {- ** String     -} {- $unicodeStringConversions -} charListToUnicodeString, unicodeStringToCharListMaybe, unicodeStringToCharListUnsafe,
-    {- ** Text       -} {- $textConversions          -} charListToText,          textToCharListMaybe,          textToCharListUnsafe,
-    {- ** ByteString -} {- $byteStringConversions    -} charListToByteString,    byteStringToCharListMaybe,    byteStringToCharListUnsafe,
+    {- ** @Int@        -} {- $intConversions           -} charToInt,               intToCharMaybe,               intToCharUnsafe,
+    {- ** @Word8@      -} {- $word8Conversions         -} charToWord8,             word8ToCharMaybe,             word8ToCharUnsafe,
+    {- ** @Char@       -} {- $unicodeCharConversions   -} charToUnicode,           unicodeToCharMaybe,           unicodeToCharUnsafe,
+    {- ** @String@     -} {- $unicodeStringConversions -} charListToUnicodeString, unicodeStringToCharListMaybe, unicodeStringToCharListUnsafe,
+    {- ** @Text@       -} {- $textConversions          -} charListToText,          textToCharListMaybe,          textToCharListUnsafe,
+    {- ** @ByteString@ -} {- $byteStringConversions    -} charListToByteString,    byteStringToCharListMaybe,    byteStringToCharListUnsafe,
 
-    {- * Refinement type -} {- $refinement -} ASCII,
+    {- * Refinement type -} {- $refinement -} {- ** @ASCII@ -} ASCII,
 
-    {- * Polymorphic conversions -}
-    {- ** Validate -} validateChar, validateString,
-    {- ** Lift -} {- $lift -} lift,
+    {- * Polymorphic conversions -} {- ** Validate -} validateChar, validateString, {- ** Lift -} {- $lift -} lift,
 
-    {- * Classes -} IsChar, IsString, Lift,
+    {- * Classes -} {- ** @IsChar@ -} IsChar, {- ** @IsString@ -} IsString, {- ** @Lift@ -} Lift,
 
-    {- * Quasi-quoters -} char, string
+    {- * Quasi-quoters -} {- ** @char@ -} char, {- ** @string@ -} string
 
     ) where
 
