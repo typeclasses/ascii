@@ -5,8 +5,7 @@ version: 1.0.0.0
 synopsis: The ASCII character set and encoding
 category: Data, Text
 
-description:
-    This package provides a variety of ways to work with ASCII text.
+description: This package provides a variety of ways to work with ASCII text.
 
 license: Apache-2.0
 license-file: license.txt
@@ -46,13 +45,21 @@ library
     reexported-modules: ASCII.Case
 
     build-depends: ascii-predicates >= 1.0 && < 1.1
-    reexported-modules: ASCII.Predicates, ASCII.Lists, ASCII.ListsAndPredicates
+    reexported-modules: ASCII.Predicates
+    reexported-modules: ASCII.Lists
+    reexported-modules: ASCII.ListsAndPredicates
 
     build-depends: ascii-superset >= 1.0 && < 1.1
-    reexported-modules: ASCII.Superset, ASCII.Refinement, ASCII.Lift
+    reexported-modules: ASCII.Superset
+    reexported-modules: ASCII.Refinement
+    reexported-modules: ASCII.Lift
 
     build-depends: ascii-th >= 1.0 && < 1.1
-    reexported-modules: ASCII.TemplateHaskell, ASCII.QuasiQuoters
+    reexported-modules: ASCII.TemplateHaskell
+    reexported-modules: ASCII.QuasiQuoters
 
     build-depends: data-ascii
-    reexported-modules: Data.Ascii, Data.Ascii.Blaze, Data.Ascii.ByteString, Data.Ascii.Word8
+    reexported-modules: Data.Ascii
+    reexported-modules: Data.Ascii.Blaze
+    reexported-modules: Data.Ascii.ByteString
+    reexported-modules: Data.Ascii.Word8

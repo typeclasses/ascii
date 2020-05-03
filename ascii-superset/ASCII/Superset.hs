@@ -3,11 +3,12 @@ module ASCII.Superset where
 import Control.Monad (return)
 import Control.Monad.Fail (MonadFail (fail))
 import Data.Bool (Bool, (&&))
-import Data.Function ((.))
+import Data.Function ((.), id)
 import Data.Ord ((<=), (>=))
 import Data.Maybe (Maybe (..))
 
 import qualified ASCII.Char as ASCII
+import qualified Data.Bool as Bool
 import qualified Data.Char as Unicode
 import qualified Data.Word as Word
 import qualified Data.Int as Int
@@ -61,6 +62,12 @@ toCharListOrFail x = if isAsciiString x then return (toCharListUnsafe x) else fa
 
 
 ---  Instances  ---
+
+instance IsChar ASCII.Char
+  where
+    isAsciiChar _ = Bool.True
+    fromChar = id
+    toCharUnsafe = id
 
 instance IsChar Unicode.Char
   where

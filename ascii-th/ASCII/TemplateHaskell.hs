@@ -1,42 +1,37 @@
-module ASCII.TemplateHaskell
-  (
-    -- * Setup for examples
-    -- $setup
+-- | Use of this module requires the @TemplateHaskell@ language extension.
 
-    -- * Characters
-      charExp, charPat
+module ASCII.TemplateHaskell (
 
-    -- * Character lists
-    , charListExp, charListPat
+    {- * Characters          -} charExp,     charPat,
+    {- * Character lists     -} charListExp, charListPat,
+    {- * Character supersets -} isCharExp,   isCharPat,
+    {- * String supersets    -} isStringExp, isStringPat
 
   ) where
 
-import qualified ASCII.Char as ASCII
+import qualified ASCII.Char       as  ASCII
+import qualified ASCII.Superset
 
-import qualified Generics.Deriving.ConNames as G
-
-import Language.Haskell.TH.Syntax ( Q, Exp, Pat, lift )
-import qualified Language.Haskell.TH.Syntax as TH
-
-import Control.Applicative ((<$>), (<*>))
-import Control.Monad.Fail (fail)
-import Control.Monad ((>>=), return)
-import Data.Function ((.))
-import Data.Functor (fmap)
-import Data.List ((++))
-import Data.Traversable (traverse)
-import Text.Show (show)
-
-import qualified Data.Maybe as Maybe
+import Data.Data                  ( Data )
+import Data.Maybe                 ( Maybe (..) )
+import Language.Haskell.TH.Syntax ( Q, Exp, Pat, dataToExpQ, dataToPatQ )
 
 {- $setup
 
->>> :set -XTemplateHaskell
->>> import ASCII.Char
+>>> :set -XNoViewPatterns
+>>> import ASCII.Char (Char (..))
+>>> import ASCII.Refinement (ASCII)
 >>> import ASCII.Superset
 >>> import ASCII.TemplateHaskell
+>>> import Data.Word (Word8)
 
 -}
+
+exp :: Data a => a -> Q Exp
+exp = dataToExpQ (\_ -> Nothing)
+
+pat :: Data a => a -> Q Pat
+pat = dataToPatQ (\_ -> Nothing)
 
 {- |
 
@@ -49,7 +44,7 @@ Delete
 -}
 
 charExp :: ASCII.Char -> Q Exp
-charExp = lift
+charExp = exp
 
 {- |
 
@@ -74,11 +69,7 @@ This is the same as:
 -}
 
 charPat :: ASCII.Char -> Q Pat
-charPat c = TH.ConP <$> lookupConName <*> return []
-  where
-    conName = "ASCII.Char." ++ G.conNameOf c
-    lookupConName = TH.lookupValueName conName >>= Maybe.maybe lookupFailed return
-    lookupFailed = fail ("lookupValueName " ++ show conName ++ " failed.")
+charPat = pat
 
 {- |
 
@@ -88,7 +79,7 @@ charPat c = TH.ConP <$> lookupConName <*> return []
 -}
 
 charListExp :: [ASCII.Char] -> Q Exp
-charListExp = lift
+charListExp = exp
 
 {- |
 
@@ -103,4 +94,43 @@ charListExp = lift
 -}
 
 charListPat :: [ASCII.Char] -> Q Pat
-charListPat = fmap TH.ListP . traverse charPat
+charListPat = pat
+
+{- |
+
+>>> $(isCharExp CapitalLetterA) :: ASCII.Char
+CapitalLetterA
+
+>>> $(isCharExp CapitalLetterA) :: Word8
+65
+
+>>> $(isCharExp CapitalLetterA) :: ASCII Word8
+asciiUnsafe 65
+
+-}
+
+isCharExp :: ASCII.Char -> Q Exp
+isCharExp x = [| ASCII.Superset.fromChar $(charExp x) |]
+
+{- |
+
+>>> :set -XViewPatterns
+
+>>> :{
+>>> case (66 :: Word8) of
+>>>     $(isCharPat CapitalLetterA) -> 1
+>>>     $(isCharPat CapitalLetterB) -> 2
+>>>     _                           -> 3
+>>> :}
+2
+
+-}
+
+isCharPat :: ASCII.Char -> Q Pat
+isCharPat x = [p| (ASCII.Superset.toCharMaybe -> Just $(charPat x)) |]
+
+isStringExp :: [ASCII.Char] -> Q Exp
+isStringExp xs = [| ASCII.Superset.fromCharList $(charListExp xs) |]
+
+isStringPat :: [ASCII.Char] -> Q Pat
+isStringPat xs = [p| (ASCII.Superset.toCharListMaybe -> Just $(charListPat xs)) |]

@@ -19,7 +19,7 @@ module ASCII.Char
 import Prelude ((<), (>), otherwise, Int, Maybe (..))
 
 import qualified Prelude
-import qualified Language.Haskell.TH.Syntax as TH
+import qualified Data.Data as Data
 import qualified GHC.Generics as G
 
 {- $setup
@@ -59,8 +59,8 @@ deriving instance Prelude.Enum Char
 deriving instance Prelude.Bounded Char
 deriving instance Prelude.Show Char
 
--- Requires the DeriveLift language extension.
-deriving instance TH.Lift Char
+-- Requires the DeriveDataTypeable language extension.
+deriving instance Data.Data Char
 
 -- Requires the DeriveGeneric language extension.
 deriving instance G.Generic Char

@@ -4,14 +4,18 @@ main = doctest args
 
 args = ghcOptions ++ sourceFiles
 
-ghcOptions =
-  [ "-XDeriveGeneric"
-  , "-XDeriveLift"
-  , "-XDerivingStrategies"
-  , "-XGeneralizedNewtypeDeriving"
-  , "-XNoImplicitPrelude"
-  , "-XQuasiQuotes"
-  , "-XStandaloneDeriving"
+ghcOptions = map ("-X" <>) extensions ++ ["-fdefer-typed-holes"]
+
+extensions =
+  [ "DeriveDataTypeable"
+  , "DeriveGeneric"
+  , "DerivingStrategies"
+  , "GeneralizedNewtypeDeriving"
+  , "NoImplicitPrelude"
+  , "QuasiQuotes"
+  , "StandaloneDeriving"
+  , "TemplateHaskell"
+  , "ViewPatterns"
   ]
 
 sourceFiles =

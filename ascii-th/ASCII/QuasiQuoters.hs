@@ -1,17 +1,11 @@
-module ASCII.QuasiQuoters
-  (
-    -- * Setup for examples
-    -- $setup
+-- | Use of this module requires the @QuasiQuotes@ language extension.
 
-    -- * Quasi-quoters
-    char
-  , charList
-
-  ) where
+module ASCII.QuasiQuoters ( char, string ) where
 
 import ASCII.Char
 import ASCII.Superset
-import ASCII.TemplateHaskell
+
+import qualified ASCII.TemplateHaskell
 
 import Language.Haskell.TH.Quote
 import Language.Haskell.TH.Syntax
@@ -26,19 +20,36 @@ import qualified Data.String as Unicode
 
 {- $setup
 
->>> :set -XQuasiQuotes
 >>> :set -fno-warn-overlapping-patterns
+>>> :set -XNoQuasiQuotes
+>>> :set -XNoViewPatterns
+>>> import qualified ASCII
+>>> import qualified Data.String
+>>> import qualified Data.Text
+>>> import qualified Data.ByteString.Builder
+>>> import Data.Word (Word8)
 >>> import ASCII.Char
 >>> import ASCII.QuasiQuoters
 
 -}
 
-{- | Produces an expression or a pattern corresponding to an ASCII 'Char'.
+{- | Produces an expression or a pattern corresponding to an ASCII character.
+
+The result will have an 'IsChar' constraint; since this is polymorphic, use with a type signature to specify the particular you want is recommended.
 
 The quasi-quoted string must consist of a single character that is within the ASCII character set.
 
->>> [char|e|]
+>>> :set -XQuasiQuotes
+
+>>> [char|e|] :: ASCII.Char
 SmallLetterE
+
+>>> [char|e|] :: Word8
+101
+
+Use in a pattern context requires enabling the @ViewPatterns@ language extension.
+
+>>> :set -XViewPatterns
 
 >>> case Tilde of [char|@|] -> 1; [char|~|] -> 2; _ -> 3
 2
@@ -46,22 +57,46 @@ SmallLetterE
 -}
 
 char :: QuasiQuoter
-char = expPatQQ requireOneAscii charExp charPat
+char =
+    expPatQQ requireOneAscii
+        ASCII.TemplateHaskell.isCharExp
+        ASCII.TemplateHaskell.isCharPat
 
-{- | Produces an expression or a pattern corresponding to an ASCII 'Char' list.
+{- | Produces an expression or a pattern corresponding to an ASCII string.
+
+The result will have an 'IsString' constraint; since this is polymorphic, use with a type signature to specify the particular you want is recommended.
 
 The quasi-quoted string must consist only of characters are within the ASCII character set.
 
->>> [charList|Hello!|]
+>>> :set -XQuasiQuotes
+
+>>> [string|Hello!|] :: [ASCII.Char]
 [CapitalLetterH,SmallLetterE,SmallLetterL,SmallLetterL,SmallLetterO,ExclamationMark]
 
->>> case [CapitalLetterH, SmallLetterI] of [charList|Bye|] -> 1; [charList|Hi|] -> 2; _ -> 3
+>>> [string|Hello!|] :: Data.String.String
+"Hello!"
+
+>>> [string|Hello!|] :: Data.Text.Text
+"Hello!"
+
+>>> Data.ByteString.Builder.toLazyByteString [string|Hello!|]
+"Hello!"
+
+
+Use in a pattern context requires enabling the @ViewPatterns@ language extension.
+
+>>> :set -XViewPatterns
+
+>>> case [CapitalLetterH, SmallLetterI] of [string|Bye|] -> 1; [string|Hi|] -> 2; _ -> 3
 2
 
 -}
 
-charList :: QuasiQuoter
-charList = expPatQQ requireAsciiList charListExp charListPat
+string :: QuasiQuoter
+string =
+    expPatQQ requireAsciiList
+        ASCII.TemplateHaskell.isStringExp
+        ASCII.TemplateHaskell.isStringPat
 
 requireOneAscii :: Unicode.String -> Q Char
 requireOneAscii = requireOne >=> requireAscii
@@ -83,12 +118,12 @@ f || msg = \a -> case f a of Just b -> return b; Nothing -> fail msg
 
 expPatQQ :: (Unicode.String -> Q a) -> (a -> Q Exp) -> (a -> Q Pat) -> QuasiQuoter
 expPatQQ f a b =
-  QuasiQuoter
-    { quoteExp = f >=> a
-    , quotePat = f >=> b
-    , quoteType = notType
-    , quoteDec = notDec
-    }
+    QuasiQuoter
+        { quoteExp  = f >=> a
+        , quotePat  = f >=> b
+        , quoteType = notType
+        , quoteDec  = notDec
+        }
 
 notType :: MonadFail m => a -> m b
 notType _ = fail "Cannot be used in a type context."

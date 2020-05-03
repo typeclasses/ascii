@@ -1,6 +1,6 @@
 {- |
 
-The __American Standard Code for Information Interchange__ (ASCII) comprises a set of 128 characters, each represented by 7 bits. 33 of these characters are /'ASCII.Group.Control' codes/; a few of these are still in use, but most are obsolete relics of the early days of computing. The other 95 are /'ASCII.Group.Printable' characters/ such as letters and numbers, mostly corresponding to the keys on an American English keyboard.
+The __American Standard Code for Information Interchange__ (ASCII) comprises a set of 128 characters, each represented by 7 bits. 33 of these characters are /'Control' codes/; a few of these are still in use, but most are obsolete relics of the early days of computing. The other 95 are /'Printable' characters/ such as letters and numbers, mostly corresponding to the keys on an American English keyboard.
 
 Nowadays instead of ASCII we typically work with text using an encoding such as UTF-8 that can represent the entire Unicode character set, which includes over a hundred thousand characters and is not limited to the symbols of any particular writing system or culture. However, ASCII is still relevant to network protocols; for example, we can see it in the specification of [HTTP message headers](https://tools.ietf.org/html/rfc7230#section-1.2).
 
@@ -10,84 +10,56 @@ We do not elaborate on the semantics of the control characters here, because thi
 
 -}
 
-module ASCII
-  (
+module ASCII (
 
-  -- * The ASCII @Char@ type
-  -- $char
-    Char
+    {- * The ASCII @Char@ type -} {- $char -} Char,
 
-  -- * Character classifications
+    {- * Character classifications -}
+    {- ** Print/control groups -} {- $groups -} Group (..), charGroup,  inGroup,
+    {- ** Upper/lower case     -} {- $case   -} Case (..),  letterCase, isCase,
 
-  -- ** Print/control groups
-  -- $groups
-  , ASCII.Group.Group (..), ASCII.Group.charGroup, ASCII.Group.inGroup
+    {- * Monomorphic conversions -} {- $monomorphicConversions -}
+    {- ** Int        -} {- $intConversions           -} charToInt,               intToCharMaybe,               intToCharUnsafe,
+    {- ** Word8      -} {- $word8Conversions         -} charToWord8,             word8ToCharMaybe,             word8ToCharUnsafe,
+    {- ** Char       -} {- $unicodeCharConversions   -} charToUnicode,           unicodeToCharMaybe,           unicodeToCharUnsafe,
+    {- ** String     -} {- $unicodeStringConversions -} charListToUnicodeString, unicodeStringToCharListMaybe, unicodeStringToCharListUnsafe,
+    {- ** Text       -} {- $textConversions          -} charListToText,          textToCharListMaybe,          textToCharListUnsafe,
+    {- ** ByteString -} {- $byteStringConversions    -} charListToByteString,    byteStringToCharListMaybe,    byteStringToCharListUnsafe,
 
-  -- ** Upper/lower case
-  -- $case
-  , ASCII.Case.Case (..), ASCII.Case.letterCase, ASCII.Case.isCase
+    {- * Refinement type -} {- $refinement -} ASCII,
 
-  -- * Monomorphic conversions
-  -- $monomorphicConversions
+    {- * Polymorphic conversions -}
+    {- ** Validate -} validateChar, validateString,
+    {- ** Lift -} {- $lift -} lift,
 
-  -- ** Int
-  -- $intConversions
-  , charToInt, intToCharMaybe, intToCharUnsafe
+    {- * Classes -} IsChar, IsString, Lift,
 
-  -- ** Word8
-  -- $word8Conversions
-  , charToWord8, word8ToCharMaybe, word8ToCharUnsafe
+    {- * Quasi-quoters -} char, string
 
-  -- ** Char
-  -- $unicodeCharConversions
-  , charToUnicode, unicodeToCharMaybe, unicodeToCharUnsafe
+    ) where
 
-  -- ** String
-  -- $unicodeStringConversions
-  , charListToUnicodeString, unicodeStringToCharListMaybe, unicodeStringToCharListUnsafe
 
-  -- ** Text
-  -- $textConversions
-  , charListToText, textToCharListMaybe, textToCharListUnsafe
+import             ASCII.Case          ( Case (..), letterCase, isCase )
+import             ASCII.Char          ( Char )
+import             ASCII.Group         ( Group (..), charGroup, inGroup )
+import  qualified  ASCII.Lift
+import             ASCII.Lift          ( Lift )
+import             ASCII.QuasiQuoters  ( char, string )
+import             ASCII.Refinement    ( ASCII, validateChar, validateString )
+import  qualified  ASCII.Superset
+import             ASCII.Superset      ( IsChar, IsString )
 
-  -- ** ByteString
-  -- $byteStringConversions
-  , charListToByteString, byteStringToCharListMaybe, byteStringToCharListUnsafe
 
-  -- * Refinement type
-  -- $refinement
-  , ASCII.Refinement.ASCII
+import             Data.Int            ( Int )
+import             Data.Maybe          ( Maybe )
+import             Data.Word           ( Word8 )
 
-  -- * Polymorphic conversions
-  -- ** Validate
-  , ASCII.Refinement.validateChar
-  , ASCII.Refinement.validateString
-  -- ** Lift
-  -- $lift
-  , lift
 
-  -- * Classes
-  , IsChar, IsString, ASCII.Lift.Lift
+import  qualified  Data.ByteString   as  BS
+import  qualified  Data.Char         as  Unicode
+import  qualified  Data.String       as  Unicode
+import  qualified  Data.Text         as  Text
 
-  ) where
-
-import Data.Int (Int)
-import Data.Maybe (Maybe)
-import Data.Word (Word8)
-
-import qualified Data.ByteString as BS
-import qualified Data.Char as Unicode
-import qualified Data.String as Unicode
-import qualified Data.Text as Text
-
-import ASCII.Char (Char)
-import ASCII.Superset (IsChar, IsString)
-
-import qualified ASCII.Case
-import qualified ASCII.Group
-import qualified ASCII.Lift
-import qualified ASCII.Refinement
-import qualified ASCII.Superset
 
 {- $setup
 
@@ -267,5 +239,5 @@ Due to the highly polymorphic nature of the 'lift' function, often it must used 
 
 -}
 
-lift :: ASCII.Lift.Lift ascii superset => ascii -> superset
+lift :: Lift ascii superset => ascii -> superset
 lift = ASCII.Lift.lift

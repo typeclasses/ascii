@@ -17,13 +17,14 @@ import qualified ASCII.Superset as S
 import qualified Data.List as List
 import qualified Text.Show as Show
 
-import Data.Eq (Eq)
-import Data.Function ((.), ($))
-import Data.Hashable (Hashable)
-import Data.Maybe (Maybe (..))
-import Data.Ord (Ord, (>))
-import Data.Text (Text)
-import Prelude (succ)
+import Data.Bool     ( Bool (..) )
+import Data.Eq       ( Eq )
+import Data.Function ( (.), ($), id )
+import Data.Hashable ( Hashable )
+import Data.Maybe    ( Maybe (..) )
+import Data.Ord      ( Ord, (>) )
+import Data.Text     ( Text )
+import Prelude       ( succ )
 
 {- $setup
 
@@ -55,6 +56,20 @@ instance Show.Show superset => Show.Show (ASCII superset)
       where app_prec = 10
 
     showList x = Show.showString "asciiUnsafe " . Show.showList (List.map lift x)
+
+instance S.IsChar superset => S.IsChar (ASCII superset)
+  where
+    isAsciiChar _ = True
+    fromChar = asciiUnsafe . S.fromChar
+    toCharUnsafe = S.toCharUnsafe . lift
+
+instance S.IsString superset => S.IsString (ASCII superset)
+  where
+    isAsciiString _ = True
+    fromCharList = asciiUnsafe . S.fromCharList
+    toCharListUnsafe = S.toCharListUnsafe . lift
+    toCharListSub = S.toCharListUnsafe . lift
+    substituteString = id
 
 asciiUnsafe :: superset -> ASCII superset
 asciiUnsafe = ASCII_Unsafe

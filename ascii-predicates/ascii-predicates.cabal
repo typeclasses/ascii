@@ -5,8 +5,7 @@ version: 1.0.0.0
 synopsis: Various categorizations of ASCII characters
 category: Data, Text
 
-description:
-    This package provides a variety of predicates on the ASCII character set.
+description: This package provides a variety of predicates on the ASCII character set.
 
 license: Apache-2.0
 license-file: license.txt
@@ -33,4 +32,6 @@ library
     build-depends: base       >= 4.11 && < 4.14
     build-depends: ascii-char >= 1.0  && < 1.1
 
-    exposed-modules: ASCII.Predicates, ASCII.Lists, ASCII.ListsAndPredicates
+    exposed-modules: ASCII.Predicates
+    exposed-modules: ASCII.Lists
+    exposed-modules: ASCII.ListsAndPredicates
