@@ -1,21 +1,15 @@
--- | Use of this module requires the @QuasiQuotes@ language extension.
-
 module ASCII.QuasiQuoters ( char, string ) where
 
-import ASCII.Char
-import ASCII.Superset
+import ASCII.Char                  ( Char )
+import ASCII.Superset              ( toCharMaybe, toCharListMaybe )
+import ASCII.TemplateHaskell       ( isCharExp, isCharPat, isStringExp, isStringPat )
+import Control.Monad               ( (>=>), return )
+import Control.Monad.Fail          ( MonadFail, fail )
+import Data.Maybe                  ( Maybe (..) )
+import Language.Haskell.TH.Quote   ( QuasiQuoter (..) )
+import Language.Haskell.TH.Syntax  ( Q, Exp, Pat )
 
-import qualified ASCII.TemplateHaskell
-
-import Language.Haskell.TH.Quote
-import Language.Haskell.TH.Syntax
-
-import Control.Monad ((>=>), return)
-import Control.Monad.Fail (MonadFail, fail)
-
-import Data.Maybe (Maybe (..))
-
-import qualified Data.Char as Unicode
+import qualified Data.Char   as Unicode
 import qualified Data.String as Unicode
 
 {- $setup
@@ -57,10 +51,7 @@ Use in a pattern context requires enabling the @ViewPatterns@ language extension
 -}
 
 char :: QuasiQuoter
-char =
-    expPatQQ requireOneAscii
-        ASCII.TemplateHaskell.isCharExp
-        ASCII.TemplateHaskell.isCharPat
+char = expPatQQ requireOneAscii isCharExp isCharPat
 
 {- | Produces an expression or a pattern corresponding to an ASCII string.
 
@@ -93,10 +84,7 @@ Use in a pattern context requires enabling the @ViewPatterns@ language extension
 -}
 
 string :: QuasiQuoter
-string =
-    expPatQQ requireAsciiList
-        ASCII.TemplateHaskell.isStringExp
-        ASCII.TemplateHaskell.isStringPat
+string = expPatQQ requireAsciiList isStringExp isStringPat
 
 requireOneAscii :: Unicode.String -> Q Char
 requireOneAscii = requireOne >=> requireAscii

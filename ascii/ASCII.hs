@@ -37,26 +37,25 @@ module ASCII (
     ) where
 
 
-import             ASCII.Case          ( Case (..), letterCase, isCase )
-import             ASCII.Char          ( Char )
-import             ASCII.Group         ( Group (..), charGroup, inGroup )
-import  qualified  ASCII.Lift
-import             ASCII.Lift          ( Lift )
-import             ASCII.QuasiQuoters  ( char, string )
-import             ASCII.Refinement    ( ASCII, validateChar, validateString )
-import  qualified  ASCII.Superset
-import             ASCII.Superset      ( IsChar, IsString )
+import ASCII.Case          ( Case (..), letterCase, isCase )
+import ASCII.Char          ( Char )
+import ASCII.Group         ( Group (..), charGroup, inGroup )
+import ASCII.Lift          ( Lift )
+import ASCII.QuasiQuoters  ( char, string )
+import ASCII.Refinement    ( ASCII, validateChar, validateString )
+import ASCII.Superset      ( IsChar, IsString )
 
+import Data.Int            ( Int )
+import Data.Maybe          ( Maybe )
+import Data.Word           ( Word8 )
 
-import             Data.Int            ( Int )
-import             Data.Maybe          ( Maybe )
-import             Data.Word           ( Word8 )
+import qualified  ASCII.Lift
+import qualified  ASCII.Superset
 
-
-import  qualified  Data.ByteString   as  BS
-import  qualified  Data.Char         as  Unicode
-import  qualified  Data.String       as  Unicode
-import  qualified  Data.Text         as  Text
+import qualified  Data.ByteString  as  BS
+import qualified  Data.Char        as  Unicode
+import qualified  Data.String      as  Unicode
+import qualified  Data.Text        as  Text
 
 
 {- $setup

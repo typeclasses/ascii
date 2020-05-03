@@ -1,4 +1,8 @@
--- | The 'Char' type has 128 nullary constructors, listed in order according to each character's 7-bit numeric code.
+{- |
+
+The 'Char' type has 128 nullary constructors, listed in order according to each character's 7-bit numeric code.
+
+-}
 
 module ASCII.Char
   (

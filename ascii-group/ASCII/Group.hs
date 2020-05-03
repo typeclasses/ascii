@@ -1,4 +1,8 @@
--- | ASCII characters are broadly categorized into two groups: /control codes/ and /printable characters/.
+{- |
+
+ASCII characters are broadly categorized into two groups: /control codes/ and /printable characters/.
+
+-}
 
 module ASCII.Group
   (

@@ -1,5 +1,3 @@
--- | Use of this module requires the @TemplateHaskell@ language extension.
-
 module ASCII.TemplateHaskell (
 
     {- * Characters          -} charExp,     charPat,
@@ -21,8 +19,9 @@ import Language.Haskell.TH.Syntax ( Q, Exp, Pat, dataToExpQ, dataToPatQ )
 >>> :set -XNoViewPatterns
 >>> import ASCII.Char (Char (..))
 >>> import ASCII.Refinement (ASCII)
->>> import ASCII.Superset
->>> import ASCII.TemplateHaskell
+>>> import ASCII.Superset (toCharOrFail)
+>>> import ASCII.TemplateHaskell (charExp)
+>>> import Control.Monad ((>>=))
 >>> import Data.Word (Word8)
 
 -}
