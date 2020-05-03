@@ -1,26 +1,26 @@
 module ASCII.Superset where
 
-import Control.Monad (return)
-import Control.Monad.Fail (MonadFail (fail))
-import Data.Bool (Bool, (&&))
-import Data.Function ((.), id)
-import Data.Ord ((<=), (>=))
-import Data.Maybe (Maybe (..))
+import Control.Monad      ( return )
+import Control.Monad.Fail ( MonadFail (fail) )
+import Data.Bool          ( Bool, (&&) )
+import Data.Function      ( (.), id )
+import Data.Ord           ( (<=), (>=) )
+import Data.Maybe         ( Maybe (..) )
 
-import qualified ASCII.Char as ASCII
-import qualified Data.Bool as Bool
-import qualified Data.Char as Unicode
-import qualified Data.Word as Word
-import qualified Data.Int as Int
-import qualified Data.List as List
-import qualified Numeric.Natural as Nat
+import qualified ASCII.Char               as  ASCII
+import qualified Data.Bool                as  Bool
+import qualified Data.ByteString          as  BS
+import qualified Data.ByteString.Lazy     as  LBS
+import qualified Data.ByteString.Builder  as  BSB
+import qualified Data.Char                as  Unicode
+import qualified Data.Int                 as  Int
+import qualified Data.List                as  List
+import qualified Data.Text                as  T
+import qualified Data.Text.Lazy           as  LT
+import qualified Data.Text.Lazy.Builder   as  TB
+import qualified Data.Word                as  Word
+import qualified Numeric.Natural          as  Nat
 import qualified Prelude
-import qualified Data.Text as T
-import qualified Data.Text.Lazy as LT
-import qualified Data.Text.Lazy.Builder as TB
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as LBS
-import qualified Data.ByteString.Builder as BSB
 
 
 ---  Char  ---
