@@ -39,20 +39,22 @@ module ASCII (
 
 import ASCII.Case          ( Case (..) )
 import ASCII.Char          ( Char )
-import ASCII.Group         ( Group (..), charGroup, inGroup )
+import ASCII.Group         ( Group (..) )
 import ASCII.Isomorphism   ( CharIso, StringIso )
 import ASCII.Lift          ( Lift )
 import ASCII.QuasiQuoters  ( char, string )
 import ASCII.Refinement    ( ASCII, validateChar, validateString )
 import ASCII.Superset      ( CharSuperset, StringSuperset )
 
-import Data.Bool           ( Bool )
+import Control.Monad       ( (>=>) )
+import Data.Bool           ( Bool (..) )
 import Data.Function       ( (.) )
 import Data.Int            ( Int )
-import Data.Maybe          ( Maybe )
+import Data.Maybe          ( Maybe, maybe )
 import Data.Word           ( Word8 )
 
 import qualified  ASCII.Case
+import qualified  ASCII.Group
 import qualified  ASCII.Isomorphism
 import qualified  ASCII.Lift
 import qualified  ASCII.Superset
@@ -86,6 +88,33 @@ See also: "ASCII.Group"
 
 -}
 
+
+{- | Determine which group a particular character belongs to.
+
+>>> map charGroup [CapitalLetterA,EndOfTransmission]
+[Printable,Control]
+
+-}
+
+charGroup :: CharIso char => char -> Group
+charGroup = ASCII.Group.charGroup . ASCII.Isomorphism.toChar
+
+{- | Test whether a character belongs to a particular ASCII group.
+
+>>> inGroup Printable EndOfTransmission
+False
+
+>>> inGroup Control EndOfTransmission
+True
+
+>>> map (inGroup Printable) ( [-1, 5, 65, 97, 127, 130] :: [Int] )
+[False,False,True,True,False,False]
+
+-}
+
+inGroup :: CharSuperset char => Group -> char -> Bool
+inGroup g = maybe False (ASCII.Group.inGroup g) . ASCII.Superset.toCharMaybe
+
 {- $case
 
 /Case/ is a property of letters. /A-Z/ are /upper case/ letters, and /a-z/ are /lower case/ letters. No other ASCII characters have case.
@@ -94,7 +123,7 @@ See also: "ASCII.Case"
 
 -}
 
-{- |
+{- | Determines whether a character is an ASCII letter, and if so, whether it is upper or lower case.
 
 >>> map letterCase [SmallLetterA, CapitalLetterA, ExclamationMark]
 [Just LowerCase,Just UpperCase,Nothing]
@@ -104,23 +133,26 @@ See also: "ASCII.Case"
 
 -}
 
-letterCase :: CharIso char => char -> Maybe Case
-letterCase = ASCII.Case.letterCase . ASCII.Isomorphism.toChar
+letterCase :: CharSuperset char => char -> Maybe Case
+letterCase = ASCII.Superset.toCharMaybe >=> ASCII.Case.letterCase
 
-{- |
+{- | Determines whether a character is an ASCII letter of a particular case.
 
 >>> map (isCase UpperCase) [SmallLetterA, CapitalLetterA, ExclamationMark]
 [False,True,False]
 
->>> map (isCase UpperCase)  ( [string|Hey!|] :: [ASCII Word8] )
+>>> map (isCase UpperCase) ( [string|Hey!|] :: [ASCII Word8] )
 [True,False,False,False]
+
+>>> map (isCase UpperCase) ( [-1, 65, 97, 150] :: [Int] )
+[False,True,False,False]
 
 -}
 
-isCase :: CharIso char => Case -> char -> Bool
-isCase c = ASCII.Case.isCase c . ASCII.Isomorphism.toChar
+isCase :: CharSuperset char => Case -> char -> Bool
+isCase c = maybe False (ASCII.Case.isCase c) . ASCII.Superset.toCharMaybe
 
-{- |
+{- | Maps a letter character to its upper/lower case equivalent.
 
 >>> toCaseChar UpperCase SmallLetterA
 CapitalLetterA
@@ -133,7 +165,7 @@ CapitalLetterA
 toCaseChar :: CharIso char => Case -> char -> char
 toCaseChar c = ASCII.Isomorphism.asChar (ASCII.Case.toCase c)
 
-{- |
+{- | Maps each of the characters in a string to its upper/lower case equivalent.
 
 >>> toCaseString UpperCase [CapitalLetterH,SmallLetterE,SmallLetterY,ExclamationMark]
 [CapitalLetterH,CapitalLetterE,CapitalLetterY,ExclamationMark]
