@@ -29,6 +29,7 @@ sourceFiles =
   , "ascii-superset/ASCII/Lift.hs"
   , "ascii-superset/ASCII/Refinement.hs"
   , "ascii-superset/ASCII/Superset.hs"
+  , "ascii-superset/ASCII/Isomorphism.hs"
   , "ascii-th/ASCII/QuasiQuoters.hs"
   , "ascii-th/ASCII/TemplateHaskell.hs"
   ]

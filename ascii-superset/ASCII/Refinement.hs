@@ -4,27 +4,29 @@ module ASCII.Refinement
     ASCII, lift, asciiUnsafe
 
   -- * Character functions
-  , validateChar, fromChar, toChar, substituteChar
+  , validateChar, fromChar, toChar, substituteChar, asChar
 
   -- * String functions
-  , validateString, fromCharList, toCharList, substituteString
+  , validateString, fromCharList, toCharList, substituteString, mapChars
 
   ) where
 
 import qualified ASCII.Char as ASCII
 import qualified ASCII.Superset as S
+import qualified ASCII.Isomorphism as I
 
 import qualified Data.List as List
 import qualified Text.Show as Show
 
-import Data.Bool     ( Bool (..) )
-import Data.Eq       ( Eq )
-import Data.Function ( (.), ($), id )
-import Data.Hashable ( Hashable )
-import Data.Maybe    ( Maybe (..) )
-import Data.Ord      ( Ord, (>) )
-import Data.Text     ( Text )
-import Prelude       ( succ )
+import ASCII.Superset    ( CharSuperset, StringSuperset )
+import Data.Bool         ( Bool (..) )
+import Data.Eq           ( Eq )
+import Data.Function     ( (.), ($), id )
+import Data.Hashable     ( Hashable )
+import Data.Maybe        ( Maybe (..) )
+import Data.Ord          ( Ord, (>) )
+import Data.Text         ( Text )
+import Prelude           ( succ )
 
 {- $setup
 
@@ -36,7 +38,7 @@ import Prelude       ( succ )
 
 -}
 
-{- | This type constructor indicates that a value from some ASCII superset is valid ASCII. The type parameter is the ASCII superset, which should be a type with an instance of either 'S.IsChar' or 'S.IsString'.
+{- | This type constructor indicates that a value from some ASCII superset is valid ASCII. The type parameter is the ASCII superset, which should be a type with an instance of either 'CharSuperset' or 'StringSuperset'.
 
 For example, whereas a 'Text' value may contain a combination of ASCII and non-ASCII characters, a value of type @'ASCII' 'Text'@ may contain only ASCII characters.
 
@@ -57,19 +59,28 @@ instance Show.Show superset => Show.Show (ASCII superset)
 
     showList x = Show.showString "asciiUnsafe " . Show.showList (List.map lift x)
 
-instance S.IsChar superset => S.IsChar (ASCII superset)
+instance CharSuperset char => CharSuperset (ASCII char)
   where
     isAsciiChar _ = True
     fromChar = asciiUnsafe . S.fromChar
     toCharUnsafe = S.toCharUnsafe . lift
 
-instance S.IsString superset => S.IsString (ASCII superset)
+instance CharSuperset char => I.CharIso (ASCII char)
+  where
+    toChar = S.toCharUnsafe
+
+instance StringSuperset string => StringSuperset (ASCII string)
   where
     isAsciiString _ = True
     fromCharList = asciiUnsafe . S.fromCharList
     toCharListUnsafe = S.toCharListUnsafe . lift
     toCharListSub = S.toCharListUnsafe . lift
     substituteString = id
+
+instance StringSuperset string => I.StringIso (ASCII string)
+  where
+    toCharList = S.toCharListUnsafe
+    mapChars = S.mapCharsUnsafe
 
 asciiUnsafe :: superset -> ASCII superset
 asciiUnsafe = ASCII_Unsafe
@@ -81,16 +92,16 @@ asciiUnsafe = ASCII_Unsafe
 
 -}
 
-validateChar :: S.IsChar superset => superset -> Maybe (ASCII superset)
+validateChar :: CharSuperset superset => superset -> Maybe (ASCII superset)
 validateChar x = if S.isAsciiChar x then Just (asciiUnsafe x) else Nothing
 
-substituteChar :: S.IsChar superset => superset -> ASCII superset
+substituteChar :: CharSuperset superset => superset -> ASCII superset
 substituteChar x = if S.isAsciiChar x then asciiUnsafe x else fromChar ASCII.Substitute
 
-fromChar :: S.IsChar superset => ASCII.Char -> ASCII superset
+fromChar :: CharSuperset superset => ASCII.Char -> ASCII superset
 fromChar = asciiUnsafe . S.fromChar
 
-toChar :: S.IsChar superset => ASCII superset -> ASCII.Char
+toChar :: CharSuperset superset => ASCII superset -> ASCII.Char
 toChar = S.toCharUnsafe . lift
 
 {- |
@@ -100,7 +111,7 @@ asciiUnsafe "Hi!"
 
 -}
 
-fromCharList :: S.IsString superset => [ASCII.Char] -> ASCII superset
+fromCharList :: StringSuperset superset => [ASCII.Char] -> ASCII superset
 fromCharList = asciiUnsafe . S.fromCharList
 
 {- |
@@ -110,7 +121,7 @@ fromCharList = asciiUnsafe . S.fromCharList
 
 -}
 
-toCharList :: S.IsString superset => ASCII superset -> [ASCII.Char]
+toCharList :: StringSuperset superset => ASCII superset -> [ASCII.Char]
 toCharList = S.toCharListUnsafe . lift
 
 {- | Forces a string from a larger character set into ASCII by using the 'ASCII.Substitute' character in place of any non-ASCII characters.
@@ -120,7 +131,7 @@ asciiUnsafe "Crist\SUBbal"
 
 -}
 
-substituteString :: S.IsString superset => superset -> ASCII superset
+substituteString :: StringSuperset superset => superset -> ASCII superset
 substituteString = asciiUnsafe . S.substituteString
 
 {- |
@@ -133,5 +144,11 @@ substituteString = asciiUnsafe . S.substituteString
 
 -}
 
-validateString :: S.IsString superset => superset -> Maybe (ASCII superset)
+validateString :: StringSuperset superset => superset -> Maybe (ASCII superset)
 validateString x = if S.isAsciiString x then Just (asciiUnsafe x) else Nothing
+
+asChar :: CharSuperset superset => (ASCII.Char -> ASCII.Char) -> ASCII superset -> ASCII superset
+asChar f = asciiUnsafe . S.asCharUnsafe f . lift
+
+mapChars :: StringSuperset superset => (ASCII.Char -> ASCII.Char) -> ASCII superset -> ASCII superset
+mapChars f = asciiUnsafe . S.mapCharsUnsafe f . lift

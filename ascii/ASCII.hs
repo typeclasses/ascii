@@ -16,7 +16,7 @@ module ASCII (
 
     {- * Character classifications -}
     {- ** Print/control groups -} {- $groups -} Group (..), charGroup,  inGroup,
-    {- ** Upper/lower case     -} {- $case   -} Case (..),  letterCase, isCase,
+    {- ** Upper/lower case     -} {- $case   -} Case (..),  letterCase, isCase, toCaseChar, toCaseString,
 
     {- * Monomorphic conversions -} {- $monomorphicConversions -}
     {- ** @Int@        -} {- $intConversions           -} charToInt,               intToCharMaybe,               intToCharUnsafe,
@@ -30,25 +30,30 @@ module ASCII (
 
     {- * Polymorphic conversions -} {- ** Validate -} validateChar, validateString, {- ** Lift -} {- $lift -} lift,
 
-    {- * Classes -} {- ** @IsChar@ -} IsChar, {- ** @IsString@ -} IsString, {- ** @Lift@ -} Lift,
+    {- * Classes -} {- ** @CharSuperset@ -} CharSuperset, {- ** @StringSuperset@ -} StringSuperset, {- ** @Lift@ -} Lift, {- ** @CharIso@ -} CharIso, {- ** @StringIso@ -} StringIso,
 
     {- * Quasi-quoters -} {- ** @char@ -} char, {- ** @string@ -} string
 
     ) where
 
 
-import ASCII.Case          ( Case (..), letterCase, isCase )
+import ASCII.Case          ( Case (..) )
 import ASCII.Char          ( Char )
 import ASCII.Group         ( Group (..), charGroup, inGroup )
+import ASCII.Isomorphism   ( CharIso, StringIso )
 import ASCII.Lift          ( Lift )
 import ASCII.QuasiQuoters  ( char, string )
 import ASCII.Refinement    ( ASCII, validateChar, validateString )
-import ASCII.Superset      ( IsChar, IsString )
+import ASCII.Superset      ( CharSuperset, StringSuperset )
 
+import Data.Bool           ( Bool )
+import Data.Function       ( (.) )
 import Data.Int            ( Int )
 import Data.Maybe          ( Maybe )
 import Data.Word           ( Word8 )
 
+import qualified  ASCII.Case
+import qualified  ASCII.Isomorphism
 import qualified  ASCII.Lift
 import qualified  ASCII.Superset
 
@@ -88,6 +93,58 @@ See also: "ASCII.Group"
 See also: "ASCII.Case"
 
 -}
+
+{- |
+
+>>> map letterCase [SmallLetterA, CapitalLetterA, ExclamationMark]
+[Just LowerCase,Just UpperCase,Nothing]
+
+>>> map letterCase ( [string|Hey!|] :: [ASCII Word8] )
+[Just UpperCase,Just LowerCase,Just LowerCase,Nothing]
+
+-}
+
+letterCase :: CharIso char => char -> Maybe Case
+letterCase = ASCII.Case.letterCase . ASCII.Isomorphism.toChar
+
+{- |
+
+>>> map (isCase UpperCase) [SmallLetterA, CapitalLetterA, ExclamationMark]
+[False,True,False]
+
+>>> map (isCase UpperCase)  ( [string|Hey!|] :: [ASCII Word8] )
+[True,False,False,False]
+
+-}
+
+isCase :: CharIso char => Case -> char -> Bool
+isCase c = ASCII.Case.isCase c . ASCII.Isomorphism.toChar
+
+{- |
+
+>>> toCaseChar UpperCase SmallLetterA
+CapitalLetterA
+
+>>> ([char|a|] :: ASCII Word8, toCaseChar UpperCase [char|a|] :: ASCII Word8)
+(asciiUnsafe 97,asciiUnsafe 65)
+
+-}
+
+toCaseChar :: CharIso char => Case -> char -> char
+toCaseChar c = ASCII.Isomorphism.asChar (ASCII.Case.toCase c)
+
+{- |
+
+>>> toCaseString UpperCase [CapitalLetterH,SmallLetterE,SmallLetterY,ExclamationMark]
+[CapitalLetterH,CapitalLetterE,CapitalLetterY,ExclamationMark]
+
+>>> toCaseString UpperCase [string|Hey!|] :: ASCII Text
+asciiUnsafe "HEY!"
+
+-}
+
+toCaseString :: StringIso string => Case -> string -> string
+toCaseString c = ASCII.Isomorphism.mapChars (ASCII.Case.toCase c)
 
 {- $monomorphicConversions
 

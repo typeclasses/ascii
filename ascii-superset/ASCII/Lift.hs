@@ -4,7 +4,7 @@ module ASCII.Lift ( Lift (..) ) where
 
 import ASCII.Char (Char)
 import ASCII.Refinement (ASCII)
-import ASCII.Superset (IsChar, IsString)
+import ASCII.Superset (CharSuperset, StringSuperset)
 
 import qualified ASCII.Refinement
 import qualified ASCII.Superset
@@ -37,10 +37,10 @@ instance Lift (ASCII.Refinement.ASCII superset) superset
   where
     lift = ASCII.Refinement.lift
 
-instance IsChar superset => Lift Char superset
+instance CharSuperset superset => Lift Char superset
   where
     lift = ASCII.Superset.fromChar
 
-instance IsString superset => Lift [Char] superset
+instance StringSuperset superset => Lift [Char] superset
   where
     lift = ASCII.Superset.fromCharList

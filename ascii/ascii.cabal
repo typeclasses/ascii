@@ -51,6 +51,7 @@ library
 
     build-depends: ascii-superset >= 1.0 && < 1.1
     reexported-modules: ASCII.Superset
+    reexported-modules: ASCII.Isomorphism
     reexported-modules: ASCII.Refinement
     reexported-modules: ASCII.Lift
 

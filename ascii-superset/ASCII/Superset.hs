@@ -1,4 +1,14 @@
-module ASCII.Superset where
+module ASCII.Superset (
+
+    {- * Characters -}
+    {- ** Class -} CharSuperset (..),
+    {- ** Functions -} asCharUnsafe, toCharMaybe, toCharOrFail, toCharSub, substituteChar,
+
+    {- * Strings -}
+    {- ** Class -} StringSuperset (..),
+    {- ** Functions -} toCharListMaybe, toCharListOrFail
+
+    ) where
 
 import Control.Monad      ( return )
 import Control.Monad.Fail ( MonadFail (fail) )
@@ -25,75 +35,89 @@ import qualified Prelude
 
 ---  Char  ---
 
-class IsChar superset
+class CharSuperset char
   where
-    isAsciiChar :: superset -> Bool
-    fromChar :: ASCII.Char -> superset
-    toCharUnsafe :: superset -> ASCII.Char
 
-toCharMaybe :: IsChar superset => superset -> Maybe ASCII.Char
+    isAsciiChar :: char -> Bool
+
+    fromChar :: ASCII.Char -> char
+
+    toCharUnsafe :: char -> ASCII.Char
+
+asCharUnsafe :: CharSuperset char => (ASCII.Char -> ASCII.Char) -> char -> char
+asCharUnsafe f = fromChar . f . toCharUnsafe
+
+toCharMaybe :: CharSuperset char => char -> Maybe ASCII.Char
 toCharMaybe = toCharOrFail
 
-toCharOrFail :: (IsChar superset, MonadFail context) => superset -> context ASCII.Char
+toCharOrFail :: (CharSuperset char, MonadFail context) => char -> context ASCII.Char
 toCharOrFail x = if isAsciiChar x then return (toCharUnsafe x) else fail "Not an ASCII character"
 
-toCharSub :: IsChar superset => superset -> ASCII.Char
+toCharSub :: CharSuperset char => char -> ASCII.Char
 toCharSub x = if isAsciiChar x then toCharUnsafe x else ASCII.Substitute
 
-substituteChar :: IsChar superset => superset -> superset
+substituteChar :: CharSuperset char => char -> char
 substituteChar x = if isAsciiChar x then x else fromChar ASCII.Substitute
 
 
 ---  String  ---
 
-class IsString superset
+class StringSuperset string
   where
-    isAsciiString :: superset -> Bool
-    fromCharList :: [ASCII.Char] -> superset
-    toCharListUnsafe :: superset -> [ASCII.Char]
-    toCharListSub :: superset -> [ASCII.Char]
-    substituteString :: superset -> superset
 
-toCharListMaybe :: IsString superset => superset -> Maybe [ASCII.Char]
+    isAsciiString :: string -> Bool
+
+    fromCharList :: [ASCII.Char] -> string
+
+    toCharListUnsafe :: string -> [ASCII.Char]
+
+    toCharListSub :: string -> [ASCII.Char]
+
+    substituteString :: string -> string
+
+    mapCharsUnsafe :: (ASCII.Char -> ASCII.Char) -> string -> string
+    mapCharsUnsafe f = fromCharList  . List.map f . toCharListUnsafe
+
+toCharListMaybe :: StringSuperset string => string -> Maybe [ASCII.Char]
 toCharListMaybe = toCharListOrFail
 
-toCharListOrFail :: (IsString superset, MonadFail context) => superset -> context [ASCII.Char]
+toCharListOrFail :: (StringSuperset string, MonadFail context) => string -> context [ASCII.Char]
 toCharListOrFail x = if isAsciiString x then return (toCharListUnsafe x) else fail "String contains non-ASCII characters"
 
 
 ---  Instances  ---
 
-instance IsChar ASCII.Char
+instance CharSuperset ASCII.Char
   where
     isAsciiChar _ = Bool.True
     fromChar = id
     toCharUnsafe = id
 
-instance IsChar Unicode.Char
+instance CharSuperset Unicode.Char
   where
     isAsciiChar = (<= '\DEL')
     fromChar = Unicode.chr . ASCII.toInt
     toCharUnsafe = ASCII.fromIntUnsafe . Unicode.ord
 
-instance IsChar Nat.Natural
+instance CharSuperset Nat.Natural
   where
     isAsciiChar = (<= 127)
     fromChar = Prelude.fromIntegral . ASCII.toInt
     toCharUnsafe = ASCII.fromIntUnsafe . Prelude.fromIntegral
 
-instance IsChar Int.Int
+instance CharSuperset Int.Int
   where
     isAsciiChar x = (x >= 0) && (x <= 127)
     fromChar = ASCII.toInt
     toCharUnsafe = ASCII.fromIntUnsafe
 
-instance IsChar Word.Word8
+instance CharSuperset Word.Word8
   where
     isAsciiChar = (<= 127)
     fromChar = Prelude.fromIntegral . ASCII.toInt
     toCharUnsafe = ASCII.fromIntUnsafe . Prelude.fromIntegral
 
-instance IsChar a => IsString [a]
+instance CharSuperset char => StringSuperset [char]
   where
     isAsciiString = List.all isAsciiChar
     fromCharList = List.map fromChar
@@ -101,50 +125,56 @@ instance IsChar a => IsString [a]
     toCharListSub = List.map toCharSub
     substituteString = List.map substituteChar
 
-instance IsString T.Text
+instance StringSuperset T.Text
   where
     isAsciiString = T.all isAsciiChar
     fromCharList = T.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . T.unpack
     toCharListSub = toCharListSub . T.unpack
     substituteString = T.map substituteChar
+    mapCharsUnsafe f = T.map (asCharUnsafe f)
 
-instance IsString LT.Text
+instance StringSuperset LT.Text
   where
     isAsciiString = LT.all isAsciiChar
     fromCharList = LT.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . LT.unpack
     toCharListSub = toCharListSub . LT.unpack
     substituteString = LT.map substituteChar
+    mapCharsUnsafe f = LT.map (asCharUnsafe f)
 
-instance IsString TB.Builder
+instance StringSuperset TB.Builder
   where
     isAsciiString = isAsciiString . TB.toLazyText
     fromCharList = TB.fromString . fromCharList
     toCharListUnsafe = toCharListUnsafe . TB.toLazyText
     toCharListSub = toCharListSub . TB.toLazyText
     substituteString = TB.fromLazyText . substituteString . TB.toLazyText
+    mapCharsUnsafe f = TB.fromLazyText . mapCharsUnsafe f . TB.toLazyText
 
-instance IsString BS.ByteString
+instance StringSuperset BS.ByteString
   where
     isAsciiString = BS.all isAsciiChar
     fromCharList = BS.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . BS.unpack
     toCharListSub = toCharListSub . BS.unpack
     substituteString = BS.map substituteChar
+    mapCharsUnsafe f = BS.map (asCharUnsafe f)
 
-instance IsString LBS.ByteString
+instance StringSuperset LBS.ByteString
   where
     isAsciiString = LBS.all isAsciiChar
     fromCharList = LBS.pack . fromCharList
     toCharListUnsafe = toCharListUnsafe . LBS.unpack
     toCharListSub = toCharListSub . LBS.unpack
     substituteString = LBS.map substituteChar
+    mapCharsUnsafe f = LBS.map (asCharUnsafe f)
 
-instance IsString BSB.Builder
+instance StringSuperset BSB.Builder
   where
     isAsciiString = isAsciiString . BSB.toLazyByteString
     fromCharList = BSB.lazyByteString . fromCharList
     toCharListUnsafe = toCharListUnsafe . BSB.toLazyByteString
     toCharListSub = toCharListSub . BSB.toLazyByteString
     substituteString = BSB.lazyByteString . substituteString . BSB.toLazyByteString
+    mapCharsUnsafe f = BSB.lazyByteString . mapCharsUnsafe f . BSB.toLazyByteString

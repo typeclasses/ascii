@@ -39,5 +39,6 @@ library
     build-depends: text       >= 1.2  && < 1.3
 
     exposed-modules: ASCII.Superset
+    exposed-modules: ASCII.Isomorphism
     exposed-modules: ASCII.Refinement
     exposed-modules: ASCII.Lift
