@@ -4,17 +4,19 @@
 
 -}
 
-module ASCII.Case ( Case (..), letterCase, isCase ) where
+module ASCII.Case ( Case (..), letterCase, isCase, toCase ) where
 
-import ASCII.Char ( Char (..) )
-import Data.Eq    ( Eq )
-import Data.Ord   ( Ord, (<=), (>=) )
-import Data.Bool  ( Bool, otherwise )
-import Prelude    ( Enum, Bounded )
-import Text.Show  ( Show )
-import Data.Maybe ( Maybe (..) )
+import ASCII.Char    ( Char (..) )
+import Data.Bool     ( Bool, otherwise )
+import Data.Eq       ( Eq )
+import Data.Function ( (.), ($) )
+import Data.Ord      ( Ord, (<=), (>=) )
+import Prelude       ( Enum, Bounded, Int, (+), (-) )
+import Text.Show     ( Show )
+import Data.Maybe    ( Maybe (..) )
 
-import qualified Data.Bool as Bool
+import qualified ASCII.Char as Char
+import qualified Data.Bool  as Bool
 
 {- $setup
 
@@ -52,3 +54,41 @@ isCase c x = (Bool.&&) ( x >= a ) ( x <= z ) where (a, z) = az c
 az :: Case -> (Char, Char)
 az UpperCase = (CapitalLetterA, CapitalLetterZ)
 az LowerCase = (SmallLetterA, SmallLetterZ)
+
+{- | Maps a letter character to its upper/lower case equivalent.
+
+>>> toCase UpperCase SmallLetterX
+CapitalLetterX
+
+>>> toCase LowerCase CapitalLetterF
+SmallLetterF
+
+Characters that are already in the requested case are unmodified by this transformation.
+
+>>> toCase UpperCase CapitalLetterA
+CapitalLetterA
+
+Characters that are not letters, such as exclamation mark, are unmodified by this transformation.
+
+>>> toCase UpperCase ExclamationMark
+ExclamationMark
+
+-}
+
+toCase :: Case -> Char -> Char
+toCase c x = if isCase (opposite c) x then changeCaseUnsafe c x else x
+
+-- | Change a letter to the given case, assuming that the input character is a letter of the opposite case.
+
+changeCaseUnsafe :: Case -> Char -> Char
+changeCaseUnsafe c = charAsIntUnsafe (changeCaseInt c)
+
+changeCaseInt :: Case -> Int -> Int
+changeCaseInt LowerCase i = i + 32
+changeCaseInt UpperCase i = i - 32
+
+opposite UpperCase = LowerCase
+opposite LowerCase = UpperCase
+
+charAsIntUnsafe :: (Int -> Int) -> (Char -> Char)
+charAsIntUnsafe f = Char.fromIntUnsafe . f . Char.toInt
