@@ -37,9 +37,13 @@ instance Lift (ASCII.Refinement.ASCII superset) superset
   where
     lift = ASCII.Refinement.lift
 
+-- | An ASCII 'Char' may be 'lift'ed into any larger character set (a 'CharSuperset').
+
 instance CharSuperset superset => Lift Char superset
   where
     lift = ASCII.Superset.fromChar
+
+-- | An ASCII 'Char' list may be 'lift'ed into a string of any larger character set (a 'StringSuperset').
 
 instance StringSuperset superset => Lift [Char] superset
   where

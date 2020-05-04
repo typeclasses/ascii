@@ -7,13 +7,13 @@ The 'Char' type has 128 nullary constructors, listed in order according to each 
 module ASCII.Char
   (
     -- * The @Char@ type
-    Char (..)
+    Char (..),
 
     -- * Conversions with @Int@
-    , toInt, fromIntMaybe, fromIntUnsafe
+    toInt, fromIntMaybe, fromIntUnsafe,
 
     -- * Enumeration
-    , allCharacters
+    allCharacters
 
     -- * Notes
     -- $notes
@@ -59,8 +59,13 @@ data Char =
 
 deriving instance Prelude.Eq Char
 deriving instance Prelude.Ord Char
+
+-- | Instead of @Enum@ methods, consider using 'toInt' and 'fromIntMaybe'.
 deriving instance Prelude.Enum Char
+
+-- | The least character is 'Null', and the greatest character is 'Delete'.
 deriving instance Prelude.Bounded Char
+
 deriving instance Prelude.Show Char
 
 -- Requires the DeriveDataTypeable language extension.
