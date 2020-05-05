@@ -59,7 +59,7 @@ library
     reexported-modules: ASCII.TemplateHaskell
     reexported-modules: ASCII.QuasiQuoters
 
-    build-depends: data-ascii
+    build-depends: data-ascii >= 1.0 && < 1.1
     reexported-modules: Data.Ascii
     reexported-modules: Data.Ascii.Blaze
     reexported-modules: Data.Ascii.ByteString
