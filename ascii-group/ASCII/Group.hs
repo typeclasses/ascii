@@ -12,14 +12,15 @@ module ASCII.Group
   )
   where
 
-import ASCII.Char   ( Char )
-import Data.Bool    ( Bool )
-import Data.Data    ( Data )
-import Data.Eq      ( Eq, (==) )
-import Data.Ord     ( Ord, (<) )
-import GHC.Generics ( Generic )
-import Prelude      ( Enum, Bounded )
-import Text.Show    ( Show )
+import ASCII.Char    ( Char )
+import Data.Bool     ( Bool )
+import Data.Data     ( Data )
+import Data.Eq       ( Eq, (==) )
+import Data.Hashable ( Hashable )
+import Data.Ord      ( Ord, (<) )
+import GHC.Generics  ( Generic )
+import Prelude       ( Enum, Bounded )
+import Text.Show     ( Show )
 
 import qualified ASCII.Char as Char
 
@@ -47,6 +48,8 @@ deriving stock instance Show Group
 deriving stock instance Data Group
 
 deriving stock instance Generic Group
+
+deriving anyclass instance Hashable Group
 
 {- | Determine which group a particular character belongs to.
 

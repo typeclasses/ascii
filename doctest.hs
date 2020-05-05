@@ -7,7 +7,8 @@ args = ghcOptions ++ sourceFiles
 ghcOptions = map ("-X" <>) extensions ++ ["-fdefer-typed-holes"]
 
 extensions =
-  [ "DeriveDataTypeable"
+  [ "DeriveAnyClass"
+  , "DeriveDataTypeable"
   , "DeriveGeneric"
   , "DerivingStrategies"
   , "GeneralizedNewtypeDeriving"

@@ -29,11 +29,13 @@ library
     default-extensions: NoImplicitPrelude
     default-extensions: StandaloneDeriving
     default-extensions: DerivingStrategies
+    default-extensions: DeriveAnyClass
     default-extensions: DeriveDataTypeable
     default-extensions: DeriveGeneric
     ghc-options: -Wall
 
-    build-depends: base       >= 4.11 && < 4.14
     build-depends: ascii-char >= 1.0  && < 1.1
+    build-depends: base       >= 4.11 && < 4.14
+    build-depends: hashable   >= 1.2  && < 1.4
 
     exposed-modules: ASCII.Case

@@ -11,6 +11,7 @@ import Data.Bool     ( Bool, otherwise )
 import Data.Data     ( Data )
 import Data.Eq       ( Eq )
 import Data.Function ( (.), ($) )
+import Data.Hashable ( Hashable )
 import Data.Ord      ( Ord, (<=), (>=) )
 import GHC.Generics  ( Generic )
 import Prelude       ( Enum, Bounded, Int, (+), (-) )
@@ -43,6 +44,8 @@ deriving stock instance Show Case
 deriving stock instance Data Case
 
 deriving stock instance Generic Case
+
+deriving anyclass instance Hashable Case
 
 {- | Determines whether a character is a letter, and if so, whether it is upper or lower case.
 

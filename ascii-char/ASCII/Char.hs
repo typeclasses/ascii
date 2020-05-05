@@ -13,16 +13,17 @@ module ASCII.Char
   )
   where
 
-import Data.Bool    ( otherwise )
-import Data.Data    ( Data )
-import Data.Eq      ( Eq )
-import Data.Ord     ( Ord, (<), (>) )
-import Data.Int     ( Int )
-import Data.Maybe   ( Maybe (..) )
-import Prelude      ( Enum, enumFromTo, toEnum, fromEnum,
-                      Bounded, minBound, maxBound )
-import Text.Show    ( Show )
-import GHC.Generics ( Generic )
+import Data.Bool     ( otherwise )
+import Data.Data     ( Data )
+import Data.Eq       ( Eq )
+import Data.Ord      ( Ord, (<), (>) )
+import Data.Hashable ( Hashable )
+import Data.Int      ( Int )
+import Data.Maybe    ( Maybe (..) )
+import Prelude       ( Enum, enumFromTo, toEnum, fromEnum,
+                       Bounded, minBound, maxBound )
+import Text.Show     ( Show )
+import GHC.Generics  ( Generic )
 
 {- $setup
 
@@ -70,6 +71,8 @@ deriving stock instance Show Char
 deriving stock instance Data Char
 
 deriving stock instance Generic Char
+
+deriving anyclass instance Hashable Char
 
 {- | Converts an ASCII character to its corresponding numeric value between 0 and 127.
 
