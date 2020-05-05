@@ -2,12 +2,12 @@
 
 module ASCII.Lift ( Lift (..) ) where
 
-import ASCII.Char (Char)
-import ASCII.Refinement (ASCII)
-import ASCII.Superset (CharSuperset, StringSuperset)
+import ASCII.Char       ( Char )
+import ASCII.Refinement ( ASCII )
+import ASCII.Superset   ( CharSuperset, StringSuperset )
 
-import qualified ASCII.Refinement
-import qualified ASCII.Superset
+import qualified ASCII.Refinement as R
+import qualified ASCII.Superset as S
 
 {- $setup
 
@@ -17,34 +17,31 @@ import qualified ASCII.Superset
 
 -}
 
-{- | Converts from ASCII to any larger type.
-
->>> lift CapitalLetterA :: Word8
-65
-
->>> lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text
-"Hi!"
-
-Due to the highly polymorphic nature of the 'lift' function, often it must used with an explicit type signature or type application to avoid any type ambiguity.
-
--}
-
 class Lift ascii superset
   where
+
+    {- | Converts from ASCII to any larger type.
+
+    >>> lift CapitalLetterA :: Word8
+    65
+
+    >>> lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text
+    "Hi!"
+
+    Due to the highly polymorphic nature of the 'lift' function, often it must used with an explicit type signature or type application to avoid any type ambiguity.
+
+    -}
+
     lift :: ascii -> superset
 
-instance Lift (ASCII.Refinement.ASCII superset) superset
-  where
-    lift = ASCII.Refinement.lift
+-- | A value from an ASCII superset that has been refined by the 'ASCII' type constructor may be lifted back into the superset by unwrapping it from the 'ASCII' type.
+
+instance Lift (ASCII superset) superset where lift = R.lift
 
 -- | An ASCII 'Char' may be 'lift'ed into any larger character set (a 'CharSuperset').
 
-instance CharSuperset superset => Lift Char superset
-  where
-    lift = ASCII.Superset.fromChar
+instance CharSuperset superset => Lift Char superset where lift = S.fromChar
 
 -- | An ASCII 'Char' list may be 'lift'ed into a string of any larger character set (a 'StringSuperset').
 
-instance StringSuperset superset => Lift [Char] superset
-  where
-    lift = ASCII.Superset.fromCharList
+instance StringSuperset superset => Lift [Char] superset where lift = S.fromCharList

@@ -1,28 +1,28 @@
 module ASCII.Isomorphism ( CharIso (..), asChar, StringIso (..) ) where
 
-import qualified ASCII.Char as ASCII
-import ASCII.Superset
-import Data.Function (id, (.))
-import qualified Data.List as List
+import ASCII.Char     ( Char )
+import ASCII.Superset ( CharSuperset (..), StringSuperset (..) )
+import Data.Function  ( id, (.) )
+import Data.List      ( map )
 
 class CharSuperset char => CharIso char
   where
-    toChar :: char -> ASCII.Char
+    toChar :: char -> Char
 
-asChar :: CharIso char => (ASCII.Char -> ASCII.Char) -> char -> char
+asChar :: CharIso char => (Char -> Char) -> char -> char
 asChar f = fromChar . f . toChar
 
 class StringSuperset string => StringIso string
   where
-    toCharList :: string -> [ASCII.Char]
-    mapChars :: (ASCII.Char -> ASCII.Char) -> string -> string
+    toCharList :: string -> [Char]
+    mapChars :: (Char -> Char) -> string -> string
 
--- | 'ASCII.Char' is trivially isomorphic to itself.
-instance CharIso ASCII.Char
+-- | 'Char' is trivially isomorphic to itself.
+instance CharIso Char
   where
     toChar = id
 
 instance CharIso char => StringIso [char]
   where
-    toCharList = List.map toChar
-    mapChars f = List.map (asChar f)
+    toCharList = map toChar
+    mapChars f = map (asChar f)

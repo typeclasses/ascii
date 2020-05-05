@@ -8,9 +8,11 @@ module ASCII.Case ( Case (..), letterCase, isCase, toCase ) where
 
 import ASCII.Char    ( Char (..) )
 import Data.Bool     ( Bool, otherwise )
+import Data.Data     ( Data )
 import Data.Eq       ( Eq )
 import Data.Function ( (.), ($) )
 import Data.Ord      ( Ord, (<=), (>=) )
+import GHC.Generics  ( Generic )
 import Prelude       ( Enum, Bounded, Int, (+), (-) )
 import Text.Show     ( Show )
 import Data.Maybe    ( Maybe (..) )
@@ -27,7 +29,20 @@ import qualified Data.Bool  as Bool
 data Case =
     UpperCase -- ^ The letters from 'CapitalLetterA' to 'CapitalLetterZ'.
   | LowerCase -- ^ The letters from 'SmallLetterA' to 'SmallLetterZ'.
-  deriving (Eq, Ord, Enum, Bounded, Show)
+
+deriving stock instance Eq Case
+
+deriving stock instance Ord Case
+
+deriving stock instance Enum Case
+
+deriving stock instance Bounded Case
+
+deriving stock instance Show Case
+
+deriving stock instance Data Case
+
+deriving stock instance Generic Case
 
 {- | Determines whether a character is a letter, and if so, whether it is upper or lower case.
 

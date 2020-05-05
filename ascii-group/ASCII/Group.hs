@@ -6,21 +6,21 @@ ASCII characters are broadly categorized into two groups: /control codes/ and /p
 
 module ASCII.Group
   (
-    -- * The @Group@ type
-      Group (..)
+    {- * The @Group@ type -} Group (..),
+    {- * Functions -} charGroup, inGroup
+    {- * Notes -} {- $notes -}
+  )
+  where
 
-    -- * Functions
-    , charGroup, inGroup
+import ASCII.Char   ( Char )
+import Data.Bool    ( Bool )
+import Data.Data    ( Data )
+import Data.Eq      ( Eq, (==) )
+import Data.Ord     ( Ord, (<) )
+import GHC.Generics ( Generic )
+import Prelude      ( Enum, Bounded )
+import Text.Show    ( Show )
 
-    -- * Notes
-    -- $notes
-
-  ) where
-
-import qualified Prelude
-import Prelude ((<), (==), Bool)
-
-import ASCII.Char (Char)
 import qualified ASCII.Char as Char
 
 {- $setup
@@ -34,11 +34,19 @@ data Group =
     Control -- ^ 33 of the ASCII characters are /control codes/. A few of these are still in use, but most are obsolete relics of the early days of computing.
   | Printable -- ^ 95 of the ASCII characters are /printable characters/ such as letters and numbers, mostly corresponding to the keys on an American English keyboard.
 
-deriving instance Prelude.Eq Group
-deriving instance Prelude.Ord Group
-deriving instance Prelude.Enum Group
-deriving instance Prelude.Bounded Group
-deriving instance Prelude.Show Group
+deriving stock instance Eq Group
+
+deriving stock instance Ord Group
+
+deriving stock instance Enum Group
+
+deriving stock instance Bounded Group
+
+deriving stock instance Show Group
+
+deriving stock instance Data Group
+
+deriving stock instance Generic Group
 
 {- | Determine which group a particular character belongs to.
 

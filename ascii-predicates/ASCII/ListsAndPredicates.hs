@@ -1,13 +1,9 @@
 module ASCII.ListsAndPredicates
   (
-    -- * Re-exported modules
-      module ASCII.Lists
-    , module ASCII.Predicates
-
-    -- * Notes
-    -- $notes
-
-  ) where
+    {- * Re-exported modules -} module ASCII.Lists, module ASCII.Predicates
+    {- * Notes -} {- $notes -}
+  )
+  where
 
 import ASCII.Lists
 import ASCII.Predicates

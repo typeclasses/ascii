@@ -6,25 +6,23 @@ The 'Char' type has 128 nullary constructors, listed in order according to each 
 
 module ASCII.Char
   (
-    -- * The @Char@ type
-    Char (..),
+    {- * The @Char@ type -} Char (..),
+    {- * Conversions with @Int@ -} toInt, fromIntMaybe, fromIntUnsafe,
+    {- * Enumeration -} allCharacters
+    {- * Notes -} {- $notes -}
+  )
+  where
 
-    -- * Conversions with @Int@
-    toInt, fromIntMaybe, fromIntUnsafe,
-
-    -- * Enumeration
-    allCharacters
-
-    -- * Notes
-    -- $notes
-
-  ) where
-
-import Prelude ((<), (>), otherwise, Int, Maybe (..))
-
-import qualified Prelude
-import qualified Data.Data as Data
-import qualified GHC.Generics as G
+import Data.Bool    ( otherwise )
+import Data.Data    ( Data )
+import Data.Eq      ( Eq )
+import Data.Ord     ( Ord, (<), (>) )
+import Data.Int     ( Int )
+import Data.Maybe   ( Maybe (..) )
+import Prelude      ( Enum, enumFromTo, toEnum, fromEnum,
+                      Bounded, minBound, maxBound )
+import Text.Show    ( Show )
+import GHC.Generics ( Generic )
 
 {- $setup
 
@@ -57,22 +55,21 @@ data Char =
 
     | LeftCurlyBracket | VerticalLine | RightCurlyBracket | Tilde | Delete
 
-deriving instance Prelude.Eq Char
-deriving instance Prelude.Ord Char
+deriving stock instance Eq Char
+
+deriving stock instance Ord Char
 
 -- | Instead of @Enum@ methods, consider using 'toInt' and 'fromIntMaybe'.
-deriving instance Prelude.Enum Char
+deriving stock instance Enum Char
 
 -- | The least character is 'Null', and the greatest character is 'Delete'.
-deriving instance Prelude.Bounded Char
+deriving stock instance Bounded Char
 
-deriving instance Prelude.Show Char
+deriving stock instance Show Char
 
--- Requires the DeriveDataTypeable language extension.
-deriving instance Data.Data Char
+deriving stock instance Data Char
 
--- Requires the DeriveGeneric language extension.
-deriving instance G.Generic Char
+deriving stock instance Generic Char
 
 {- | Converts an ASCII character to its corresponding numeric value between 0 and 127.
 

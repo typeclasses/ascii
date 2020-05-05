@@ -1,36 +1,23 @@
 module ASCII.Predicates
   (
-  -- * Group predicates
-    isControl, isPrint
+    {- * Group predicates -} isControl, isPrint,
+    {- * Case predicates -} isLower, isUpper,
+    {- * Letter predicates -} isLetter, isAlpha,
+    {- * Number predicates -} isDigit, isOctDigit, isHexDigit, isNumber,
+    {- * Miscellaneous predicates -} isSpace, isAlphaNum, isMark, isPunctuation, isSymbol, isSeparator
+    {- * Notes -} {- $notes -}
+  )
+  where
 
-  -- * Case predicates
-  , isLower, isUpper
+import ASCII.Char    ( Char (..) )
+import Data.Bool     ( Bool (..), otherwise )
+import Data.Eq       ( (==) )
+import Data.Function ( (.) )
+import Data.Ord      ( (<), (<=), (>=) )
 
-  -- * Letter predicates
-  , isLetter, isAlpha
-
-  -- * Number predicates
-  , isDigit, isOctDigit, isHexDigit, isNumber
-
-  -- * Miscellaneous predicates
-  , isSpace, isAlphaNum, isMark, isPunctuation, isSymbol, isSeparator
-
-  -- * Notes
-  -- $notes
-
-  ) where
-
-import Data.Bool (Bool (..), otherwise)
-import Data.Eq ((==))
-import Data.Function ((.))
-import Data.Ord ((<), (<=), (>=))
-
-import qualified Data.Bool as Bool
-import qualified Data.Char
-import qualified Data.List as List
-
-import ASCII.Char (Char (..))
 import qualified ASCII.Char as Char
+import qualified Data.Bool as Bool
+import qualified Data.List as List
 
 {- | Returns True for control characters.
 

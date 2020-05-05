@@ -8,7 +8,7 @@ module ASCII.TemplateHaskell (
   ) where
 
 import qualified ASCII.Char       as  ASCII
-import qualified ASCII.Superset
+import qualified ASCII.Superset   as  S
 
 import Data.Data                  ( Data )
 import Data.Maybe                 ( Maybe (..) )
@@ -109,7 +109,7 @@ asciiUnsafe 65
 -}
 
 isCharExp :: ASCII.Char -> Q Exp
-isCharExp x = [| ASCII.Superset.fromChar $(charExp x) |]
+isCharExp x = [| S.fromChar $(charExp x) |]
 
 {- |
 
@@ -126,10 +126,10 @@ isCharExp x = [| ASCII.Superset.fromChar $(charExp x) |]
 -}
 
 isCharPat :: ASCII.Char -> Q Pat
-isCharPat x = [p| (ASCII.Superset.toCharMaybe -> Just $(charPat x)) |]
+isCharPat x = [p| (S.toCharMaybe -> Just $(charPat x)) |]
 
 isStringExp :: [ASCII.Char] -> Q Exp
-isStringExp xs = [| ASCII.Superset.fromCharList $(charListExp xs) |]
+isStringExp xs = [| S.fromCharList $(charListExp xs) |]
 
 isStringPat :: [ASCII.Char] -> Q Pat
-isStringPat xs = [p| (ASCII.Superset.toCharListMaybe -> Just $(charListPat xs)) |]
+isStringPat xs = [p| (S.toCharListMaybe -> Just $(charListPat xs)) |]

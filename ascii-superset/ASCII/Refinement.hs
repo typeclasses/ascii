@@ -1,32 +1,27 @@
 module ASCII.Refinement
   (
-  -- * ASCII type constructor
-    ASCII, lift, asciiUnsafe
-
-  -- * Character functions
-  , validateChar, fromChar, toChar, substituteChar, asChar
-
-  -- * String functions
-  , validateString, fromCharList, toCharList, substituteString, mapChars
-
-  ) where
+    {- * ASCII type constructor -} ASCII, lift, asciiUnsafe,
+    {- * Character functions -} validateChar, fromChar, toChar, substituteChar, asChar,
+    {- * String functions -} validateString, fromCharList, toCharList, substituteString, mapChars
+  )
+  where
 
 import qualified ASCII.Char as ASCII
 import qualified ASCII.Superset as S
 import qualified ASCII.Isomorphism as I
 
-import qualified Data.List as List
-import qualified Text.Show as Show
-
 import ASCII.Superset    ( CharSuperset, StringSuperset )
 import Data.Bool         ( Bool (..) )
+import Data.Data         ( Data )
 import Data.Eq           ( Eq )
 import Data.Function     ( (.), ($), id )
 import Data.Hashable     ( Hashable )
+import Data.List         ( map )
 import Data.Maybe        ( Maybe (..) )
 import Data.Ord          ( Ord, (>) )
-import Data.Text         ( Text )
+import GHC.Generics      ( Generic )
 import Prelude           ( succ )
+import Text.Show         ( Show, showString, showsPrec, showParen, showList )
 
 {- $setup
 
@@ -40,24 +35,29 @@ import Prelude           ( succ )
 
 {- | This type constructor indicates that a value from some ASCII superset is valid ASCII. The type parameter is the ASCII superset, which should be a type with an instance of either 'CharSuperset' or 'StringSuperset'.
 
-For example, whereas a 'Text' value may contain a combination of ASCII and non-ASCII characters, a value of type @'ASCII' 'Text'@ may contain only ASCII characters.
+For example, whereas a 'Data.Text.Text' value may contain a combination of ASCII and non-ASCII characters, a value of type @'ASCII' 'Data.Text.Text'@ may contain only ASCII characters.
 
 -}
 
 newtype ASCII superset = ASCII_Unsafe { lift :: superset }
 
 deriving stock instance Eq superset => Eq (ASCII superset)
+
 deriving stock instance Ord superset => Ord (ASCII superset)
 
 deriving newtype instance Hashable superset => Hashable (ASCII superset)
 
-instance Show.Show superset => Show.Show (ASCII superset)
+deriving stock instance Data superset => Data (ASCII superset)
+
+deriving stock instance Generic (ASCII superset)
+
+instance Show superset => Show (ASCII superset)
   where
-    showsPrec d x = Show.showParen (d > app_prec) $
-        Show.showString "asciiUnsafe " . Show.showsPrec (succ app_prec) (lift x)
+    showsPrec d x = showParen (d > app_prec) $
+        showString "asciiUnsafe " . showsPrec (succ app_prec) (lift x)
       where app_prec = 10
 
-    showList x = Show.showString "asciiUnsafe " . Show.showList (List.map lift x)
+    showList x = showString "asciiUnsafe " . showList (map lift x)
 
 instance CharSuperset char => CharSuperset (ASCII char)
   where

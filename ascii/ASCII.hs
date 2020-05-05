@@ -10,8 +10,8 @@ We do not elaborate on the semantics of the control characters here, because thi
 
 -}
 
-module ASCII (
-
+module ASCII
+  (
     {- * @Char@ -} {- $char -} Char,
 
     {- * Character classifications -}
@@ -33,9 +33,8 @@ module ASCII (
     {- * Classes -} {- ** @CharSuperset@ -} CharSuperset, {- ** @StringSuperset@ -} StringSuperset, {- ** @Lift@ -} Lift, {- ** @CharIso@ -} CharIso, {- ** @StringIso@ -} StringIso,
 
     {- * Quasi-quoters -} {- ** @char@ -} char, {- ** @string@ -} string
-
-    ) where
-
+  )
+  where
 
 import ASCII.Case          ( Case (..) )
 import ASCII.Char          ( Char )
@@ -63,7 +62,6 @@ import qualified  Data.ByteString  as  BS
 import qualified  Data.Char        as  Unicode
 import qualified  Data.String      as  Unicode
 import qualified  Data.Text        as  Text
-
 
 {- $setup
 
