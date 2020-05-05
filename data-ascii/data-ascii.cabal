@@ -20,6 +20,7 @@ Source-Repository head
     Location: git://github.com/typeclasses/ascii.git
 
 Library
+  Default-language:    Haskell2010
   Exposed-modules:     Data.Ascii
                      , Data.Ascii.Blaze
                      , Data.Ascii.ByteString
