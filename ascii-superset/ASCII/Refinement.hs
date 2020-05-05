@@ -18,7 +18,9 @@ import Data.Function     ( (.), ($), id )
 import Data.Hashable     ( Hashable )
 import Data.List         ( map )
 import Data.Maybe        ( Maybe (..) )
+import Data.Monoid       ( Monoid )
 import Data.Ord          ( Ord, (>) )
+import Data.Semigroup    ( Semigroup )
 import GHC.Generics      ( Generic )
 import Prelude           ( succ )
 import Text.Show         ( Show, showString, showsPrec, showParen, showList )
@@ -30,6 +32,7 @@ import Text.Show         ( Show, showString, showsPrec, showParen, showList )
 >>> import Data.List (map)
 >>> import Data.Int (Int)
 >>> import Data.String (String)
+>>> import Data.Text (Text)
 
 -}
 
@@ -46,6 +49,10 @@ deriving stock instance Eq superset => Eq (ASCII superset)
 deriving stock instance Ord superset => Ord (ASCII superset)
 
 deriving newtype instance Hashable superset => Hashable (ASCII superset)
+
+deriving newtype instance Semigroup superset => Semigroup (ASCII superset)
+
+deriving newtype instance Monoid superset => Monoid (ASCII superset)
 
 deriving stock instance Data superset => Data (ASCII superset)
 
