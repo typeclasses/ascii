@@ -1,7 +1,7 @@
 cabal-version: 2.0
 
 name: ascii-case
-version: 1.0.0.0
+version: 1.0.0.2
 synopsis: ASCII letter case
 category: Data, Text
 
@@ -19,6 +19,8 @@ bug-Reports: https://github.com/typeclasses/ascii/issues
 build-type: Simple
 
 tested-with: GHC == 8.10.1, GHC == 8.8.1, GHC == 8.6.5, GHC == 8.4.3
+
+extra-source-files: changelog.txt
 
 source-repository head
     type:     git
