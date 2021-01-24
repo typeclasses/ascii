@@ -29,7 +29,7 @@ import qualified Data.String as Unicode
 
 {- | Produces an expression or a pattern corresponding to an ASCII character.
 
-The result will have an 'ASCII.Superset.IsChar' constraint; since this is polymorphic, use with a type signature to specify the particular you want is recommended.
+The result will have an 'ASCII.Superset.CharSuperset' constraint; since this is polymorphic, use with a type signature to specify the particular you want is recommended.
 
 The quasi-quoted string must consist of a single character that is within the ASCII character set.
 
@@ -55,7 +55,7 @@ char = expPatQQ requireOneAscii isCharExp isCharPat
 
 {- | Produces an expression or a pattern corresponding to an ASCII string.
 
-The result will have an 'ASCII.Superset.IsString' constraint; since this is polymorphic, use with a type signature to specify the particular you want is recommended.
+The result will have an 'ASCII.Superset.StringSuperset' constraint; since this is polymorphic, use with a type signature to specify the particular you want is recommended.
 
 The quasi-quoted string must consist only of characters are within the ASCII character set.
 
