@@ -1,7 +1,7 @@
 cabal-version: 2.0
 
 name: ascii-char
-version: 1.0.0.2
+version: 1.0.0.4
 synopsis: A Char type representing an ASCII character
 category: Data, Text
 
@@ -34,7 +34,7 @@ library
     default-extensions: DeriveGeneric
     default-extensions: StandaloneDeriving
     default-extensions: DerivingStrategies
-    ghc-options: -Wall
+    ghc-options: -Wall -fno-warn-unused-imports
 
     build-depends: base     >= 4.11 && < 4.15
     build-depends: hashable >= 1.2  && < 1.4

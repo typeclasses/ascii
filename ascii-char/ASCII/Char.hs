@@ -15,7 +15,7 @@ module ASCII.Char
 
 import Data.Bool     ( otherwise )
 import Data.Data     ( Data )
-import Data.Eq       ( Eq )
+import Data.Eq       ( Eq, (==), (/=) )
 import Data.Ord      ( Ord, (<), (>) )
 import Data.Hashable ( Hashable )
 import Data.Int      ( Int )
@@ -24,6 +24,8 @@ import Prelude       ( Enum, enumFromTo, toEnum, fromEnum,
                        Bounded, minBound, maxBound )
 import Text.Show     ( Show )
 import GHC.Generics  ( Generic )
+
+import qualified Data.Char as C
 
 {- $setup
 
@@ -56,22 +58,28 @@ data Char =
 
     | LeftCurlyBracket | VerticalLine | RightCurlyBracket | Tilde | Delete
 
+-- | ASCII characters can be compared for equality using '(==)'. Comparisons are case-sensitive; @'SmallLetterA' '/=' 'CapitalLetterA'@.
 deriving stock instance Eq Char
 
+-- | ASCII characters are ordered; for example, the letter /A/ is "less than" ('<') the letter /B/ because it appears earlier in the list. The ordering of ASCII characters is the same as the ordering of the corresponding Unicode 'C.Char's.
 deriving stock instance Ord Char
 
--- | Instead of @Enum@ methods, consider using 'toInt' and 'fromIntMaybe'.
+-- | The 'Enum' instance allows us to use range syntax, for example @['SmallLetterA' .. 'SmallLetterZ']@ is a list all lower-case letters from /a/ to /z/. Instead of 'toEnum' and 'fromEnum', consider using 'toInt' and 'fromIntMaybe'.
 deriving stock instance Enum Char
 
--- | The least character is 'Null', and the greatest character is 'Delete'.
+-- | The least character is 'Null', and the greatest character is 'Delete'. You can write @(['minBound' .. 'maxBound'] :: [ASCII.'Char'])@ to get a list of all the ASCII characters.
 deriving stock instance Bounded Char
 
+-- | 'show' produces the name of a constructor. For example, the character @e@ is shown as @"SmallLetterE"@. See "ASCII.Char" for the complete list of constructor names.
 deriving stock instance Show Char
 
+-- | The 'Data' instance allows ASCII characters to be used with generic programming in the “SYB” style. (See the <https://hackage.haskell.org/package/syb syb> package and the 2003 paper <https://www.microsoft.com/en-us/research/wp-content/uploads/2003/01/hmap.pdf Scrap Your Boilerplate> by Ralf Lämmel and Simon Peyton Jones.)
 deriving stock instance Data Char
 
+-- | The 'Generic' instance allows ASCII characters to be used with generic programming in the “generic deriving” style. (See the <https://hackage.haskell.org/package/generic-data generic-data> package and the 2010 paper <http://dreixel.net/research/pdf/gdmh.pdf A generic deriving mechanism for Haskell> by José Pedro Magalhães, Atze Dijkstra, Johan Jeuring, and Andres Löh.)
 deriving stock instance Generic Char
 
+-- | The 'Hashable' instance lets us collect ASCII characters in hash-based sets, and it lets us use ASCII characters as keys in hash-based maps. (See the @unordered-containers@ package.)
 deriving anyclass instance Hashable Char
 
 {- | Converts an ASCII character to its corresponding numeric value between 0 and 127.
