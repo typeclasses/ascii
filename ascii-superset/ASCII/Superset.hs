@@ -87,7 +87,7 @@ toCharListOrFail x = if isAsciiString x then return (toCharListUnsafe x) else fa
 
 ---  Instances  ---
 
--- | 'ASCII.Char' is trivially a superset of itself.
+-- | 'ASCII.Char' is trivially a superset of itself. (This instance is uninteresting.)
 
 instance CharSuperset ASCII.Char
   where

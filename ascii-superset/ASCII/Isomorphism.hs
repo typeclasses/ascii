@@ -17,7 +17,7 @@ class StringSuperset string => StringIso string
     toCharList :: string -> [Char]
     mapChars :: (Char -> Char) -> string -> string
 
--- | 'Char' is trivially isomorphic to itself.
+-- | 'Char' is trivially isomorphic to itself. (This instance is uninteresting.)
 instance CharIso Char
   where
     toChar = id

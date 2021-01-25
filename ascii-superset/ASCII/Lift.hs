@@ -9,6 +9,8 @@ import ASCII.Superset   ( CharSuperset, StringSuperset )
 import qualified ASCII.Refinement as R
 import qualified ASCII.Superset as S
 
+import qualified Prelude
+
 {- $setup
 
 >>> import ASCII.Char (Char (..))
@@ -38,10 +40,10 @@ class Lift ascii superset
 
 instance Lift (ASCII superset) superset where lift = R.lift
 
--- | An ASCII 'Char' may be 'lift'ed into any larger character set (a 'CharSuperset').
+-- | An ASCII 'Char' may be 'lift'ed into any larger character set (a 'CharSuperset'); for example, 'lift' can convert an ASCII character into a value of the standard 'Prelude.Char' type in "Prelude".
 
 instance CharSuperset superset => Lift Char superset where lift = S.fromChar
 
--- | An ASCII 'Char' list may be 'lift'ed into a string of any larger character set (a 'StringSuperset').
+-- | An ASCII 'Char' list may be 'lift'ed into a string of any larger character set (a 'StringSuperset'); for example, 'lift' can convert a list of ASCII characters into a value of the standard 'Prelude.String' type in "Prelude".
 
 instance StringSuperset superset => Lift [Char] superset where lift = S.fromCharList
