@@ -105,6 +105,7 @@ changeCaseInt :: Case -> Int -> Int
 changeCaseInt LowerCase i = i + 32
 changeCaseInt UpperCase i = i - 32
 
+opposite :: Case -> Case
 opposite UpperCase = LowerCase
 opposite LowerCase = UpperCase
 
