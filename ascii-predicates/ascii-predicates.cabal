@@ -31,8 +31,9 @@ library
     default-extensions: NoImplicitPrelude
     ghc-options: -Wall
 
+    build-depends: ascii-char ^>= 1.0
+
     build-depends: base       >= 4.11 && < 4.15
-    build-depends: ascii-char >= 1.0  && < 1.1
 
     exposed-modules: ASCII.Predicates
     exposed-modules: ASCII.Lists

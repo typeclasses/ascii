@@ -36,7 +36,8 @@ library
     default-extensions: DeriveGeneric
     ghc-options: -Wall
 
-    build-depends: ascii-char >= 1.0  && < 1.1
+    build-depends: ascii-char ^>= 1.0
+
     build-depends: base       >= 4.11 && < 4.15
     build-depends: hashable   >= 1.2  && < 1.4
 
