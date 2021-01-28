@@ -1,14 +1,29 @@
 on: [push]
-name: build
+
+name: CI for 'ascii' and related libraries
+
 jobs:
-  runhaskell:
-    runs-on: ubuntu-latest # or macOS-latest, or windows-latest
+  build:
+    name: Build and test all the packages
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        ghc: ['8.10.1', '8.8.1', '8.6.5', '8.4.3']
+        cabal: ['2.4.1.0', '3.0.0.0']
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        exclude:
+          # GHC 8.8+ only works with cabal v3+
+          - ghc: 8.8.3
+            cabal: 2.4.1.0
+          - ghc: 8.10.1
+            cabal: 2.4.1.0
+
     steps:
       - uses: actions/checkout@v2
       - uses: haskell/actions/setup@v1
         with:
-          ghc-version: '8.10.1'
-          enable-stack: true
-          stack-version: 'latest'
-      - name: test
+          ghc-version: ${{ matrix.ghc }}
+          cabal-version: ${{ matrix.cabal }}
+      - name: Run tests for all packages
         run: stack test
