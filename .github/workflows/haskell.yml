@@ -10,14 +10,8 @@ jobs:
     strategy:
       matrix:
         ghc: ['8.10.1', '8.8.1', '8.6.5', '8.4.3']
-        cabal: ['2.4.1.0', '3.0.0.0']
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        exclude:
-          # GHC 8.8+ only works with cabal v3+
-          - ghc: 8.8.3
-            cabal: 2.4.1.0
-          - ghc: 8.10.1
-            cabal: 2.4.1.0
+        cabal: ['3.0.0.0']
+        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v2
