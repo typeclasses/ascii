@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 module Data.Ascii.Word8 where
 
 -- base
@@ -59,9 +57,7 @@ isAlphaNum w = isDigit w || isAlpha w
 fromDigit :: Num a => Word8 -> Maybe a
 fromDigit w | isDigit w = Just $ unsafeFromDigit w
             | otherwise = Nothing
-#if __GLASGOW_HASKELL__ >= 700
 {-# INLINABLE fromDigit #-}
-#endif
 
 unsafeFromDigit :: Num a => Word8 -> a
 unsafeFromDigit w = fromIntegral (w - ascii '0')
@@ -73,9 +69,7 @@ isOctDigit w = w >= ascii '0' && w <= ascii '7'
 fromOctDigit :: Num a => Word8 -> Maybe a
 fromOctDigit w | isOctDigit w = Just $ unsafeFromOctDigit w
                | otherwise    = Nothing
-#if __GLASGOW_HASKELL__ >= 700
 {-# INLINABLE fromOctDigit #-}
-#endif
 
 unsafeFromOctDigit :: Num a => Word8 -> a
 unsafeFromOctDigit = unsafeFromDigit
@@ -96,9 +90,7 @@ fromLowHexDigit :: Num a => Word8 -> Maybe a
 fromLowHexDigit w | isDigit w = Just $ unsafeFromDigit w
                   | isLowAF w = Just $ fromLowAF w
                   | otherwise = Nothing
-#if __GLASGOW_HASKELL__ >= 700
 {-# INLINABLE fromLowHexDigit #-}
-#endif
 
 unsafeFromLowHexDigit :: Num a => Word8 -> a
 unsafeFromLowHexDigit w | w < ascii 'a' = unsafeFromDigit w
@@ -120,9 +112,7 @@ fromUpHexDigit :: Num a => Word8 -> Maybe a
 fromUpHexDigit w | isDigit w = Just $ unsafeFromDigit w
                  | isUpAF w  = Just $ fromUpAF w
                  | otherwise = Nothing
-#if __GLASGOW_HASKELL__ >= 700
 {-# INLINABLE fromUpHexDigit #-}
-#endif
 
 unsafeFromUpHexDigit :: Num a => Word8 -> a
 unsafeFromUpHexDigit w | w < ascii 'A' = unsafeFromDigit w
@@ -137,9 +127,7 @@ fromHexDigit w | isDigit w = Just $ unsafeFromDigit w
                | isUpAF w  = Just $ fromUpAF w
                | isLowAF w = Just $ fromLowAF w
                | otherwise = Nothing
-#if __GLASGOW_HASKELL__ >= 700
 {-# INLINABLE fromHexDigit #-}
-#endif
 
 unsafeFromHexDigit :: Num a => Word8 -> a
 unsafeFromHexDigit w | w < ascii 'A' = unsafeFromDigit w
