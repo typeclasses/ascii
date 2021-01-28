@@ -1,0 +1,10 @@
+resolver: nightly-2021-01-20
+packages:
+  - ascii
+  - ascii-case
+  - ascii-char
+  - ascii-group
+  - ascii-predicates
+  - ascii-superset
+  - ascii-th
+  - data-ascii
