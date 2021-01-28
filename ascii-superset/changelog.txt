@@ -2,6 +2,8 @@
 
 1.0.0.2 - 2020-05-18 - Support GHC 8.10
 
+1.0.0.4 - 2021-01-25 - Add some comments
+
 1.0.1.0 - 2021-01-27
 
     New functions:
