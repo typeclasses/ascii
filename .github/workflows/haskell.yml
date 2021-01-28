@@ -4,7 +4,7 @@ name: CI for 'ascii' and related libraries
 
 jobs:
   build:
-    name: Build and test all the packages
+    name: Build all the packages
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -25,5 +25,5 @@ jobs:
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
-      - name: Run tests for all packages
-        run: stack test
+      - name: Build all packages
+        run: cabal build all
