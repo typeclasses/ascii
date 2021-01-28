@@ -26,9 +26,16 @@ module ASCII
     {- ** @Text@       -} {- $textConversions          -} charListToText,          textToCharListMaybe,          textToCharListUnsafe,
     {- ** @ByteString@ -} {- $byteStringConversions    -} charListToByteString,    byteStringToCharListMaybe,    byteStringToCharListUnsafe,
 
+    {- * Monomorphic conversions between ASCII supersets -} {- $monoSupersetConversions -}
+    {- ** @ByteString@ / @String@ -} byteStringToUnicodeStringMaybe, unicodeStringToByteStringMaybe,
+    {- ** @[Word8]@      / @String@ -} byteListToUnicodeStringMaybe,   unicodeStringToByteListMaybe,
+
     {- * Refinement type -} {- $refinement -} {- ** @ASCII@ -} ASCII,
 
-    {- * Polymorphic conversions -} {- ** Validate -} validateChar, validateString, {- ** Lift -} {- $lift -} lift,
+    {- * Polymorphic conversions -}
+    {- ** Validate -} validateChar, validateString,
+    {- ** Lift -} {- $lift -} lift,
+    {- ** Convert -} {- $supersetConversions -} convertCharMaybe, convertCharOrFail, convertStringMaybe, convertStringOrFail,
 
     {- * Classes -} {- ** @CharSuperset@ -} CharSuperset, {- ** @StringSuperset@ -} StringSuperset, {- ** @Lift@ -} Lift, {- ** @CharIso@ -} CharIso, {- ** @StringIso@ -} StringIso,
 
@@ -46,6 +53,7 @@ import ASCII.Refinement    ( ASCII, validateChar, validateString )
 import ASCII.Superset      ( CharSuperset, StringSuperset )
 
 import Control.Monad       ( (>=>) )
+import Control.Monad.Fail  ( MonadFail )
 import Data.Bool           ( Bool (..) )
 import Data.Function       ( (.) )
 import Data.Int            ( Int )
@@ -325,3 +333,47 @@ Due to the highly polymorphic nature of the 'lift' function, often it must used 
 
 lift :: Lift ascii superset => ascii -> superset
 lift = ASCII.Lift.lift
+
+{- $supersetConversions
+
+These functions all convert from one ASCII-superset type to another, failing if any of the characters in the input is outside the ASCII character set.
+
+-}
+
+convertCharMaybe :: (CharSuperset char1, CharSuperset char2) => char1 -> Maybe char2
+convertCharMaybe = ASCII.Superset.convertCharMaybe
+
+convertCharOrFail :: (CharSuperset char1, CharSuperset char2, MonadFail context) => char1 -> context char2
+convertCharOrFail = ASCII.Superset.convertCharOrFail
+
+convertStringMaybe :: (StringSuperset char1, StringSuperset char2) => char1 -> Maybe char2
+convertStringMaybe = ASCII.Superset.convertStringMaybe
+
+convertStringOrFail :: (StringSuperset char1, StringSuperset char2, MonadFail context) => char1 -> context char2
+convertStringOrFail = ASCII.Superset.convertStringOrFail
+
+{- $monoSupersetConversions
+
+These functions are all specializations of 'convertStringMaybe'. They convert a string from one ASCII-superset type to another.
+
+>>> ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x50]
+Just "HTTP"
+
+If any of the characters in the input is outside the ASCII character set, the result is 'Nothing'.
+
+>>> ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x80]
+Nothing
+
+-}
+
+byteStringToUnicodeStringMaybe :: BS.ByteString -> Maybe Unicode.String
+byteStringToUnicodeStringMaybe = convertStringMaybe
+
+unicodeStringToByteStringMaybe :: Unicode.String -> Maybe BS.ByteString
+unicodeStringToByteStringMaybe = convertStringMaybe
+
+byteListToUnicodeStringMaybe :: [Word8] -> Maybe Unicode.String
+byteListToUnicodeStringMaybe = convertStringMaybe
+
+unicodeStringToByteListMaybe :: Unicode.String -> Maybe [Word8]
+unicodeStringToByteListMaybe = convertStringMaybe
