@@ -346,10 +346,10 @@ convertCharMaybe = ASCII.Superset.convertCharMaybe
 convertCharOrFail :: (CharSuperset char1, CharSuperset char2, MonadFail context) => char1 -> context char2
 convertCharOrFail = ASCII.Superset.convertCharOrFail
 
-convertStringMaybe :: (StringSuperset char1, StringSuperset char2) => char1 -> Maybe char2
+convertStringMaybe :: (StringSuperset string1, StringSuperset string2) => string1 -> Maybe string2
 convertStringMaybe = ASCII.Superset.convertStringMaybe
 
-convertStringOrFail :: (StringSuperset char1, StringSuperset char2, MonadFail context) => char1 -> context char2
+convertStringOrFail :: (StringSuperset string1, StringSuperset string2, MonadFail context) => string1 -> context string2
 convertStringOrFail = ASCII.Superset.convertStringOrFail
 
 {- $monoSupersetConversions

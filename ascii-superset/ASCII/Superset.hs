@@ -94,11 +94,11 @@ toCharListOrFail :: (StringSuperset string, MonadFail context) => string -> cont
 toCharListOrFail x = if isAsciiString x then return (toCharListUnsafe x) else fail "String contains non-ASCII characters"
 
 -- | Convert from one ASCII-superset string type to another by converting each character of the input string to an ASCII 'ASCII.Char', and then converting the ASCII character list to the desired output type. Fails as 'Nothing' if the input contains any character that is outside the ASCII character set.
-convertStringMaybe :: (StringSuperset char1, StringSuperset char2) => char1 -> Maybe char2
+convertStringMaybe :: (StringSuperset string1, StringSuperset string2) => string1 -> Maybe string2
 convertStringMaybe = convertStringOrFail
 
 -- | Convert from one ASCII-superset string type to another by converting each character of the input string to an ASCII 'ASCII.Char', and then converting the ASCII character list to the desired output type. Fails with 'fail' if the input contains any character that is outside the ASCII character set.
-convertStringOrFail :: (StringSuperset char1, StringSuperset char2, MonadFail context) => char1 -> context char2
+convertStringOrFail :: (StringSuperset string1, StringSuperset string2, MonadFail context) => string1 -> context string2
 convertStringOrFail = fmap fromCharList . toCharListOrFail
 
 
