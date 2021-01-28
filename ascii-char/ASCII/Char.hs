@@ -70,7 +70,7 @@ deriving stock instance Enum Char
 -- | The least character is 'Null', and the greatest character is 'Delete'. You can write @(['minBound' .. 'maxBound'] :: [ASCII.'Char'])@ to get a list of all the ASCII characters.
 deriving stock instance Bounded Char
 
--- | 'show' produces the name of a constructor. For example, the character @e@ is shown as @"SmallLetterE"@. See "ASCII.Char" for the complete list of constructor names.
+-- | 'show' produces the name of a constructor. For example, the character @e@ is shown as “@SmallLetterE@”. See "ASCII.Char" for the complete list of constructor names.
 deriving stock instance Show Char
 
 -- | The 'Data' instance allows ASCII characters to be used with generic programming in the “SYB” style. (See the <https://hackage.haskell.org/package/syb syb> package and the 2003 paper <https://www.microsoft.com/en-us/research/wp-content/uploads/2003/01/hmap.pdf Scrap Your Boilerplate> by Ralf Lämmel and Simon Peyton Jones.)
