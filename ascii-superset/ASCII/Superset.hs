@@ -2,11 +2,11 @@ module ASCII.Superset (
 
     {- * Characters -}
     {- ** Class -} CharSuperset (..),
-    {- ** Functions -} asCharUnsafe, toCharMaybe, toCharOrFail, toCharSub, substituteChar,
+    {- ** Functions -} asCharUnsafe, toCharMaybe, toCharOrFail, toCharSub, substituteChar, convertCharMaybe, convertCharOrFail,
 
     {- * Strings -}
     {- ** Class -} StringSuperset (..),
-    {- ** Functions -} toCharListMaybe, toCharListOrFail
+    {- ** Functions -} toCharListMaybe, toCharListOrFail, convertStringMaybe, convertStringOrFail
 
     ) where
 
@@ -14,6 +14,7 @@ import Control.Monad      ( return )
 import Control.Monad.Fail ( MonadFail (fail) )
 import Data.Bool          ( Bool, (&&) )
 import Data.Function      ( (.), id )
+import Data.Functor       ( fmap )
 import Data.Ord           ( (<=), (>=) )
 import Data.Maybe         ( Maybe (..) )
 
@@ -59,6 +60,14 @@ toCharSub x = if isAsciiChar x then toCharUnsafe x else ASCII.Substitute
 substituteChar :: CharSuperset char => char -> char
 substituteChar x = if isAsciiChar x then x else fromChar ASCII.Substitute
 
+-- | Convert from one ASCII-superset character type to another via the ASCII 'ASCII.Char' type. Fails as 'Nothing' if the input is outside the ASCII character set.
+convertCharMaybe :: (CharSuperset char1, CharSuperset char2) => char1 -> Maybe char2
+convertCharMaybe = convertCharOrFail
+
+-- | Convert from one ASCII-superset character type to another via the ASCII 'ASCII.Char' type. Fails with 'fail' if the input is outside the ASCII character set.
+convertCharOrFail :: (CharSuperset char1, CharSuperset char2, MonadFail context) => char1 -> context char2
+convertCharOrFail = fmap fromChar . toCharOrFail
+
 
 ---  String  ---
 
@@ -83,6 +92,14 @@ toCharListMaybe = toCharListOrFail
 
 toCharListOrFail :: (StringSuperset string, MonadFail context) => string -> context [ASCII.Char]
 toCharListOrFail x = if isAsciiString x then return (toCharListUnsafe x) else fail "String contains non-ASCII characters"
+
+-- | Convert from one ASCII-superset string type to another by converting each character of the input string to an ASCII 'ASCII.Char', and then converting the ASCII character list to the desired output type. Fails as 'Nothing' if the input contains any character that is outside the ASCII character set.
+convertStringMaybe :: (StringSuperset char1, StringSuperset char2) => char1 -> Maybe char2
+convertStringMaybe = convertStringOrFail
+
+-- | Convert from one ASCII-superset string type to another by converting each character of the input string to an ASCII 'ASCII.Char', and then converting the ASCII character list to the desired output type. Fails with 'fail' if the input contains any character that is outside the ASCII character set.
+convertStringOrFail :: (StringSuperset char1, StringSuperset char2, MonadFail context) => char1 -> context char2
+convertStringOrFail = fmap fromCharList . toCharListOrFail
 
 
 ---  Instances  ---
