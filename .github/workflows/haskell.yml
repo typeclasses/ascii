@@ -25,4 +25,4 @@ jobs:
       - name: Install doctest
         run: cabal install doctest
       - name: Run doctest
-        run: cabal exec ./doctest.hs
+        run: cabal exec runhaskell doctest.hs
