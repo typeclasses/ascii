@@ -4,7 +4,7 @@ name: CI for 'ascii' and related libraries
 
 jobs:
   build:
-    name: Build all the packages
+    name: Build and test all the packages
     runs-on: ubuntu-latest
 
     strategy:
@@ -20,5 +20,9 @@ jobs:
       - uses: haskell/actions/setup@v1
         with:
           ghc-version: ${{ matrix.ghc }}
-      - name: Build all packages
+      - name: Build
         run: cabal build all
+      - name: Install doctest
+        run: cabal install doctest
+      - name: Run doctest
+        run: cabal exec ./doctest.hs
