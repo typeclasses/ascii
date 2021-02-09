@@ -11,3 +11,5 @@
         - convertCharOrFail
         - convertStringMaybe
         - convertStringOrFail
+
+1.0.1.2 - 2021-02-09 - Support bytestring-0.11
