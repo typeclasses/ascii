@@ -1,13 +1,16 @@
-module ASCII.QuasiQuoters ( char, string ) where
+module ASCII.QuasiQuoters ( char, string, hex ) where
 
-import ASCII.Char                  ( Char )
-import ASCII.Superset              ( toCharMaybe, toCharListMaybe )
-import ASCII.TemplateHaskell       ( isCharExp, isCharPat, isStringExp, isStringPat )
-import Control.Monad               ( (>=>), return )
-import Control.Monad.Fail          ( MonadFail, fail )
-import Data.Maybe                  ( Maybe (..) )
-import Language.Haskell.TH.Quote   ( QuasiQuoter (..) )
-import Language.Haskell.TH.Syntax  ( Q, Exp, Pat )
+import ASCII.Char                   ( Char )
+import ASCII.Superset               ( toCharMaybe, toCharListMaybe )
+import ASCII.TemplateHaskell        ( isCharExp, isCharPat, isStringExp, isStringPat )
+import Control.Monad                ( (>=>), return )
+import Control.Monad.Fail           ( MonadFail, fail )
+import Data.Maybe                   ( Maybe (..) )
+import Data.String                  ( words )
+import Language.Haskell.TH.Quote    ( QuasiQuoter (..) )
+import Language.Haskell.TH.Syntax   ( Q, Exp, Pat )
+import Numeric                      ( readHex )
+import Text.ParserCombinators.ReadP ( readP_to_S )
 
 import qualified Data.Char   as Unicode
 import qualified Data.String as Unicode
@@ -85,6 +88,46 @@ Use in a pattern context requires enabling the @ViewPatterns@ language extension
 
 string :: QuasiQuoter
 string = expPatQQ requireAsciiList isStringExp isStringPat
+
+{- |
+
+An ASCII character, written as a hexidecimal number.
+
+>>> :set -XQuasiQuotes
+
+>>> [hexChar| 48 |] :: ASCII.Char
+CapitalLetterH
+
+-}
+
+hexChar :: QuasiQuoter
+hexChar = expPatQQ hexAsciiChar isCharExp isCharPat
+
+{- |
+
+An ASCII string, written as a whitespace-delimited series of hexidecimal numbers.
+
+>>> :set -XQuasiQuotes
+
+>>> [hex| 48 65 6c 6c 6f 21 |] :: [ASCII.Char]
+[CapitalLetterH,SmallLetterE,SmallLetterL,SmallLetterL,SmallLetterO,ExclamationMark]
+
+>>> [hex| 48 65 6c 6c 6f 21 |] :: Data.Text.Text
+"Hello!"
+
+-}
+
+hexString :: QuasiQuoter
+hexString = expPatQQ hexAsciiList isStringExp isStringPat
+
+hexIntegerMaybe :: Unicode.String -> Maybe Integer
+hexIntegerMaybe = \case{ (x, "") : _ -> Just x; _ -> Nothing } . readP_to_S readHex
+
+hexAsciiChar :: Unicode.String -> Q Char
+hexAsciiChar = _
+
+hexAsciiList :: Unicode.String -> Q [Char]
+hexAsciiList = traverse hexAsciiChar . words
 
 requireOneAscii :: Unicode.String -> Q Char
 requireOneAscii = requireOne >=> requireAscii
