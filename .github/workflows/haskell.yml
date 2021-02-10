@@ -17,12 +17,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Cache Haskell dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cabal/packages
+            ~/.cabal/store
+          key: ${{ runner.os }}-${{ matrix.ghc }}
+
       - uses: haskell/actions/setup@v1
         with:
           ghc-version: ${{ matrix.ghc }}
+
       - name: Build
         run: cabal build all
+
       - name: Install doctest
         run: cabal install doctest
+
       - name: Run doctest
         run: cabal exec -- runhaskell --ghc-arg='-package doctest' doctest.hs
