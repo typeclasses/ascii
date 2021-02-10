@@ -37,8 +37,8 @@ library
     build-depends: ascii-char       ^>= 1.0
     build-depends: ascii-superset   ^>= 1.0
 
-    build-depends: base             >= 4.11 && < 4.15
-    build-depends: template-haskell >= 2.13 && < 2.17
+    build-depends: base             >= 4.11 && < 4.16
+    build-depends: template-haskell >= 2.13 && < 2.18
 
     exposed-modules: ASCII.TemplateHaskell
     exposed-modules: ASCII.QuasiQuoters

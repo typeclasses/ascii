@@ -36,7 +36,7 @@ library
     default-extensions: DerivingStrategies
     ghc-options: -Wall -fno-warn-unused-imports
 
-    build-depends: base     >= 4.11 && < 4.15
+    build-depends: base     >= 4.11 && < 4.16
     build-depends: hashable >= 1.2  && < 1.4
 
     exposed-modules: ASCII.Char

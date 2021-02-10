@@ -31,7 +31,7 @@ library
     default-extensions: NoImplicitPrelude
     ghc-options: -Wall
 
-    build-depends: base       >= 4.11 && < 4.15
+    build-depends: base       >= 4.11 && < 4.16
     build-depends: bytestring ^>= 0.10 || ^>= 0.11
     build-depends: text       ^>= 1.2
 

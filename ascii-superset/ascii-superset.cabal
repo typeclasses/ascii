@@ -38,7 +38,7 @@ library
 
     build-depends: ascii-char ^>= 1.0
 
-    build-depends: base       >= 4.11 && < 4.15
+    build-depends: base       >= 4.11 && < 4.16
     build-depends: bytestring ^>= 0.10 || ^>= 0.11
     build-depends: hashable   >= 1.2  && < 1.4
     build-depends: text       ^>= 1.2
