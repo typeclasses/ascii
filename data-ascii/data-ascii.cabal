@@ -1,7 +1,7 @@
 cabal-version: 2.0
 
 Name:                data-ascii
-Version:             1.0.0.4
+Version:             1.0.0.6
 Synopsis:            Type-safe, bytestring-based ASCII values
 Description:         Type-safe, bytestring-based ASCII values.
 License:             BSD3
