@@ -6,7 +6,12 @@ jobs:
   build:
     name: Build and test all the packages
     runs-on: ubuntu-latest
-    continue-on-error: ${{ contains(["latest", "9.0.1"], matrix.ghc) }}
+    continue-on-error: ${{ contains(env.broken-ghc-versions, matrix.ghc) }}
+
+    env:
+      broken-ghc-versions:
+        - 'latest'
+        - '9.0.1'
 
     strategy:
       matrix:
