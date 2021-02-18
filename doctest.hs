@@ -4,7 +4,10 @@ main = doctest args
 
 args = ghcOptions ++ sourceFiles
 
-ghcOptions = map ("-X" <>) extensions ++ ["-fdefer-typed-holes"]
+ghcOptions =
+    map ("-X" <>) extensions ++
+    map ("-package " <>) packages ++
+    ["-fdefer-typed-holes"]
 
 extensions =
   [ "DeriveAnyClass"
@@ -17,6 +20,14 @@ extensions =
   , "StandaloneDeriving"
   , "TemplateHaskell"
   , "ViewPatterns"
+  ]
+
+packages =
+  [ "bytestring"
+  , "doctest"
+  , "hashable"
+  , "template-haskell"
+  , "text"
   ]
 
 sourceFiles =

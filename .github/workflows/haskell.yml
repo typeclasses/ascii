@@ -71,7 +71,7 @@ jobs:
             --constraint='template-haskell ${{matrix.template-haskell}}'
 
       - name: Install doctest
-        run: cabal install doctest
+        run: cabal install doctest --lib
 
       - name: Run doctest
-        run: cabal exec -- runhaskell --ghc-arg='-package doctest' doctest.hs
+        run: runhaskell --ghc-arg='-package doctest' doctest.hs
