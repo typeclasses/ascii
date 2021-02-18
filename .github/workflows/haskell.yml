@@ -6,7 +6,7 @@ jobs:
   build:
     name: Build and test all the packages
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.ghc == 'latest' || matrix.ghc == '9.0.1' }}
+    continue-on-error: ${{ matrix.ghc == 'latest' }}
 
     strategy:
       matrix:
