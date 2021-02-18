@@ -72,6 +72,8 @@ jobs:
 
       - name: Install doctest
         run: cabal install doctest --lib
+        if: ${{ matrix.ghc != '9.0.1' }}
 
       - name: Run doctest
         run: runhaskell --ghc-arg='-package doctest' doctest.hs
+        if: ${{ matrix.ghc != '9.0.1' }}
