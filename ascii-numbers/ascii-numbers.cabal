@@ -1,0 +1,39 @@
+cabal-version: 2.0
+
+name: ascii-numbers
+version: 1.0.0.0
+synopsis: ASCII representations of numbers
+category: Data, Numeric, Text
+
+description: This package provides functions for converting back and forth between numbers and their ASCII representations.
+
+license: Apache-2.0
+license-file: license.txt
+
+author: Chris Martin
+maintainer: Chris Martin, Julie Moronuki
+
+homepage:    https://github.com/typeclasses/ascii
+bug-Reports: https://github.com/typeclasses/ascii/issues
+
+build-type: Simple
+
+tested-with: GHC == 9.0.1, GHC == 8.10.1, GHC == 8.8.1, GHC == 8.6.5, GHC == 8.4.3
+
+extra-source-files: changelog.txt
+
+source-repository head
+    type:     git
+    location: git://github.com/typeclasses/ascii.git
+
+library
+    default-language: Haskell2010
+    default-extensions: NoImplicitPrelude
+    ghc-options: -Wall -fno-warn-unused-imports
+
+    build-depends: ascii-char     ^>= 1.0
+    build-depends: ascii-superset ^>= 1.0.1
+
+    build-depends: base >= 4.11 && < 4.16
+
+    exposed-modules: ASCII.Numbers
