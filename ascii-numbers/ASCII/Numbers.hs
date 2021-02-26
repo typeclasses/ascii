@@ -1,5 +1,9 @@
 module ASCII.Numbers
-  ( naturalHexString, naturalHexCharMaybe, naturalHexCharUnsafe,
+  (
+  -- * Hex-encoding Naturals
+  naturalHexString, naturalHexCharMaybe, naturalHexCharUnsafe,
+  -- * Hex-encoding Integers
+  integerHexString, integerHexCharMaybe, integerHexCharUnsafe
   -- * More examples
   -- $examples
   ) where
@@ -9,12 +13,14 @@ import ASCII.Char
 import ASCII.Superset
 
 import Data.Bifoldable (bifoldMap)
+import Data.Bool (otherwise)
 import Data.Function ((.))
 import Data.Maybe (Maybe (Just, Nothing), fromMaybe)
 import Data.Monoid (mempty)
+import Data.Ord
 import Data.Semigroup ((<>))
 import Numeric.Natural (Natural)
-import Prelude (error, quotRem)
+import Prelude (error, abs, quotRem, Integer, toInteger)
 import Text.Show (show)
 
 import qualified ASCII.Numbers.DList as DList
@@ -26,7 +32,7 @@ import ASCII.Numbers.DList (DList)
 >>> import Data.Function (($), fix)
 >>> import Data.List (map, splitAt)
 >>> import Data.String (unwords)
->>> import Prelude ((+))
+>>> import Prelude ((+), negate)
 >>> import System.IO (putStrLn)
 
 -}
@@ -44,6 +50,37 @@ naturalHexString :: StringSuperset string => Case -> Natural -> string
 naturalHexString _ 0 = fromCharList [ Digit0 ]
 naturalHexString c n = fromCharList (DList.toList (naturalHexDList c n))
 
+{- |
+
+>>> putStrLn $ integerHexString LowerCase 12
+c
+
+>>> putStrLn $ integerHexString LowerCase (negate 12)
+-c
+
+>>> putStrLn $ integerHexString UpperCase (256 + 12)
+10C
+
+>>> putStrLn $ integerHexString UpperCase (negate (256 + 12))
+-10C
+
+-}
+integerHexString :: StringSuperset string => Case -> Integer -> string
+integerHexString c n = fromCharList (integerHexList c n)
+
+integerHexList :: Case -> Integer -> [Char]
+integerHexList c n
+    | n < 0      =  HyphenMinus : DList.toList (nonNegativeIntegerHexDList c (abs n))
+    | otherwise  =                DList.toList (nonNegativeIntegerHexDList c n)
+
+nonNegativeIntegerHexDList :: Case -> Integer -> DList Char
+nonNegativeIntegerHexDList _ 0 = mempty
+nonNegativeIntegerHexDList c n =
+    bifoldMap
+        (nonNegativeIntegerHexDList c)
+        (DList.singleton . integerHexCharUnsafe c)
+        (quotRem n 16)
+
 naturalHexDList :: Case -> Natural -> DList Char
 naturalHexDList _ 0 = mempty
 naturalHexDList c n =
@@ -58,34 +95,43 @@ naturalHexCharUnsafe c n =
         (error ("Out of hex range: " <> show n))
         (naturalHexCharMaybe c n)
 
+integerHexCharUnsafe :: Case -> Integer -> Char
+integerHexCharUnsafe c n =
+    fromMaybe
+        (error ("Out of hex range: " <> show n))
+        (integerHexCharMaybe c n)
+
 naturalHexCharMaybe :: Case -> Natural -> Maybe Char
+naturalHexCharMaybe c n = integerHexCharMaybe c (toInteger n)
 
-naturalHexCharMaybe _ 0 = Just Digit0
-naturalHexCharMaybe _ 1 = Just Digit1
-naturalHexCharMaybe _ 2 = Just Digit2
-naturalHexCharMaybe _ 3 = Just Digit3
-naturalHexCharMaybe _ 4 = Just Digit4
-naturalHexCharMaybe _ 5 = Just Digit5
-naturalHexCharMaybe _ 6 = Just Digit6
-naturalHexCharMaybe _ 7 = Just Digit7
-naturalHexCharMaybe _ 8 = Just Digit8
-naturalHexCharMaybe _ 9 = Just Digit9
+integerHexCharMaybe :: Case -> Integer -> Maybe Char
 
-naturalHexCharMaybe UpperCase 10 = Just CapitalLetterA
-naturalHexCharMaybe UpperCase 11 = Just CapitalLetterB
-naturalHexCharMaybe UpperCase 12 = Just CapitalLetterC
-naturalHexCharMaybe UpperCase 13 = Just CapitalLetterD
-naturalHexCharMaybe UpperCase 14 = Just CapitalLetterE
-naturalHexCharMaybe UpperCase 15 = Just CapitalLetterF
+integerHexCharMaybe _ 0 = Just Digit0
+integerHexCharMaybe _ 1 = Just Digit1
+integerHexCharMaybe _ 2 = Just Digit2
+integerHexCharMaybe _ 3 = Just Digit3
+integerHexCharMaybe _ 4 = Just Digit4
+integerHexCharMaybe _ 5 = Just Digit5
+integerHexCharMaybe _ 6 = Just Digit6
+integerHexCharMaybe _ 7 = Just Digit7
+integerHexCharMaybe _ 8 = Just Digit8
+integerHexCharMaybe _ 9 = Just Digit9
 
-naturalHexCharMaybe LowerCase 10 = Just SmallLetterA
-naturalHexCharMaybe LowerCase 11 = Just SmallLetterB
-naturalHexCharMaybe LowerCase 12 = Just SmallLetterC
-naturalHexCharMaybe LowerCase 13 = Just SmallLetterD
-naturalHexCharMaybe LowerCase 14 = Just SmallLetterE
-naturalHexCharMaybe LowerCase 15 = Just SmallLetterF
+integerHexCharMaybe UpperCase 10 = Just CapitalLetterA
+integerHexCharMaybe UpperCase 11 = Just CapitalLetterB
+integerHexCharMaybe UpperCase 12 = Just CapitalLetterC
+integerHexCharMaybe UpperCase 13 = Just CapitalLetterD
+integerHexCharMaybe UpperCase 14 = Just CapitalLetterE
+integerHexCharMaybe UpperCase 15 = Just CapitalLetterF
 
-naturalHexCharMaybe _ _ = Nothing
+integerHexCharMaybe LowerCase 10 = Just SmallLetterA
+integerHexCharMaybe LowerCase 11 = Just SmallLetterB
+integerHexCharMaybe LowerCase 12 = Just SmallLetterC
+integerHexCharMaybe LowerCase 13 = Just SmallLetterD
+integerHexCharMaybe LowerCase 14 = Just SmallLetterE
+integerHexCharMaybe LowerCase 15 = Just SmallLetterF
+
+integerHexCharMaybe _ _ = Nothing
 
 {- $examples
 
