@@ -36,6 +36,7 @@ sourceFiles =
   , "ascii-char/ASCII/Char.hs"
   , "ascii-group/ASCII/Group.hs"
   , "ascii-numbers/ASCII/Numbers.hs"
+  , "ascii-numbers/ASCII/Numbers/DList.hs"
   , "ascii-predicates/ASCII/Lists.hs"
   , "ascii-predicates/ASCII/Predicates.hs"
   , "ascii-predicates/ASCII/ListsAndPredicates.hs"

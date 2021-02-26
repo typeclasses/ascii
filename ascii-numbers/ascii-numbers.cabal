@@ -31,9 +31,12 @@ library
     default-extensions: NoImplicitPrelude
     ghc-options: -Wall -fno-warn-unused-imports
 
+    build-depends: ascii-case     ^>= 1.0
     build-depends: ascii-char     ^>= 1.0
     build-depends: ascii-superset ^>= 1.0.1
 
     build-depends: base >= 4.11 && < 4.16
 
     exposed-modules: ASCII.Numbers
+
+    other-modules: ASCII.Numbers.DList
