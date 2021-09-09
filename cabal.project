@@ -6,4 +6,3 @@ packages:
     ./ascii-predicates
     ./ascii-superset
     ./ascii-th
-    ./data-ascii
