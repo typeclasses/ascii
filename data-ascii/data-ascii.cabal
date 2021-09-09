@@ -13,7 +13,6 @@ Category:            Data
 Homepage:            https://github.com/typeclasses/ascii
 Bug-Reports:         https://github.com/typeclasses/ascii/issues
 Build-type:          Simple
-Tested-with:         GHC == 9.0.1, GHC == 8.10.1, GHC == 8.8.1, GHC == 8.6.5, GHC == 8.4.3
 Extra-source-files:  changelog.txt
 
 Source-Repository head

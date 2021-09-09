@@ -18,8 +18,6 @@ bug-Reports: https://github.com/typeclasses/ascii/issues
 
 build-type: Simple
 
-tested-with: GHC == 9.0.1, GHC == 8.10.1, GHC == 8.8.1, GHC == 8.6.5, GHC == 8.4.3
-
 extra-source-files: changelog.txt
 
 source-repository head
