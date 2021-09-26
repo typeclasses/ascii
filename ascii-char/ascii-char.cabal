@@ -33,6 +33,7 @@ library
     default-extensions: StandaloneDeriving
     default-extensions: DerivingStrategies
     ghc-options: -Wall -fno-warn-unused-imports
+    hs-source-dirs: library
 
     build-depends: base     >= 4.11 && < 4.16
     build-depends: hashable >= 1.2  && < 1.4

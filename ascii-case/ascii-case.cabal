@@ -33,6 +33,7 @@ library
     default-extensions: DeriveDataTypeable
     default-extensions: DeriveGeneric
     ghc-options: -Wall
+    hs-source-dirs: library
 
     build-depends: ascii-char ^>= 1.0
 
