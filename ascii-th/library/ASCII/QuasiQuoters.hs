@@ -12,21 +12,6 @@ import Language.Haskell.TH.Syntax  ( Q, Exp, Pat )
 import qualified Data.Char   as Unicode
 import qualified Data.String as Unicode
 
-{- $setup
-
->>> :set -fno-warn-overlapping-patterns
->>> :set -XNoQuasiQuotes
->>> :set -XNoViewPatterns
->>> import qualified ASCII
->>> import qualified Data.String
->>> import qualified Data.Text
->>> import qualified Data.ByteString.Builder
->>> import Data.Word (Word8)
->>> import ASCII.Char
->>> import ASCII.QuasiQuoters
-
--}
-
 {- | Produces an expression or a pattern corresponding to an ASCII character.
 
 The result will have an 'ASCII.Superset.CharSuperset' constraint; since this is polymorphic, use with a type signature to specify the particular you want is recommended.

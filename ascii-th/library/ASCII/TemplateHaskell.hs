@@ -14,18 +14,6 @@ import Data.Data                  ( Data )
 import Data.Maybe                 ( Maybe (..) )
 import Language.Haskell.TH.Syntax ( Q, Exp, Pat, dataToExpQ, dataToPatQ )
 
-{- $setup
-
->>> :set -XNoViewPatterns
->>> import ASCII.Char (Char (..))
->>> import ASCII.Refinement (ASCII)
->>> import ASCII.Superset (toCharOrFail)
->>> import ASCII.TemplateHaskell (charExp)
->>> import Control.Monad ((>>=))
->>> import Data.Word (Word8)
-
--}
-
 exp :: Data a => a -> Q Exp
 exp = dataToExpQ (\_ -> Nothing)
 
