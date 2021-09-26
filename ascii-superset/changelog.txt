@@ -16,4 +16,7 @@
 
 1.0.1.4 - 2021-02-10 - Support GHC 9.0
 
-1.0.1.6 - Add a test suite
+1.0.1.6
+
+    - Add a test suite
+    - Raise 'text' lower bound to 1.2.3

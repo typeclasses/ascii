@@ -40,7 +40,7 @@ library
     build-depends: base       >= 4.11 && < 4.16
     build-depends: bytestring ^>= 0.10 || ^>= 0.11
     build-depends: hashable   >= 1.2  && < 1.4
-    build-depends: text       ^>= 1.2
+    build-depends: text       ^>= 1.2.3
 
     exposed-modules: ASCII.Superset
     exposed-modules: ASCII.Isomorphism
