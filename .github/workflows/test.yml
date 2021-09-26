@@ -1,0 +1,38 @@
+on: [push]
+
+name: Tests for 'ascii' and related libraries
+
+jobs:
+  build:
+    name: Build and test all the packages
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    strategy:
+      matrix:
+        ghc:
+          - '8.4'
+          - '8.6'
+          - '8.8'
+          - '8.10'
+          - '9.0'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache Haskell dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cabal/packages
+            ~/.cabal/store
+          key: ${{ runner.os }}-${{ matrix.ghc }}
+
+      - uses: haskell/actions/setup@v1
+        with:
+          ghc-version: ${{ matrix.ghc }}
+
+      - name: Test
+        run: runhaskell --ghc-arg='-package process' ./.github/workflows/test.hs
+        env:
+          ghc: ${{ matrix.ghc }}
