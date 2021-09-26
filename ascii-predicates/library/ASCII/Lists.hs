@@ -11,7 +11,7 @@ module ASCII.Lists
 
 import ASCII.Char ( Char (..) )
 import Data.List  ( (++) )
-import Prelude    ( Enum, enumFromTo,
+import Prelude    ( enumFromTo,
                     Bounded (..), minBound, maxBound )
 
 -- | All 128 ASCII characters, listed in order from 'Null' to 'Delete'.
