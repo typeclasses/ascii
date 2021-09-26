@@ -8,4 +8,4 @@
 
 1.0.0.8 - 2021-02-10 - Support GHC 9.0
 
-1.0.0.10 - Add a test suite
+1.0.0.10 - 2021-09-26 - Add a test suite

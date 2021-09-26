@@ -1,4 +1,4 @@
 1.0.0.0 - 2020-05-05 - Initial release
 1.0.0.2 - 2020-05-18 - Support GHC 8.10
 1.0.0.4 - 2021-02-10 - Support GHC 9.0
-1.0.0.6 - Add a test suite
+1.0.0.6 - 2021-09-26 - Add a test suite
