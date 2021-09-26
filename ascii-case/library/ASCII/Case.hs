@@ -21,12 +21,6 @@ import Data.Maybe    ( Maybe (..) )
 import qualified ASCII.Char as Char
 import qualified Data.Bool  as Bool
 
-{- $setup
-
->>> import Prelude
-
--}
-
 data Case =
     UpperCase -- ^ The letters from 'CapitalLetterA' to 'CapitalLetterZ'.
   | LowerCase -- ^ The letters from 'SmallLetterA' to 'SmallLetterZ'.

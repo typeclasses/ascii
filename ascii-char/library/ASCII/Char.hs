@@ -27,12 +27,6 @@ import GHC.Generics  ( Generic )
 
 import qualified Data.Char as C
 
-{- $setup
-
->>> import Prelude hiding (Char)
-
--}
-
 -- | A character in the ASCII character set.
 
 data Char =

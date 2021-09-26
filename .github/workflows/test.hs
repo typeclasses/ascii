@@ -7,7 +7,7 @@ main =
     ghc <- readGHC <$> getEnv "ghc"
     callProcess "cabal" $ "install" : "doctest" : "--lib" : []
     callProcess "cabal" $ "build" : "all" : constraints ghc
-    callProcess "runhaskell" $ "--ghc-arg=-package doctest" : "doctest.hs" : []
+    callProcess "cabal" $ "test" : "all" : "--enable-tests" : constraints ghc
 
 x .= Just y  = Just ("--constraint=" ++ x ++ "==" ++ y)
 x .= Nothing = Nothing

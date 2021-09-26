@@ -71,15 +71,6 @@ import qualified  Data.Char        as  Unicode
 import qualified  Data.String      as  Unicode
 import qualified  Data.Text        as  Text
 
-{- $setup
-
->>> import ASCII.Char (Char (..))
->>> import Data.List (map)
->>> import Data.Text (Text)
->>> import Data.Word (Word8)
-
--}
-
 {- $char
 
 See also: "ASCII.Char"

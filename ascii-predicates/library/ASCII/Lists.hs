@@ -14,13 +14,6 @@ import Data.List  ( (++) )
 import Prelude    ( Enum, enumFromTo,
                     Bounded (..), minBound, maxBound )
 
-{- $setup
-
->>> import Data.Eq ((==))
->>> import qualified Data.List
-
--}
-
 -- | All 128 ASCII characters, listed in order from 'Null' to 'Delete'.
 
 all :: [Char]

@@ -11,14 +11,6 @@ import qualified ASCII.Superset as S
 
 import qualified Prelude
 
-{- $setup
-
->>> import ASCII.Char (Char (..))
->>> import Data.Text (Text)
->>> import Data.Word (Word8)
-
--}
-
 class Lift ascii superset
   where
 

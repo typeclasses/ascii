@@ -25,17 +25,6 @@ import GHC.Generics      ( Generic )
 import Prelude           ( succ )
 import Text.Show         ( Show, showString, showsPrec, showParen, showList )
 
-{- $setup
-
->>> :set -XOverloadedStrings
->>> import ASCII.Char (Char (..))
->>> import Data.List (map)
->>> import Data.Int (Int)
->>> import Data.String (String)
->>> import Data.Text (Text)
-
--}
-
 {- | This type constructor indicates that a value from some ASCII superset is valid ASCII. The type parameter is the ASCII superset, which should be a type with an instance of either 'CharSuperset' or 'StringSuperset'.
 
 For example, whereas a 'Data.Text.Text' value may contain a combination of ASCII and non-ASCII characters, a value of type @'ASCII' 'Data.Text.Text'@ may contain only ASCII characters.

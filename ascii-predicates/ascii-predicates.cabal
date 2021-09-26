@@ -1,7 +1,7 @@
 cabal-version: 2.0
 
 name: ascii-predicates
-version: 1.0.0.4
+version: 1.0.0.6
 synopsis: Various categorizations of ASCII characters
 category: Data, Text
 
@@ -37,3 +37,14 @@ library
     exposed-modules: ASCII.Predicates
     exposed-modules: ASCII.Lists
     exposed-modules: ASCII.ListsAndPredicates
+
+test-suite test
+    type: exitcode-stdio-1.0
+    default-language: Haskell2010
+    default-extensions: NoImplicitPrelude
+    default-extensions: OverloadedStrings
+    default-extensions: QuasiQuotes
+    ghc-options: -Wall
+    hs-source-dirs: test
+    main-is: test.hs
+    build-depends: ascii-char, ascii-predicates, base

@@ -8,13 +8,6 @@ module ASCII.ListsAndPredicates
 import ASCII.Lists
 import ASCII.Predicates
 
-{- $setup
-
->>> import Data.Eq ((==))
->>> import Data.List (filter)
-
--}
-
 {- $notes
 
 The two modules re-exported here present the same information in two different forms:
