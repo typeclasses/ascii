@@ -22,3 +22,12 @@
 
     - Add a test suite
     - Raise 'text' lower bound to 1.2.3
+
+1.1.0.0 - 2021-09-26
+
+    The dependency on the 'data-ascii' package is removed,
+    and the following modules are no longer re-exported:
+      - Data.Ascii
+      - Data.Ascii.Blaze
+      - Data.Ascii.ByteString
+      - Data.Ascii.Word8

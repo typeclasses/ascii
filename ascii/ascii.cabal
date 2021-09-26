@@ -1,7 +1,7 @@
 cabal-version: 2.0
 
 name: ascii
-version: 1.0.1.6
+version: 1.1.0.0
 synopsis: The ASCII character set and encoding
 category: Data, Text
 
@@ -59,12 +59,6 @@ library
     build-depends: ascii-th ^>= 1.0
     reexported-modules: ASCII.TemplateHaskell
     reexported-modules: ASCII.QuasiQuoters
-
-    build-depends: data-ascii ^>= 1.0
-    reexported-modules: Data.Ascii
-    reexported-modules: Data.Ascii.Blaze
-    reexported-modules: Data.Ascii.ByteString
-    reexported-modules: Data.Ascii.Word8
 
 test-suite test
     type: exitcode-stdio-1.0
