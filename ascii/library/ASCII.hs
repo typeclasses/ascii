@@ -17,6 +17,8 @@ module ASCII
     {- * Character classifications -}
     {- ** Print/control groups -} {- $groups -} Group (..), charGroup,  inGroup,
     {- ** Upper/lower case     -} {- $case   -} Case (..),  letterCase, isCase, toCaseChar, toCaseString,
+    {- ** Letters and numbers  -} isAlphaNum, isLetter, isDigit, isOctDigit, isHexDigit,
+    {- ** Spaces and symbols   -} isSpace, isPunctuation, isSymbol,
 
     {- * Monomorphic conversions -} {- $monomorphicConversions -}
     {- ** @Int@        -} {- $intConversions           -} charToInt,               intToCharMaybe,               intToCharUnsafe,
@@ -55,6 +57,7 @@ import ASCII.Superset      ( CharSuperset, StringSuperset )
 import Control.Monad       ( (>=>) )
 import Control.Monad.Fail  ( MonadFail )
 import Data.Bool           ( Bool (..) )
+import Data.Foldable       ( any )
 import Data.Function       ( (.) )
 import Data.Int            ( Int )
 import Data.Maybe          ( Maybe, maybe )
@@ -64,6 +67,7 @@ import qualified  ASCII.Case
 import qualified  ASCII.Group
 import qualified  ASCII.Isomorphism
 import qualified  ASCII.Lift
+import qualified  ASCII.Predicates
 import qualified  ASCII.Superset
 
 import qualified  Data.ByteString  as  BS
@@ -368,3 +372,103 @@ byteListToUnicodeStringMaybe = convertStringMaybe
 
 unicodeStringToByteListMaybe :: Unicode.String -> Maybe [Word8]
 unicodeStringToByteListMaybe = convertStringMaybe
+
+{- | Returns True for ASCII letters:
+
+- 'ASCII.Char.SmallLetterA' to 'ASCII.Char.SmallLetterZ'
+- 'ASCII.Char.CapitalLetterA' to 'ASCII.Char.CapitalLetterZ'
+
+-}
+
+isLetter :: CharSuperset char => char -> Bool
+isLetter x = any ASCII.Predicates.isLetter (convertCharMaybe x)
+
+{- | Returns True for the characters from 'ASCII.Char.Digit0' to 'ASCII.Char.Digit9'. -}
+
+isDigit :: CharSuperset char => char -> Bool
+isDigit x = any ASCII.Predicates.isDigit (convertCharMaybe x)
+
+
+{- | Returns True for the characters from 'ASCII.Char.Digit0' to 'ASCII.Char.Digit7'. -}
+
+isOctDigit :: CharSuperset char => char -> Bool
+isOctDigit x = any ASCII.Predicates.isOctDigit (convertCharMaybe x)
+
+
+{- | Returns True for characters in any of the following ranges:
+
+- 'ASCII.Char.Digit0' to 'ASCII.Char.Digit9'
+- 'ASCII.Char.CapitalLetterA' to 'ASCII.Char.CapitalLetterF'
+- 'ASCII.Char.SmallLetterA' to 'ASCII.Char.SmallLetterF'
+
+-}
+
+isHexDigit :: CharSuperset char => char -> Bool
+isHexDigit x = any ASCII.Predicates.isHexDigit (convertCharMaybe x)
+
+{- | Returns True for the following characters:
+
+- 'ASCII.Char.Space'
+- 'ASCII.Char.HorizontalTab'
+- 'ASCII.Char.LineFeed'
+- 'ASCII.Char.VerticalTab'
+- 'ASCII.Char.FormFeed'
+- 'ASCII.Char.CarriageReturn'
+
+-}
+
+isSpace :: CharSuperset char => char -> Bool
+isSpace x = any ASCII.Predicates.isSpace (convertCharMaybe x)
+
+{- | Returns True if the character is either an ASCII letter ('isLetter') or an ASCII digit ('isDigit'). -}
+
+isAlphaNum :: CharSuperset char => char -> Bool
+isAlphaNum x = any ASCII.Predicates.isAlphaNum (convertCharMaybe x)
+
+{- | Returns True for the following characters:
+
+- 'ASCII.Char.ExclamationMark'
+- 'ASCII.Char.QuotationMark'
+- 'ASCII.Char.NumberSign'
+- 'ASCII.Char.PercentSign'
+- 'ASCII.Char.Ampersand'
+- 'ASCII.Char.Apostrophe'
+- 'ASCII.Char.LeftParenthesis'
+- 'ASCII.Char.RightParenthesis'
+- 'ASCII.Char.Asterisk'
+- 'ASCII.Char.Comma'
+- 'ASCII.Char.HyphenMinus'
+- 'ASCII.Char.FullStop'
+- 'ASCII.Char.Slash'
+- 'ASCII.Char.Colon'
+- 'ASCII.Char.Semicolon'
+- 'ASCII.Char.QuestionMark'
+- 'ASCII.Char.AtSign'
+- 'ASCII.Char.LeftSquareBracket'
+- 'ASCII.Char.Backslash'
+- 'ASCII.Char.RightSquareBracket'
+- 'ASCII.Char.Underscore'
+- 'ASCII.Char.LeftCurlyBracket'
+- 'ASCII.Char.RightCurlyBracket'
+
+-}
+
+isPunctuation :: CharSuperset char => char -> Bool
+isPunctuation x = any ASCII.Predicates.isPunctuation (convertCharMaybe x)
+
+{- | Returns True for the following characters:
+
+- 'ASCII.Char.DollarSign'
+- 'ASCII.Char.PlusSign'
+- 'ASCII.Char.LessThanSign'
+- 'ASCII.Char.EqualsSign'
+- 'ASCII.Char.GreaterThanSign'
+- 'ASCII.Char.Caret'
+- 'ASCII.Char.GraveAccent'
+- 'ASCII.Char.VerticalLine'
+- 'ASCII.Char.Tilde'
+
+-}
+
+isSymbol :: CharSuperset char => char -> Bool
+isSymbol x = any ASCII.Predicates.isSymbol (convertCharMaybe x)

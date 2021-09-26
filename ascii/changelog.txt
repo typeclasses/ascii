@@ -31,3 +31,15 @@
       - Data.Ascii.Blaze
       - Data.Ascii.ByteString
       - Data.Ascii.Word8
+
+1.1.1.0 - 2021-09-26
+
+    New functions:
+        - isAlphaNum
+        - isLetter
+        - isDigit
+        - isOctDigit
+        - isHexDigit
+        - isSpace
+        - isPunctuation
+        - isSymbol
