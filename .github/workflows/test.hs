@@ -44,7 +44,7 @@ constraints ghc = catMaybes
           GHC_9_0  -> Just "2.17.*"
     , "text" .= case ghc of
           GHC_8_4  -> Just "1.2.3.0"
-          GHC_8_10 -> Just "1.2.4.0"
-          GHC_9_0  -> Just "1.2.5.0"
+          GHC_8_10 -> Just "1.2.4.*"
+          GHC_9_0  -> Just "1.2.5.*"
           _        -> Nothing
     ]
