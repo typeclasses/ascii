@@ -1,7 +1,7 @@
 cabal-version: 2.0
 
 name: ascii-case
-version: 1.0.0.6
+version: 1.0.0.8
 synopsis: ASCII letter case
 category: Data, Text
 
@@ -38,7 +38,7 @@ library
     build-depends: ascii-char ^>= 1.0
 
     build-depends: base       >= 4.11 && < 4.16
-    build-depends: hashable   >= 1.2  && < 1.4
+    build-depends: hashable   >= 1.2  && < 1.5
 
     exposed-modules: ASCII.Case
 

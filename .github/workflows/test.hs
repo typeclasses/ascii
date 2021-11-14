@@ -34,7 +34,8 @@ constraints ghc = catMaybes
           _        -> Nothing
     , "hashable" .= case ghc of
           GHC_8_4  -> Just "1.2.*"
-          GHC_9_0  -> Just "1.3.*"
+          GHC_8_6  -> Just "1.2.*"
+          GHC_9_0  -> Just "1.4.*"
           _        -> Nothing
     , "template-haskell" .= case ghc of
           GHC_8_4  -> Just "2.13.*"
@@ -48,3 +49,4 @@ constraints ghc = catMaybes
           GHC_9_0  -> Just "1.2.5.*"
           _        -> Nothing
     ]
+
