@@ -5,7 +5,6 @@ import System.Process
 main =
   do
     ghc <- readGHC <$> getEnv "ghc"
-    callProcess "cabal" $ "install" : "doctest" : "--lib" : []
     callProcess "cabal" $ "build" : "all" : constraints ghc
     callProcess "cabal" $ "test" : "all" : "--enable-tests" : constraints ghc
 
