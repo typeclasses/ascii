@@ -1,7 +1,7 @@
 cabal-version: 2.0
 
 name: ascii-predicates
-version: 1.0.0.6
+version: 1.0.0.8
 synopsis: Various categorizations of ASCII characters
 category: Data, Text
 
@@ -32,7 +32,7 @@ library
 
     build-depends: ascii-char ^>= 1.0
 
-    build-depends: base       >= 4.11 && < 4.16
+    build-depends: base       >= 4.11 && < 4.17
 
     exposed-modules: ASCII.Predicates
     exposed-modules: ASCII.Lists

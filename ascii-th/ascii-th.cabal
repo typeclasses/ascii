@@ -1,7 +1,7 @@
 cabal-version: 2.0
 
 name: ascii-th
-version: 1.0.0.6
+version: 1.0.0.8
 synopsis: Template Haskell support for ASCII
 category: Data, Text
 
@@ -36,8 +36,8 @@ library
     build-depends: ascii-char       ^>= 1.0
     build-depends: ascii-superset   ^>= 1.0
 
-    build-depends: base             >= 4.11 && < 4.16
-    build-depends: template-haskell >= 2.13 && < 2.18
+    build-depends: base             >= 4.11 && < 4.17
+    build-depends: template-haskell >= 2.13 && < 2.19
 
     exposed-modules: ASCII.TemplateHaskell
     exposed-modules: ASCII.QuasiQuoters

@@ -30,7 +30,7 @@ library
     ghc-options: -Wall
     hs-source-dirs: library
 
-    build-depends: base       >= 4.11 && < 4.16
+    build-depends: base       >= 4.11 && < 4.17
     build-depends: bytestring ^>= 0.10 || ^>= 0.11
     build-depends: text       ^>= 1.2.3
 

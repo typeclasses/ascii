@@ -22,3 +22,5 @@
     - Raise 'text' lower bound to 1.2.3
 
 1.0.1.8 - 2021-11-13 - Support hashable 1.4
+
+1.0.0.10 - 2022-01-09 - Support GHC 9.2

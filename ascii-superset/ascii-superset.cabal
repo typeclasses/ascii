@@ -1,7 +1,7 @@
 cabal-version: 2.0
 
 name: ascii-superset
-version: 1.0.1.8
+version: 1.0.1.10
 synopsis: Representing ASCII with refined supersets
 category: Data, Text
 
@@ -37,7 +37,7 @@ library
 
     build-depends: ascii-char ^>= 1.0
 
-    build-depends: base       >= 4.11 && < 4.16
+    build-depends: base       >= 4.11 && < 4.17
     build-depends: bytestring ^>= 0.10 || ^>= 0.11
     build-depends: hashable   >= 1.2  && < 1.5
     build-depends: text       ^>= 1.2.3
