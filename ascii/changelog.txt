@@ -43,3 +43,5 @@
         - isSpace
         - isPunctuation
         - isSymbol
+
+1.1.1.2 - 2022-01-09 - Support GHC 9.2
