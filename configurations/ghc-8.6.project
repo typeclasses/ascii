@@ -1,0 +1,13 @@
+packages:
+    ./ascii
+    ./ascii-case
+    ./ascii-char
+    ./ascii-group
+    ./ascii-predicates
+    ./ascii-superset
+    ./ascii-th
+
+constraints:
+    base ^>= 4.12
+  , hashable ^>= 1.2
+  , template-haskell ^>= 2.14
