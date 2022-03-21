@@ -47,7 +47,7 @@ library
     exposed-modules: ASCII.Refinement
     exposed-modules: ASCII.Lift
 
-test-suite test
+test-suite test-ascii-superset
     type: exitcode-stdio-1.0
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude

@@ -38,7 +38,7 @@ library
     exposed-modules: ASCII.Lists
     exposed-modules: ASCII.ListsAndPredicates
 
-test-suite test
+test-suite test-ascii-predicates
     type: exitcode-stdio-1.0
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude

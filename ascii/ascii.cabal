@@ -60,7 +60,7 @@ library
     reexported-modules: ASCII.TemplateHaskell
     reexported-modules: ASCII.QuasiQuoters
 
-test-suite test
+test-suite test-ascii
     type: exitcode-stdio-1.0
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude

@@ -42,7 +42,7 @@ library
 
     exposed-modules: ASCII.Case
 
-test-suite test
+test-suite test-ascii-case
     type: exitcode-stdio-1.0
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude

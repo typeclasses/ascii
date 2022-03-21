@@ -42,7 +42,7 @@ library
     exposed-modules: ASCII.TemplateHaskell
     exposed-modules: ASCII.QuasiQuoters
 
-test-suite test
+test-suite test-ascii-th
     type: exitcode-stdio-1.0
     default-language: Haskell2010
     default-extensions: NoImplicitPrelude
