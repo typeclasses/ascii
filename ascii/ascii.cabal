@@ -79,7 +79,7 @@ test-suite test-ascii
     import: base
     type: exitcode-stdio-1.0
     hs-source-dirs: test
-    main-is: test.hs
+    main-is: Main.hs
 
     build-depends:
         ascii

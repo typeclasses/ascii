@@ -1,17 +1,17 @@
-module Main where
+module Main (main) where
 
-import ASCII.Case
+import ASCII.Group
 
-import ASCII.Char (Char (..))
+import ASCII.Char (Char (..), allCharacters)
 
 import Control.Applicative (Applicative (..))
 import Control.Monad (Monad (..))
-import Data.Bool (Bool (..))
+import Data.Bool (Bool (..), not)
 import Data.Eq (Eq ((==)))
+import Data.Foldable (all)
 import Data.Function ((.), ($))
 import Data.Functor (Functor (..))
-import Data.List (intercalate, map, null)
-import Data.Maybe (Maybe (..))
+import Data.List (intercalate, map, null, length, filter)
 import Data.Semigroup ((<>))
 import Numeric.Natural (Natural)
 import System.Exit (die)
@@ -20,12 +20,15 @@ import Text.Show (show)
 
 main :: IO ()
 main = dieIfFailures $ do
-    test 1 $ map letterCase [CapitalLetterR, SmallLetterR, DollarSign] == [Just UpperCase, Just LowerCase,Nothing]
-    test 2 $ map (isCase UpperCase) [CapitalLetterR, SmallLetterR, DollarSign] == [True, False, False]
-    test 3 $ toCase UpperCase SmallLetterX == CapitalLetterX
-    test 4 $ toCase LowerCase CapitalLetterF == SmallLetterF
-    test 5 $ toCase UpperCase CapitalLetterA == CapitalLetterA
-    test 6 $ toCase UpperCase ExclamationMark == ExclamationMark
+    test 1 $ map charGroup [CapitalLetterA, EndOfTransmission] == [Printable, Control]
+    test 2 $ not $ inGroup Printable EndOfTransmission
+    test 3 $ inGroup Control EndOfTransmission
+    test 4 $ charGroup Space == Printable
+    test 5 $ charGroup HorizontalTab == Control
+    test 6 $ all (inGroup Printable) [CapitalLetterA, SmallLetterZ, Digit4, Tilde]
+    test 7 $ all (inGroup Control) [Null, Substitute, UnitSeparator, Delete]
+    test 8 $ length (filter (inGroup Control) allCharacters) == 33
+    test 9 $ length (filter (inGroup Printable) allCharacters) == 95
 
 dieIfFailures :: Failures a -> IO a
 dieIfFailures (Failures fs x) =

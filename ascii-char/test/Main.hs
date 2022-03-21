@@ -1,34 +1,30 @@
-module Main where
+module Main (main) where
 
-import ASCII.Group
-
-import ASCII.Char (Char (..), allCharacters)
+import ASCII.Char
 
 import Control.Applicative (Applicative (..))
 import Control.Monad (Monad (..))
-import Data.Bool (Bool (..), not)
+import Data.Bool (Bool (..))
 import Data.Eq (Eq ((==)))
-import Data.Foldable (all)
 import Data.Function ((.), ($))
 import Data.Functor (Functor (..))
-import Data.List (intercalate, map, null, length, filter)
+import Data.List (intercalate, map, null, length)
+import Data.Maybe (Maybe (..))
 import Data.Semigroup ((<>))
 import Numeric.Natural (Natural)
+import Prelude (minBound, maxBound)
 import System.Exit (die)
 import System.IO (IO, putStrLn)
 import Text.Show (show)
 
 main :: IO ()
 main = dieIfFailures $ do
-    test 1 $ map charGroup [CapitalLetterA, EndOfTransmission] == [Printable, Control]
-    test 2 $ not $ inGroup Printable EndOfTransmission
-    test 3 $ inGroup Control EndOfTransmission
-    test 4 $ charGroup Space == Printable
-    test 5 $ charGroup HorizontalTab == Control
-    test 6 $ all (inGroup Printable) [CapitalLetterA, SmallLetterZ, Digit4, Tilde]
-    test 7 $ all (inGroup Control) [Null, Substitute, UnitSeparator, Delete]
-    test 8 $ length (filter (inGroup Control) allCharacters) == 33
-    test 9 $ length (filter (inGroup Printable) allCharacters) == 95
+    test 1 $ map toInt [Null, CapitalLetterA, SmallLetterA, Delete] == [0, 65, 97, 127]
+    test 2 $ map fromIntMaybe [-1, 0, 65, 127, 128] == [Nothing, Just Null, Just CapitalLetterA, Just Delete, Nothing]
+    test 3 $ map fromIntUnsafe [65, 66, 67] == [CapitalLetterA, CapitalLetterB, CapitalLetterC]
+    test 4 $ length allCharacters == 128
+    test 5 $ (minBound :: Char) == Null
+    test 6 $ (maxBound :: Char) == Delete
 
 dieIfFailures :: Failures a -> IO a
 dieIfFailures (Failures fs x) =

@@ -1,6 +1,8 @@
-module Main where
+module Main (main) where
 
-import ASCII.Char
+import ASCII.Case
+
+import ASCII.Char (Char (..))
 
 import Control.Applicative (Applicative (..))
 import Control.Monad (Monad (..))
@@ -8,23 +10,22 @@ import Data.Bool (Bool (..))
 import Data.Eq (Eq ((==)))
 import Data.Function ((.), ($))
 import Data.Functor (Functor (..))
-import Data.List (intercalate, map, null, length)
+import Data.List (intercalate, map, null)
 import Data.Maybe (Maybe (..))
 import Data.Semigroup ((<>))
 import Numeric.Natural (Natural)
-import Prelude (minBound, maxBound)
 import System.Exit (die)
 import System.IO (IO, putStrLn)
 import Text.Show (show)
 
 main :: IO ()
 main = dieIfFailures $ do
-    test 1 $ map toInt [Null, CapitalLetterA, SmallLetterA, Delete] == [0, 65, 97, 127]
-    test 2 $ map fromIntMaybe [-1, 0, 65, 127, 128] == [Nothing, Just Null, Just CapitalLetterA, Just Delete, Nothing]
-    test 3 $ map fromIntUnsafe [65, 66, 67] == [CapitalLetterA, CapitalLetterB, CapitalLetterC]
-    test 4 $ length allCharacters == 128
-    test 5 $ (minBound :: Char) == Null
-    test 6 $ (maxBound :: Char) == Delete
+    test 1 $ map letterCase [CapitalLetterR, SmallLetterR, DollarSign] == [Just UpperCase, Just LowerCase,Nothing]
+    test 2 $ map (isCase UpperCase) [CapitalLetterR, SmallLetterR, DollarSign] == [True, False, False]
+    test 3 $ toCase UpperCase SmallLetterX == CapitalLetterX
+    test 4 $ toCase LowerCase CapitalLetterF == SmallLetterF
+    test 5 $ toCase UpperCase CapitalLetterA == CapitalLetterA
+    test 6 $ toCase UpperCase ExclamationMark == ExclamationMark
 
 dieIfFailures :: Failures a -> IO a
 dieIfFailures (Failures fs x) =
