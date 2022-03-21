@@ -1,0 +1,36 @@
+cradle:
+  cabal:
+    - path: "./ascii/library"
+      component: "lib:ascii"
+    - path: "./ascii/test"
+      component: "test:test-ascii"
+
+    - path: "./ascii-case/library"
+      component: "lib:ascii-case"
+    - path: "./ascii-case/test"
+      component: "test:test-ascii-case"
+
+    - path: "./ascii-char/library"
+      component: "lib:ascii-char"
+    - path: "./ascii-char/test"
+      component: "test:test-ascii-char"
+
+    - path: "./ascii-group/library"
+      component: "lib:ascii-group"
+    - path: "./ascii-group/test"
+      component: "test:test-ascii-group"
+
+    - path: "./ascii-predicates/library"
+      component: "lib:ascii-predicates"
+    - path: "./ascii-predicates/test"
+      component: "test:test-ascii-predicates"
+
+    - path: "./ascii-superset/library"
+      component: "lib:ascii-superset"
+    - path: "./ascii-superset/test"
+      component: "test:test-ascii-superset"
+
+    - path: "./ascii-th/library"
+      component: "lib:ascii-th"
+    - path: "./ascii-th/test"
+      component: "test:test-ascii-th"
