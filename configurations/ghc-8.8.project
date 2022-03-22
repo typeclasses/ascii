@@ -1,11 +1,11 @@
 packages:
-    ./ascii
-    ./ascii-case
-    ./ascii-char
-    ./ascii-group
-    ./ascii-predicates
-    ./ascii-superset
-    ./ascii-th
+    ascii
+    ascii-case
+    ascii-char
+    ascii-group
+    ascii-predicates
+    ascii-superset
+    ascii-th
 
 constraints:
     base == 4.13.*
