@@ -21,8 +21,6 @@ bug-Reports: https://github.com/typeclasses/ascii/issues
 
 build-type: Simple
 
-extra-source-files: changelog.txt
-
 source-repository head
     type: git
     location: git://github.com/typeclasses/ascii.git
