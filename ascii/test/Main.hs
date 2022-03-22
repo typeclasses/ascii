@@ -5,68 +5,103 @@ import ASCII
 import ASCII.Char (Char (..))
 import ASCII.Refinement (asciiUnsafe)
 
-import Control.Applicative (Applicative (..))
-import Control.Monad (Monad (..))
-import Data.Bool (Bool (..))
-import Data.Eq (Eq ((==)))
-import Data.Function (($), (.))
-import Data.Functor (Functor (..))
+import Control.Monad (Monad (..), when)
+import Data.Bool (Bool (..), not)
+import Data.Function (($))
 import Data.Int (Int)
-import Data.List (intercalate, map, null)
+import Data.List (map)
 import Data.Maybe (Maybe (..))
-import Data.Semigroup ((<>))
 import Data.Text (Text)
 import Data.Word (Word8)
-import Numeric.Natural (Natural)
-import System.Exit (die)
-import System.IO (IO, putStrLn)
-import Text.Show (show)
+import System.Exit (exitFailure)
+import System.IO (IO)
+
+import Hedgehog (Property, assert, checkParallel, discover, property, withTests,
+                 (===))
 
 main :: IO ()
-main = dieIfFailures $ do
-    test 1 $ map charGroup [CapitalLetterA, EndOfTransmission] == [Printable, Control]
-    test 2 $ inGroup Printable EndOfTransmission == False
-    test 3 $ inGroup Control EndOfTransmission == True
-    test 4 $ map (inGroup Printable) ([-1, 5, 65, 97, 127, 130] :: [Int]) == [False, False, True, True, False, False]
-    test 5 $ map letterCase [SmallLetterA, CapitalLetterA, ExclamationMark] == [Just LowerCase, Just UpperCase, Nothing]
-    test 6 $ map letterCase ([string|Hey!|] :: [ASCII Word8]) == [Just UpperCase, Just LowerCase, Just LowerCase, Nothing]
-    test 7 $ map (isCase UpperCase) [SmallLetterA, CapitalLetterA, ExclamationMark] == [False, True, False]
-    test 8 $ map (isCase UpperCase) ([string|Hey!|] :: [ASCII Word8]) == [True, False, False, False]
-    test 9 $ map (isCase UpperCase) ([-1, 65, 97, 150] :: [Int]) == [False, True, False, False]
-    test 10 $ toCaseChar UpperCase SmallLetterA == CapitalLetterA
-    test 11 $ ([char|a|] :: ASCII Word8, toCaseChar UpperCase [char|a|] :: ASCII Word8) == (asciiUnsafe 97, asciiUnsafe 65)
-    test 12 $ toCaseString UpperCase [CapitalLetterH,SmallLetterE,SmallLetterY,ExclamationMark] == [CapitalLetterH, CapitalLetterE, CapitalLetterY, ExclamationMark]
-    test 13 $ (toCaseString UpperCase [string|Hey!|] :: ASCII Text) == asciiUnsafe "HEY!"
-    test 14 $ map charToInt [Null, CapitalLetterA, SmallLetterA, Delete] == [0, 65, 97, 127]
-    test 15 $ map charToWord8 [Null, CapitalLetterA, SmallLetterA, Delete] == [0, 65, 97, 127]
-    test 16 $ charListToText [CapitalLetterH, SmallLetterI, ExclamationMark] == "Hi!"
-    test 17 $ (lift CapitalLetterA :: Word8) == 65
-    test 18 $ (lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text) == "Hi!"
-    test 19 $ ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x50] == Just "HTTP"
-    test 20 $ ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x80] == Nothing
+main = checkParallel $$(discover) >>= \ok -> when (not ok) exitFailure
 
-dieIfFailures :: Failures a -> IO a
-dieIfFailures (Failures fs x) =
-    if null fs
-        then do putStrLn "💯"; return x
-        else die $ intercalate " " (map (("🔥" <> ) . show) fs)
+prop_letter_printable :: Property
+prop_letter_printable = withTests 1 $ property $
+    charGroup CapitalLetterA === Printable
 
-type TestNumber = Natural
+prop_eot_control :: Property
+prop_eot_control = withTests 1 $ property $
+    charGroup EndOfTransmission === Control
 
-test :: TestNumber -> Bool -> Failures ()
-test n t = Failures (if t then [] else [n]) ()
+prop_eot_not_printable :: Property
+prop_eot_not_printable = withTests 1 $ property $
+    assert $ not $ inGroup Printable EndOfTransmission
 
-data Failures a = Failures [TestNumber] a
+prop_is_eot_control :: Property
+prop_is_eot_control = withTests 1 $ property $
+    assert $ inGroup Control EndOfTransmission
 
-instance Functor Failures
-  where
-    fmap f (Failures a x) = Failures a (f x)
+prop_inGroup_printable :: Property
+prop_inGroup_printable = withTests 1 $ property $
+    map (inGroup Printable) ([-1, 5, 65, 97, 127, 130] :: [Int]) === [False, False, True, True, False, False]
 
-instance Applicative Failures
-  where
-    pure x = Failures [] x
-    Failures a f <*> Failures b x = Failures (a <> b) (f x)
+prop_cases :: Property
+prop_cases = withTests 1 $ property $
+    map letterCase [SmallLetterA, CapitalLetterA, ExclamationMark] === [Just LowerCase, Just UpperCase, Nothing]
 
-instance Monad Failures
-  where
-    Failures a x >>= f = let Failures b y = f x in Failures (a <> b) y
+prop_cases_string_qq :: Property
+prop_cases_string_qq = withTests 1 $ property $
+    map letterCase ([string|Hey!|] :: [ASCII Word8]) === [Just UpperCase, Just LowerCase, Just LowerCase, Nothing]
+
+prop_is_upper_char :: Property
+prop_is_upper_char = withTests 1 $ property $
+    map (isCase UpperCase) [SmallLetterA, CapitalLetterA, ExclamationMark] === [False, True, False]
+
+prop_is_upper_string_qq :: Property
+prop_is_upper_string_qq = withTests 1 $ property $
+    map (isCase UpperCase) ([string|Hey!|] :: [ASCII Word8]) === [True, False, False, False]
+
+prop_is_upper_int :: Property
+prop_is_upper_int = withTests 1 $ property $
+    map (isCase UpperCase) ([-1, 65, 97, 150] :: [Int]) === [False, True, False, False]
+
+prop_to_upper_letter :: Property
+prop_to_upper_letter = withTests 1 $ property $
+    toCaseChar UpperCase SmallLetterA === CapitalLetterA
+
+prop_to_upper_char_qq :: Property
+prop_to_upper_char_qq = withTests 1 $ property $
+    ([char|a|] :: ASCII Word8, toCaseChar UpperCase [char|a|] :: ASCII Word8) === (asciiUnsafe 97, asciiUnsafe 65)
+
+prop_to_upper_various :: Property
+prop_to_upper_various = withTests 1 $ property $
+    toCaseString UpperCase [CapitalLetterH,SmallLetterE,SmallLetterY,ExclamationMark] === [CapitalLetterH, CapitalLetterE, CapitalLetterY, ExclamationMark]
+
+prop_to_upper_string_qq :: Property
+prop_to_upper_string_qq = withTests 1 $ property $
+    (toCaseString UpperCase [string|Hey!|] :: ASCII Text) === asciiUnsafe "HEY!"
+
+prop_to_int :: Property
+prop_to_int = withTests 1 $ property $
+    map charToInt [Null, CapitalLetterA, SmallLetterA, Delete] === [0, 65, 97, 127]
+
+prop_to_word8 :: Property
+prop_to_word8 = withTests 1 $ property $
+    map charToWord8 [Null, CapitalLetterA, SmallLetterA, Delete] === [0, 65, 97, 127]
+
+prop_to_text :: Property
+prop_to_text = withTests 1 $ property $
+    charListToText [CapitalLetterH, SmallLetterI, ExclamationMark] === "Hi!"
+
+prop_lift_to_word8 :: Property
+prop_lift_to_word8 = withTests 1 $ property $
+    (lift CapitalLetterA :: Word8) === 65
+
+prop_lift_to_text :: Property
+prop_lift_to_text = withTests 1 $ property $
+    (lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text) === "Hi!"
+
+prop_bytes_to_string :: Property
+prop_bytes_to_string = withTests 1 $ property $
+    ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x50] === Just "HTTP"
+
+prop_bytes_to_string_fail :: Property
+prop_bytes_to_string_fail = withTests 1 $ property $
+    ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x80] === Nothing
