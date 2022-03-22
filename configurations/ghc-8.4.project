@@ -8,8 +8,8 @@ packages:
     ./ascii-th
 
 constraints:
-    base ^>= 4.11
-  , bytestring ^>= 0.10
-  , hashable ^>= 1.2
-  , template-haskell ^>= 2.13
+    base == 4.11.*
+  , bytestring == 0.10.*
+  , hashable == 1.2.*
+  , template-haskell == 2.13.*
   , text == 1.2.3.0

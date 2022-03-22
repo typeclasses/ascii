@@ -8,5 +8,5 @@ packages:
     ./ascii-th
 
 constraints:
-    base ^>= 4.16
-  , template-haskell ^>= 2.18
+    base == 4.16.*
+  , template-haskell == 2.18.*
