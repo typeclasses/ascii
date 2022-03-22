@@ -48,7 +48,7 @@ library
         StandaloneDeriving
 
     build-depends:
-        hashable >= 1.2  && < 1.5
+        hashable >= 1.2 && < 1.5
 
     exposed-modules:
         ASCII.Group
