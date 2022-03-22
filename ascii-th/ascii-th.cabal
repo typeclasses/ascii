@@ -63,4 +63,5 @@ test-suite test-ascii-th
     build-depends:
         ascii-th
       , bytestring ^>= 0.10 || ^>= 0.11
+      , hedgehog ^>= 1.0 || ^>= 1.1
       , text ^>= 1.2.3
