@@ -1,15 +1,15 @@
 module ASCII.QuasiQuoters ( char, string ) where
 
-import ASCII.Char                  ( Char )
-import ASCII.Superset              ( toCharMaybe, toCharListMaybe )
-import ASCII.TemplateHaskell       ( isCharExp, isCharPat, isStringExp, isStringPat )
-import Control.Monad               ( (>=>), return )
-import Control.Monad.Fail          ( MonadFail, fail )
-import Data.Maybe                  ( Maybe (..) )
-import Language.Haskell.TH.Quote   ( QuasiQuoter (..) )
-import Language.Haskell.TH.Syntax  ( Q, Exp, Pat )
+import ASCII.Char (Char)
+import ASCII.Superset (toCharListMaybe, toCharMaybe)
+import ASCII.TemplateHaskell (isCharExp, isCharPat, isStringExp, isStringPat)
+import Control.Monad (return, (>=>))
+import Control.Monad.Fail (MonadFail, fail)
+import Data.Maybe (Maybe (..))
+import Language.Haskell.TH.Quote (QuasiQuoter (..))
+import Language.Haskell.TH.Syntax (Exp, Pat, Q)
 
-import qualified Data.Char   as Unicode
+import qualified Data.Char as Unicode
 import qualified Data.String as Unicode
 
 {- | Produces an expression or a pattern corresponding to an ASCII character.

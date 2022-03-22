@@ -9,10 +9,9 @@ module ASCII.Lists
   )
   where
 
-import ASCII.Char ( Char (..) )
-import Data.List  ( (++) )
-import Prelude    ( enumFromTo,
-                    Bounded (..), minBound, maxBound )
+import ASCII.Char (Char (..))
+import Data.List ((++))
+import Prelude (Bounded (..), enumFromTo, maxBound, minBound)
 
 -- | All 128 ASCII characters, listed in order from 'Null' to 'Delete'.
 

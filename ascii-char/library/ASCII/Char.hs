@@ -13,17 +13,16 @@ module ASCII.Char
   )
   where
 
-import Data.Bool     ( otherwise )
-import Data.Data     ( Data )
-import Data.Eq       ( Eq, (==), (/=) )
-import Data.Ord      ( Ord, (<), (>) )
-import Data.Hashable ( Hashable )
-import Data.Int      ( Int )
-import Data.Maybe    ( Maybe (..) )
-import Prelude       ( Enum, enumFromTo, toEnum, fromEnum,
-                       Bounded, minBound, maxBound )
-import Text.Show     ( Show )
-import GHC.Generics  ( Generic )
+import Data.Bool (otherwise)
+import Data.Data (Data)
+import Data.Eq (Eq, (/=), (==))
+import Data.Hashable (Hashable)
+import Data.Int (Int)
+import Data.Maybe (Maybe (..))
+import Data.Ord (Ord, (<), (>))
+import GHC.Generics (Generic)
+import Prelude (Bounded, Enum, enumFromTo, fromEnum, maxBound, minBound, toEnum)
+import Text.Show (Show)
 
 import qualified Data.Char as C
 

@@ -45,35 +45,35 @@ module ASCII
   )
   where
 
-import ASCII.Case          ( Case (..) )
-import ASCII.Char          ( Char )
-import ASCII.Group         ( Group (..) )
-import ASCII.Isomorphism   ( CharIso, StringIso )
-import ASCII.Lift          ( Lift )
-import ASCII.QuasiQuoters  ( char, string )
-import ASCII.Refinement    ( ASCII, validateChar, validateString )
-import ASCII.Superset      ( CharSuperset, StringSuperset )
+import ASCII.Case (Case (..))
+import ASCII.Char (Char)
+import ASCII.Group (Group (..))
+import ASCII.Isomorphism (CharIso, StringIso)
+import ASCII.Lift (Lift)
+import ASCII.QuasiQuoters (char, string)
+import ASCII.Refinement (ASCII, validateChar, validateString)
+import ASCII.Superset (CharSuperset, StringSuperset)
 
-import Control.Monad       ( (>=>) )
-import Control.Monad.Fail  ( MonadFail )
-import Data.Bool           ( Bool (..) )
-import Data.Foldable       ( any )
-import Data.Function       ( (.) )
-import Data.Int            ( Int )
-import Data.Maybe          ( Maybe, maybe )
-import Data.Word           ( Word8 )
+import Control.Monad ((>=>))
+import Control.Monad.Fail (MonadFail)
+import Data.Bool (Bool (..))
+import Data.Foldable (any)
+import Data.Function ((.))
+import Data.Int (Int)
+import Data.Maybe (Maybe, maybe)
+import Data.Word (Word8)
 
-import qualified  ASCII.Case
-import qualified  ASCII.Group
-import qualified  ASCII.Isomorphism
-import qualified  ASCII.Lift
-import qualified  ASCII.Predicates
-import qualified  ASCII.Superset
+import qualified ASCII.Case
+import qualified ASCII.Group
+import qualified ASCII.Isomorphism
+import qualified ASCII.Lift
+import qualified ASCII.Predicates
+import qualified ASCII.Superset
 
-import qualified  Data.ByteString  as  BS
-import qualified  Data.Char        as  Unicode
-import qualified  Data.String      as  Unicode
-import qualified  Data.Text        as  Text
+import qualified Data.ByteString as BS
+import qualified Data.Char as Unicode
+import qualified Data.String as Unicode
+import qualified Data.Text as Text
 
 {- $char
 

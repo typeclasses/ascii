@@ -7,12 +7,12 @@ module ASCII.TemplateHaskell (
 
   ) where
 
-import qualified ASCII.Char       as  ASCII
-import qualified ASCII.Superset   as  S
+import qualified ASCII.Char as ASCII
+import qualified ASCII.Superset as S
 
-import Data.Data                  ( Data )
-import Data.Maybe                 ( Maybe (..) )
-import Language.Haskell.TH.Syntax ( Q, Exp, Pat, dataToExpQ, dataToPatQ )
+import Data.Data (Data)
+import Data.Maybe (Maybe (..))
+import Language.Haskell.TH.Syntax (Exp, Pat, Q, dataToExpQ, dataToPatQ)
 
 exp :: Data a => a -> Q Exp
 exp = dataToExpQ (\_ -> Nothing)

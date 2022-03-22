@@ -2,9 +2,9 @@
 
 module ASCII.Lift ( Lift (..) ) where
 
-import ASCII.Char       ( Char )
-import ASCII.Refinement ( ASCII )
-import ASCII.Superset   ( CharSuperset, StringSuperset )
+import ASCII.Char (Char)
+import ASCII.Refinement (ASCII)
+import ASCII.Superset (CharSuperset, StringSuperset)
 
 import qualified ASCII.Refinement as R
 import qualified ASCII.Superset as S

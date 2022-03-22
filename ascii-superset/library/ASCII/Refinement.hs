@@ -7,23 +7,23 @@ module ASCII.Refinement
   where
 
 import qualified ASCII.Char as ASCII
-import qualified ASCII.Superset as S
 import qualified ASCII.Isomorphism as I
+import qualified ASCII.Superset as S
 
-import ASCII.Superset    ( CharSuperset, StringSuperset )
-import Data.Bool         ( Bool (..) )
-import Data.Data         ( Data )
-import Data.Eq           ( Eq )
-import Data.Function     ( (.), ($), id )
-import Data.Hashable     ( Hashable )
-import Data.List         ( map )
-import Data.Maybe        ( Maybe (..) )
-import Data.Monoid       ( Monoid )
-import Data.Ord          ( Ord, (>) )
-import Data.Semigroup    ( Semigroup )
-import GHC.Generics      ( Generic )
-import Prelude           ( succ )
-import Text.Show         ( Show, showString, showsPrec, showParen, showList )
+import ASCII.Superset (CharSuperset, StringSuperset)
+import Data.Bool (Bool (..))
+import Data.Data (Data)
+import Data.Eq (Eq)
+import Data.Function (id, ($), (.))
+import Data.Hashable (Hashable)
+import Data.List (map)
+import Data.Maybe (Maybe (..))
+import Data.Monoid (Monoid)
+import Data.Ord (Ord, (>))
+import Data.Semigroup (Semigroup)
+import GHC.Generics (Generic)
+import Prelude (succ)
+import Text.Show (Show, showList, showParen, showString, showsPrec)
 
 {- | This type constructor indicates that a value from some ASCII superset is valid ASCII. The type parameter is the ASCII superset, which should be a type with an instance of either 'CharSuperset' or 'StringSuperset'.
 

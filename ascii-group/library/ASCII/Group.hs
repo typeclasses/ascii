@@ -12,15 +12,15 @@ module ASCII.Group
   )
   where
 
-import ASCII.Char    ( Char )
-import Data.Bool     ( Bool )
-import Data.Data     ( Data )
-import Data.Eq       ( Eq, (==) )
-import Data.Hashable ( Hashable )
-import Data.Ord      ( Ord, (<) )
-import GHC.Generics  ( Generic )
-import Prelude       ( Enum, Bounded )
-import Text.Show     ( Show )
+import ASCII.Char (Char)
+import Data.Bool (Bool)
+import Data.Data (Data)
+import Data.Eq (Eq, (==))
+import Data.Hashable (Hashable)
+import Data.Ord (Ord, (<))
+import GHC.Generics (Generic)
+import Prelude (Bounded, Enum)
+import Text.Show (Show)
 
 import qualified ASCII.Char as Char
 

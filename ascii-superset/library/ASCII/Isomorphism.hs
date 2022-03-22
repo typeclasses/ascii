@@ -1,9 +1,9 @@
 module ASCII.Isomorphism ( CharIso (..), asChar, StringIso (..) ) where
 
-import ASCII.Char     ( Char )
-import ASCII.Superset ( CharSuperset (..), StringSuperset (..) )
-import Data.Function  ( id, (.) )
-import Data.List      ( map )
+import ASCII.Char (Char)
+import ASCII.Superset (CharSuperset (..), StringSuperset (..))
+import Data.Function (id, (.))
+import Data.List (map)
 
 class CharSuperset char => CharIso char
   where

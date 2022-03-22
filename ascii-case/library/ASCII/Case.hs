@@ -6,20 +6,20 @@
 
 module ASCII.Case ( Case (..), letterCase, isCase, toCase ) where
 
-import ASCII.Char    ( Char (..) )
-import Data.Bool     ( Bool, otherwise )
-import Data.Data     ( Data )
-import Data.Eq       ( Eq )
-import Data.Function ( (.) )
-import Data.Hashable ( Hashable )
-import Data.Ord      ( Ord, (<=), (>=) )
-import GHC.Generics  ( Generic )
-import Prelude       ( Enum, Bounded, Int, (+), (-) )
-import Text.Show     ( Show )
-import Data.Maybe    ( Maybe (..) )
+import ASCII.Char (Char (..))
+import Data.Bool (Bool, otherwise)
+import Data.Data (Data)
+import Data.Eq (Eq)
+import Data.Function ((.))
+import Data.Hashable (Hashable)
+import Data.Maybe (Maybe (..))
+import Data.Ord (Ord, (<=), (>=))
+import GHC.Generics (Generic)
+import Prelude (Bounded, Enum, Int, (+), (-))
+import Text.Show (Show)
 
 import qualified ASCII.Char as Char
-import qualified Data.Bool  as Bool
+import qualified Data.Bool as Bool
 
 data Case =
     UpperCase -- ^ The letters from 'CapitalLetterA' to 'CapitalLetterZ'.

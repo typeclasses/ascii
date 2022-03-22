@@ -9,11 +9,11 @@ module ASCII.Predicates
   )
   where
 
-import ASCII.Char    ( Char (..) )
-import Data.Bool     ( Bool (..), otherwise )
-import Data.Eq       ( (==) )
-import Data.Function ( (.) )
-import Data.Ord      ( (<), (<=), (>=) )
+import ASCII.Char (Char (..))
+import Data.Bool (Bool (..), otherwise)
+import Data.Eq ((==))
+import Data.Function ((.))
+import Data.Ord ((<), (<=), (>=))
 
 import qualified ASCII.Char as Char
 import qualified Data.Bool as Bool
