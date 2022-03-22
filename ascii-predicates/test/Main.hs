@@ -4,86 +4,139 @@ import ASCII.ListsAndPredicates
 
 import qualified ASCII.Char
 
-import Control.Applicative (Applicative (..))
-import Control.Monad (Monad (..))
-import Data.Bool (Bool (..))
+import Control.Monad (Monad (..), when)
+import Data.Bool (not)
 import Data.Eq (Eq ((==)))
 import Data.Function (($), (.))
-import Data.Functor (Functor (..))
-import Data.List (filter, intercalate, map, null)
-import Data.Semigroup ((<>))
-import Numeric.Natural (Natural)
-import System.Exit (die)
-import System.IO (IO, putStrLn)
-import Text.Show (show)
+import Data.List (filter)
+import System.Exit (exitFailure)
+import System.IO (IO)
 
 import qualified Data.Char as Char
 import qualified Data.List as List
 
+import Hedgehog (MonadTest, Property, assert, checkParallel, discover, property,
+                 withTests, (===))
+
 main :: IO ()
-main = dieIfFailures $ do
+main = checkParallel $$(discover) >>= \ok -> when (not ok) exitFailure
 
-    do
-        let lists = [ all, printableCharacters, controlCodes, letters,
-                      capitalLetters, smallLetters, digits, octDigits,
-                      hexDigits, numbers]
+---
 
-        test 1 $ List.all (\xs -> List.sort xs == xs) lists
+lists :: [[ASCII.Char.Char]]
+lists = [ all, printableCharacters, controlCodes, letters,
+          capitalLetters, smallLetters, digits, octDigits,
+          hexDigits, numbers ]
 
-    do
-        let convert = Char.chr . ASCII.Char.toInt
-            eq f g = List.all (\x -> f x == g (convert x))
-                              ASCII.Char.allCharacters
+prop_lists_are_sorted :: Property
+prop_lists_are_sorted = withTests 1 $ property $
+    assert $ List.all (\xs -> List.sort xs == xs) lists
 
-        test 2 $ eq isControl Char.isControl
-        test 3 $ eq isSpace Char.isSpace
-        test 4 $ eq isLower Char.isLower
-        test 5 $ eq isUpper Char.isUpper
-        test 6 $ eq isAlpha Char.isAlpha
-        test 7 $ eq isAlphaNum Char.isAlphaNum
-        test 8 $ eq isPrint Char.isPrint
-        test 9 $ eq isDigit Char.isDigit
-        test 10 $ eq isOctDigit Char.isOctDigit
-        test 11 $ eq isHexDigit Char.isHexDigit
-        test 12 $ eq isLetter Char.isLetter
-        test 13 $ eq isMark Char.isMark
-        test 14 $ eq isNumber Char.isNumber
-        test 15 $ eq isPunctuation Char.isPunctuation
-        test 16 $ eq isSymbol Char.isSymbol
-        test 17 $ eq isSeparator Char.isSeparator
+---
 
-    test 18 $ controlCodes == filter isControl all
-    test 19 $ printableCharacters == filter isPrint all
-    test 20 $ letters == filter isLetter all
-    test 21 $ capitalLetters == filter isUpper all
-    test 22 $ smallLetters == filter isLower all
-    test 23 $ digits == filter isDigit all
-    test 24 $ numbers == filter isNumber all
-    test 25 $ octDigits == filter isOctDigit all
-    test 26 $ hexDigits == filter isHexDigit all
-
-dieIfFailures :: Failures a -> IO a
-dieIfFailures (Failures fs x) =
-    if null fs
-        then do putStrLn "💯"; return x
-        else die $ intercalate " " (map (("🔥" <> ) . show) fs)
-
-type TestNumber = Natural
-
-test :: TestNumber -> Bool -> Failures ()
-test n t = Failures (if t then [] else [n]) ()
-
-data Failures a = Failures [TestNumber] a
-
-instance Functor Failures
+eq :: (MonadTest m, Eq a) => (ASCII.Char.Char -> a) -> (Char.Char -> a) -> m ()
+eq f g = assert $ List.all (\x -> f x == g (convert x)) ASCII.Char.allCharacters
   where
-    fmap f (Failures a x) = Failures a (f x)
+    convert = Char.chr . ASCII.Char.toInt
 
-instance Applicative Failures
-  where
-    pure x = Failures [] x
-    Failures a f <*> Failures b x = Failures (a <> b) (f x)
+prop_eq_control :: Property
+prop_eq_control = withTests 1 $ property $
+    eq isControl Char.isControl
 
-instance Monad Failures
-  where
-    Failures a x >>= f = let Failures b y = f x in Failures (a <> b) y
+prop_eq_space :: Property
+prop_eq_space = withTests 1 $ property $
+    eq isSpace Char.isSpace
+
+prop_eq_lower :: Property
+prop_eq_lower = withTests 1 $ property $
+    eq isLower Char.isLower
+
+prop_eq_upper :: Property
+prop_eq_upper = withTests 1 $ property $
+    eq isUpper Char.isUpper
+
+prop_eq_alpha :: Property
+prop_eq_alpha = withTests 1 $ property $
+    eq isAlpha Char.isAlpha
+
+prop_eq_alphaNum :: Property
+prop_eq_alphaNum = withTests 1 $ property $
+    eq isAlphaNum Char.isAlphaNum
+
+prop_eq_print :: Property
+prop_eq_print = withTests 1 $ property $
+    eq isPrint Char.isPrint
+
+prop_eq_digit :: Property
+prop_eq_digit = withTests 1 $ property $
+    eq isDigit Char.isDigit
+
+prop_eq_octDigit :: Property
+prop_eq_octDigit = withTests 1 $ property $
+    eq isOctDigit Char.isOctDigit
+
+prop_eq_hexDigit :: Property
+prop_eq_hexDigit = withTests 1 $ property $
+    eq isHexDigit Char.isHexDigit
+
+prop_eq_letter :: Property
+prop_eq_letter = withTests 1 $ property $
+    eq isLetter Char.isLetter
+
+prop_eq_mark :: Property
+prop_eq_mark = withTests 1 $ property $
+    eq isMark Char.isMark
+
+prop_eq_number :: Property
+prop_eq_number = withTests 1 $ property $
+    eq isNumber Char.isNumber
+
+prop_eq_punctuation :: Property
+prop_eq_punctuation = withTests 1 $ property $
+    eq isPunctuation Char.isPunctuation
+
+prop_eq_symbol :: Property
+prop_eq_symbol = withTests 1 $ property $
+    eq isSymbol Char.isSymbol
+
+prop_eq_separator :: Property
+prop_eq_separator = withTests 1 $ property $
+    eq isSeparator Char.isSeparator
+
+---
+
+prop_list_control :: Property
+prop_list_control = withTests 1 $ property $
+    controlCodes === filter isControl all
+
+prop_list_printable :: Property
+prop_list_printable = withTests 1 $ property $
+    printableCharacters === filter isPrint all
+
+prop_list_letter :: Property
+prop_list_letter = withTests 1 $ property $
+    letters === filter isLetter all
+
+prop_list_capital :: Property
+prop_list_capital = withTests 1 $ property $
+    capitalLetters === filter isUpper all
+
+prop_list_small :: Property
+prop_list_small = withTests 1 $ property $
+    smallLetters === filter isLower all
+
+prop_list_digit :: Property
+prop_list_digit = withTests 1 $ property $
+    digits === filter isDigit all
+
+prop_list_number :: Property
+prop_list_number = withTests 1 $ property $
+    numbers === filter isNumber all
+
+prop_list_oct :: Property
+prop_list_oct = withTests 1 $ property $
+    octDigits === filter isOctDigit all
+
+prop_list_hex :: Property
+prop_list_hex = withTests 1 $ property $
+    hexDigits === filter isHexDigit all
