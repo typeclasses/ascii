@@ -1,0 +1,1 @@
+- Drop support for `base` 4.11 (GHC 8.4)

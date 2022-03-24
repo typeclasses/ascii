@@ -37,14 +37,14 @@ common base
     build-depends:
         ascii-char ^>= 1.0
       , ascii-superset ^>= 1.0
-      , base >= 4.11 && < 4.17
+      , base >= 4.12 && < 4.17
 
 library
     import: base
     hs-source-dirs: library
 
     build-depends:
-        template-haskell >= 2.13 && < 2.19
+        template-haskell >= 2.14 && < 2.19
 
     exposed-modules:
         ASCII.TemplateHaskell
