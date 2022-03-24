@@ -48,6 +48,10 @@ This repository contains several packages.
     It also defines the [`ASCII`][refinement] type constructor, which is used
     to indicate that a value from some ASCII superset is confined to ASCII.
 
+  * The `ascii-numbers` package provides utilities for working with numbers
+    represented using ASCII digits 0-9, ASCII letters A-F to represent
+    hexadecimal digits 10-15, and the `HypenMinus` character for negation.
+
   * The `ascii-th` package provides a [quasi-quoter][qq] that allows one to
     safely and conveniently express ASCII string literals. The generated
     expressions are polymorphic and can take the form of any type belonging to

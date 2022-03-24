@@ -20,6 +20,11 @@ cradle:
     - path: "./ascii-group/test"
       component: "test:test-ascii-group"
 
+    - path: "./ascii-numbers/library"
+      component: "lib:ascii-numbers"
+    - path: "./ascii-numbers/test"
+      component: "test:test-ascii-numbers"
+
     - path: "./ascii-predicates/library"
       component: "lib:ascii-predicates"
     - path: "./ascii-predicates/test"
