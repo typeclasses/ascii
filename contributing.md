@@ -4,7 +4,7 @@
 
 The purpose of this project is to make it easy to work with ASCII text in Haskell. The flagship package, called [`ascii`](https://hackage.haskell.org/package/ascii), is intended to be largely inclusive of features. If it is missing something that you want, please request it or contribute.
 
-- Even very small additions can be great usability improvements. This can include simple compositions of existing functions, or commonly-used specializations of polymorphic functions.
+- Even very small additions can be great usability improvements. This can include simple compositions of existing functions, or commonly-used specializations of polymorphic functions. If you cannot quickly figure out how to do something, there is probably something we can do to improve the library.
 
 - Substantial new features are also be welcome. We'd rather incorporate more ASCII-related features into this repository and into the `ascii` package than to see other separately-maintained packages pop up. A [discussion](https://github.com/typeclasses/ascii/discussions) might be a good way to start.
 
