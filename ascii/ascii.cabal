@@ -31,8 +31,8 @@ common base
         NoImplicitPrelude
 
     build-depends:
-        base >= 4.12 && < 4.17
-      , text ^>= 1.2.3
+        base >= 4.13 && < 4.17
+      , text ^>= 1.2.4
 
 library
     import: base
@@ -81,7 +81,7 @@ test-suite test-ascii
 
     build-depends:
         ascii
-      , hedgehog ^>= 1.0 || ^>= 1.1
+      , hedgehog ^>= 1.0.1 || ^>= 1.1
 
     default-extensions:
         OverloadedStrings

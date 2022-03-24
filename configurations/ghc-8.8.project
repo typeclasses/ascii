@@ -9,5 +9,8 @@ packages:
 
 constraints:
     base == 4.13.*
-  , bytestring == 0.11.*
+  , bytestring == 0.10.*
+  , hashable == 1.3.*
+  , hedgehog == 1.0.1
   , template-haskell == 2.15.*
+  , text == 1.2.4.0

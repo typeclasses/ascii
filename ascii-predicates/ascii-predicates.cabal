@@ -33,7 +33,7 @@ common base
 
     build-depends:
         ascii-char ^>= 1.0
-      , base >= 4.12 && < 4.17
+      , base >= 4.13 && < 4.17
 
 library
     import: base
@@ -57,4 +57,4 @@ test-suite test-ascii-predicates
 
     build-depends:
         ascii-predicates
-      , hedgehog ^>= 1.0 || ^>= 1.1
+      , hedgehog ^>= 1.0.1 || ^>= 1.1
