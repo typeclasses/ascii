@@ -15,39 +15,74 @@ module ASCII
     {- * @Char@ -} {- $char -} Char,
 
     {- * Character classifications -}
-    {- ** Print/control groups -} {- $groups -} Group (..), charGroup,  inGroup,
-    {- ** Upper/lower case     -} {- $case   -} Case (..),  letterCase, isCase, toCaseChar, toCaseString,
-    {- ** Letters and numbers  -} isAlphaNum, isLetter, isDigit, isOctDigit, isHexDigit,
+    {- ** Print/control groups -} {- $groups -}
+    Group (..), charGroup,  inGroup,
+    {- ** Upper/lower case -} {- $case -}
+    Case (..), letterCase, isCase, toCaseChar, toCaseString,
+    {- ** Letters  -} isLetter,
+    {- ** Letters and numbers  -} isAlphaNum,
+    {- ** Decimal digits -} {- $digit -} isDigit, Digit,
+    {- ** Hexadecimal digits -} {- $hexchar -} isHexDigit, HexChar,
+    {- ** Octal digits -} isOctDigit,
     {- ** Spaces and symbols   -} isSpace, isPunctuation, isSymbol,
 
-    {- * Monomorphic conversions -} {- $monomorphicConversions -}
-    {- ** @Int@        -} {- $intConversions           -} charToInt,               intToCharMaybe,               intToCharUnsafe,
-    {- ** @Word8@      -} {- $word8Conversions         -} charToWord8,             word8ToCharMaybe,             word8ToCharUnsafe,
-    {- ** @Char@       -} {- $unicodeCharConversions   -} charToUnicode,           unicodeToCharMaybe,           unicodeToCharUnsafe,
-    {- ** @String@     -} {- $unicodeStringConversions -} charListToUnicodeString, unicodeStringToCharListMaybe, unicodeStringToCharListUnsafe,
-    {- ** @Text@       -} {- $textConversions          -} charListToText,          textToCharListMaybe,          textToCharListUnsafe,
-    {- ** @ByteString@ -} {- $byteStringConversions    -} charListToByteString,    byteStringToCharListMaybe,    byteStringToCharListUnsafe,
+    {- * Monomorphic character conversions -} {- $monomorphicConversions -}
+    {- ** @ASCII.Char@ ↔ @Int@ -} {- $intConversions -}
+    charToInt, intToCharMaybe, intToCharUnsafe,
+    {- ** @ASCII.Char@ ↔ @Word8@ -} {- $word8Conversions -}
+    charToWord8, word8ToCharMaybe, word8ToCharUnsafe,
+    {- ** @ASCII.Char@ ↔ @Char@ -} {- $unicodeCharConversions -}
+    charToUnicode, unicodeToCharMaybe, unicodeToCharUnsafe,
+
+    {- * Monomorphic string conversions -}
+    {- ** @ASCII.Char@ ↔ @String@ -} {- $unicodeStringConversions -}
+    charListToUnicodeString, unicodeStringToCharListMaybe, unicodeStringToCharListUnsafe,
+    {- ** @ASCII.Char@ ↔ @Text@ -} {- $textConversions -}
+    charListToText, textToCharListMaybe, textToCharListUnsafe,
+    {- ** @ASCII.Char@ ↔ @ByteString@ -} {- $byteStringConversions -}
+    charListToByteString, byteStringToCharListMaybe, byteStringToCharListUnsafe,
 
     {- * Monomorphic conversions between ASCII supersets -} {- $monoSupersetConversions -}
-    {- ** @ByteString@ / @String@ -} byteStringToUnicodeStringMaybe, unicodeStringToByteStringMaybe,
-    {- ** @[Word8]@      / @String@ -} byteListToUnicodeStringMaybe,   unicodeStringToByteListMaybe,
+    {- ** @ByteString@ ↔ @String@ -}
+    byteStringToUnicodeStringMaybe, unicodeStringToByteStringMaybe,
+    {- ** @[Word8]@ ↔ @String@ -}
+    byteListToUnicodeStringMaybe, unicodeStringToByteListMaybe,
 
-    {- * Refinement type -} {- $refinement -} {- ** @ASCII@ -} ASCII,
+    {- * Monomorphic numeric string conversions -}
+    {- ** @Natural@ ↔ @[Digit]@ -}
+    showNaturalDigits, readNaturalDigits,
+    {- ** @Natural@ ↔ @[HexChar]@ -}
+    showNaturalHexChars, readNaturalHexChars,
+
+    {- * Refinement type -} {- $refinement -} ASCII,
 
     {- * Polymorphic conversions -}
     {- ** Validate -} validateChar, validateString,
     {- ** Lift -} {- $lift -} lift,
-    {- ** Convert -} {- $supersetConversions -} convertCharMaybe, convertCharOrFail, convertStringMaybe, convertStringOrFail,
+    {- ** Convert -} {- $supersetConversions -}
+    convertCharMaybe, convertCharOrFail, convertStringMaybe, convertStringOrFail,
+    {- ** Integral strings -} {- $numbers -}
+    showIntegralDecimal, showIntegralHexadecimal,
+    readIntegralDecimal, readIntegralHexadecimal,
+    {- ** Natural strings -}
+    showNaturalDecimal, showNaturalHexadecimal,
+    readNaturalDecimal, readNaturalHexadecimal,
 
-    {- * Classes -} {- ** @CharSuperset@ -} CharSuperset, {- ** @StringSuperset@ -} StringSuperset, {- ** @Lift@ -} Lift, {- ** @CharIso@ -} CharIso, {- ** @StringIso@ -} StringIso,
+    {- * Classes -}
+    {- ** Supersets of ASCII -} CharSuperset, StringSuperset, Lift,
+    {- ** Equivalents to ASCII -} CharIso, StringIso,
+    {- ** Supersets of numeric characters -}
+    DigitSuperset, DigitStringSuperset, HexCharSuperset, HexStringSuperset,
 
-    {- * Quasi-quoters -} {- ** @char@ -} char, {- ** @string@ -} string
+    {- * Quasi-quoters -} char, string
   )
   where
 
 import ASCII.Case (Case (..))
 import ASCII.Char (Char)
+import ASCII.Decimal (D10, DigitStringSuperset, DigitSuperset)
 import ASCII.Group (Group (..))
+import ASCII.Hexadecimal (HexChar, HexCharSuperset, HexStringSuperset)
 import ASCII.Isomorphism (CharIso, StringIso)
 import ASCII.Lift (Lift)
 import ASCII.QuasiQuoters (char, string)
@@ -56,15 +91,20 @@ import ASCII.Superset (CharSuperset, StringSuperset)
 
 import Control.Monad ((>=>))
 import Control.Monad.Fail (MonadFail)
+import Data.Bits (Bits)
 import Data.Bool (Bool (..))
 import Data.Foldable (any)
 import Data.Function ((.))
 import Data.Int (Int)
 import Data.Maybe (Maybe, maybe)
 import Data.Word (Word8)
+import Numeric.Natural (Natural)
+import Prelude (Integral)
 
 import qualified ASCII.Case
+import qualified ASCII.Decimal
 import qualified ASCII.Group
+import qualified ASCII.Hexadecimal
 import qualified ASCII.Isomorphism
 import qualified ASCII.Lift
 import qualified ASCII.Predicates
@@ -472,3 +512,201 @@ isPunctuation x = any ASCII.Predicates.isPunctuation (convertCharMaybe x)
 
 isSymbol :: CharSuperset char => char -> Bool
 isSymbol x = any ASCII.Predicates.isSymbol (convertCharMaybe x)
+
+{- $numbers
+
+See also: "ASCII.Decimal" and "ASCII.Hexadecimal"
+
+-}
+
+{- |
+
+Gives the ASCII string representation of an integer in decimal (base 10)
+notation, using digits 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9',
+leading with 'ASCII.Char.HyphenMinus' for negative numbers.
+
+For example, @'showIntegralDecimal' (-512 :: 'Prelude.Integer')@ = @"-512"@.
+
+-}
+
+showIntegralDecimal :: (Integral n, StringSuperset string) => n -> string
+showIntegralDecimal = ASCII.Decimal.showIntegral
+
+{- |
+
+Gives the ASCII string representation of an integer in hexadecimal (base 16)
+notation, using digits 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9', for
+digits 0 though 9. The representation of digits 10 to 15 is determined by the
+value of 'Case' parameter: 'UpperCase' means 'ASCII.Char.CapitalLetterA' to
+'ASCII.Char.CapitalLetterF', and 'LowerCase' means 'ASCII.Char.SmallLetterA' to
+'ASCII.Char.SmallLetterF'. For negative numbers, the resulting string begins
+with 'ASCII.Char.HyphenMinus'.
+
+For example, @'showIntegralHexadecimal' 'UpperCase' ('Prelude.negate' (256 + 12) :: 'Prelude.Integer')@ = @"-10C"@.
+
+-}
+
+showIntegralHexadecimal :: (Integral n, StringSuperset string) => Case -> n -> string
+showIntegralHexadecimal = ASCII.Hexadecimal.showIntegral
+
+{- |
+
+Roughly the inverse of 'showIntegralDecimal'
+
+* Leading zeroes are accepted, as in @"0074"@ and @"-0074"@
+
+Conditions where the result is 'Data.Maybe.Nothing':
+
+* If the input is empty
+* If the input contains any other extraneous characters
+* If the resulting number would be outside the range supported by the 'Integral' (determined by its 'Bits' instance)
+
+-}
+
+readIntegralDecimal :: (StringSuperset string, Integral number, Bits number) => string -> Maybe number
+readIntegralDecimal = ASCII.Decimal.readIntegral
+
+{- |
+
+Roughly the inverse of 'showIntegralHexadecimal'
+
+* Upper and lower case letters are treated equally
+* Leading zeroes are accepted, as in @"006a"@ and @"-006a"@
+
+Conditions where the result is 'Data.Maybe.Nothing':
+
+* If the input is empty
+* If the input contains any other extraneous characters
+* If the resulting number would be outside the range supported by the 'Integral' (determined by its 'Bits' instance)
+
+-}
+
+readIntegralHexadecimal :: (StringSuperset string, Integral number, Bits number) => string -> Maybe number
+readIntegralHexadecimal = ASCII.Hexadecimal.readIntegral
+
+{- |
+
+Gives the ASCII string representation of an natural number in decimal (base 10)
+notation, using digits 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9'.
+
+For example, @'showNaturalDecimal' 512@ = @"512"@.
+
+-}
+
+showNaturalDecimal :: DigitStringSuperset string => Natural -> string
+showNaturalDecimal = ASCII.Decimal.showNatural
+
+{- |
+
+Gives the ASCII string representation of an integer in hexadecimal (base 16)
+notation, using digits 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9', for
+digits 0 though 9. The representation of digits 10 to 15 is determined by the
+value of 'Case' parameter: 'UpperCase' means 'ASCII.Char.CapitalLetterA' to
+'ASCII.Char.CapitalLetterF', and 'LowerCase' means 'ASCII.Char.SmallLetterA' to
+'ASCII.Char.SmallLetterF'.
+
+For example, @'showNaturalHexadecimal' 'UpperCase' (256 + 12)@ = @"10C"@.
+
+-}
+
+showNaturalHexadecimal :: HexStringSuperset string => Case -> Natural -> string
+showNaturalHexadecimal = ASCII.Hexadecimal.showNatural
+
+{- |
+
+Roughly the inverse of 'showNaturalDecimal'
+
+* Leading zeroes are accepted, as in @"0074"@
+
+Conditions where the result is 'Data.Maybe.Nothing':
+
+* If the input is empty
+* If the input contains any other extraneous characters
+
+-}
+
+readNaturalDecimal :: DigitStringSuperset string => string -> Maybe Natural
+readNaturalDecimal = ASCII.Decimal.readNatural
+
+{- |
+
+Roughly the inverse of 'showNaturalHexadecimal'
+
+* Upper and lower case letters are treated equally
+* Leading zeroes are accepted, as in @"006a"@
+
+Conditions where the result is 'Data.Maybe.Nothing':
+
+* If the input is empty
+* If the input contains any other extraneous characters
+
+-}
+
+readNaturalHexadecimal :: HexStringSuperset string => string -> Maybe Natural
+readNaturalHexadecimal = ASCII.Hexadecimal.readNatural
+
+{- $digit
+
+See also: "ASCII.Decimal"
+
+-}
+
+{- |
+
+The subset of ASCII used to represent unsigned decimal numbers:
+
+* 'ASCII.Char.Digit0' to 'ASCII.Char.Digit9'
+
+-}
+
+type Digit = D10
+
+{- $hexchar
+
+See also: "ASCII.Hexadecimal"
+
+-}
+
+{- |
+
+Specialization of 'showNaturalDecimal'
+
+See also: 'showIntegralDecimal'
+
+-}
+
+showNaturalDigits :: Natural -> [Digit]
+showNaturalDigits = showNaturalDecimal
+
+{- |
+
+Specialization of 'readNaturalDecimal'
+
+See also: 'readIntegralDecimal'
+
+-}
+
+readNaturalDigits :: [Digit] -> Maybe Natural
+readNaturalDigits = readNaturalDecimal
+
+{- |
+
+Specialization of 'showNaturalHexadecimal'
+
+See also: 'showIntegralHexadecimal'
+
+-}
+
+showNaturalHexChars :: Case -> Natural -> [HexChar]
+showNaturalHexChars = showNaturalHexadecimal
+
+{- |
+
+Specialization of 'readNaturalHexadecimal'
+
+See also: 'readIntegralHexadecimal'
+
+-}
+
+readNaturalHexChars :: [HexChar] -> Maybe Natural
+readNaturalHexChars = readNaturalHexadecimal
