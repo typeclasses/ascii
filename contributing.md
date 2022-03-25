@@ -14,7 +14,7 @@ The project is broken into several packages so that core concepts can be provide
 
 The larger the package, the more willing we should be to make minor and major releases. The [`ascii`](https://hackage.haskell.org/package/ascii) package in particular should prioritize improvement over stability.
 
-Brief support of [PVP](https://pvp.haskell.org/): In the version "A.B.C.D", the first two numbers "A.B" represent the *major* version, "C" is the *minor* version, and "D" is the *patch* version. Patch releases do not change the API at all (bug fixes, performance improvements, supporting new dependency versions), and minor releases are limited to backwards-compatible changes (such as adding a new function).
+Brief summary of [PVP](https://pvp.haskell.org/): In the version "A.B.C.D", the first two numbers "A.B" represent the *major* version, "C" is the *minor* version, and "D" is the *patch* version. Patch releases do not change the API at all (bug fixes, performance improvements, supporting new dependency versions), and minor releases are limited to backwards-compatible changes (such as adding a new function).
 
 ### Dependencies
 
