@@ -13,6 +13,7 @@ import Data.List (map)
 import Data.Maybe (Maybe (..))
 import Data.Text (Text)
 import Data.Word (Word8)
+import Prelude (enumFromTo, maxBound, minBound)
 import System.Exit (exitFailure)
 import System.IO (IO)
 
@@ -105,3 +106,16 @@ prop_bytes_to_string = withTests 1 $ property $
 prop_bytes_to_string_fail :: Property
 prop_bytes_to_string_fail = withTests 1 $ property $
     ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x80] === Nothing
+
+prop_digitStrings :: Property
+prop_digitStrings = withTests 1 $ property $
+    map digitString (enumFromTo minBound maxBound) ===
+    (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] :: [Text])
+
+prop_hexCharStrings :: Property
+prop_hexCharStrings = withTests 1 $ property $
+    map hexCharString (enumFromTo minBound maxBound) ===
+    ( [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+      , "A", "B", "C", "D", "E", "F"
+      , "a", "b", "c", "d", "e", "f"
+      ] :: [Text] )

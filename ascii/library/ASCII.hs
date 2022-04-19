@@ -67,6 +67,8 @@ module ASCII
     {- ** Natural strings -}
     showNaturalDecimal, showNaturalHexadecimal,
     readNaturalDecimal, readNaturalHexadecimal,
+    {- ** Single-digit strings -}
+    digitString, hexCharString,
 
     {- * Classes -}
     {- ** Supersets of ASCII -} CharSuperset, StringSuperset, Lift,
@@ -710,3 +712,19 @@ See also: 'readIntegralHexadecimal'
 
 readNaturalHexChars :: [HexChar] -> Maybe Natural
 readNaturalHexChars = readNaturalHexadecimal
+
+{- |
+
+A string containing a single digit character 0-9
+
+-}
+digitString :: DigitStringSuperset string => Digit -> string
+digitString x = ASCII.Decimal.fromDigitList [x]
+
+{- |
+
+A string containing a single hexadecimal digit character 0-9, A-F, or a-f.
+
+-}
+hexCharString :: HexStringSuperset string => HexChar -> string
+hexCharString x = ASCII.Hexadecimal.fromHexCharList [x]
