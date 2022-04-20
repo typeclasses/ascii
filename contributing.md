@@ -16,6 +16,8 @@ The larger the package, the more willing we should be to make minor and major re
 
 Brief summary of [PVP](https://pvp.haskell.org/): In the version "A.B.C.D", the first two numbers "A.B" represent the *major* version, "C" is the *minor* version, and "D" is the *patch* version. Patch releases do not change the API at all (bug fixes, performance improvements, supporting new dependency versions), and minor releases are limited to backwards-compatible changes (such as adding a new function).
 
+The `ascii` package re-exports definitions and entire modules from other packages. Its dependency bounds for these packages are always written in the form `== A.B.C.*`, and anything larger than a patch release of the other packages requires a new release of the `ascii` package as well.
+
 ### Dependencies
 
 The goal is to support new releases of dependencies as quickly as possible. If there is a new version of a library that we do not yet support, please open an [issue](https://github.com/typeclasses/ascii/issues), and consider submitting a fix.
