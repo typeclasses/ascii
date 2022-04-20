@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: ascii-numbers
-version: 1.0.0.0
+version: 1.1.0.0
 synopsis: ASCII representations of numbers
 category: Data, Numeric, Text
 
