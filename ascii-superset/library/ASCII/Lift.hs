@@ -11,10 +11,14 @@ import qualified ASCII.Superset as S
 
 import qualified Prelude
 
-class Lift ascii superset
+-- | Embedding of one character set within another
+--
+-- The @subset@ and @superset@ types may be characters or strings in ASCII, some subset of ASCII, or some superset of ASCII.
+--
+class Lift subset superset
   where
 
-    {- | Converts from ASCII to any larger type.
+    {- | Converts from a smaller to a larger type.
 
     >>> lift CapitalLetterA :: Word8
     65
@@ -26,7 +30,7 @@ class Lift ascii superset
 
     -}
 
-    lift :: ascii -> superset
+    lift :: subset -> superset
 
 -- | A value from an ASCII superset that has been refined by the 'ASCII' type constructor may be lifted back into the superset by unwrapping it from the 'ASCII' type.
 
