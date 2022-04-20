@@ -82,7 +82,7 @@ module ASCII
 
 import ASCII.Case (Case (..))
 import ASCII.Char (Char)
-import ASCII.Decimal (D10, DigitStringSuperset, DigitSuperset)
+import ASCII.Decimal (Digit, DigitStringSuperset, DigitSuperset)
 import ASCII.Group (Group (..))
 import ASCII.Hexadecimal (HexChar, HexCharSuperset, HexStringSuperset)
 import ASCII.Isomorphism (CharIso, StringIso)
@@ -652,16 +652,6 @@ readNaturalHexadecimal = ASCII.Hexadecimal.readNatural
 See also: "ASCII.Decimal"
 
 -}
-
-{- |
-
-The subset of ASCII used to represent unsigned decimal numbers:
-
-* 'ASCII.Char.Digit0' to 'ASCII.Char.Digit9'
-
--}
-
-type Digit = D10
 
 {- $hexchar
 

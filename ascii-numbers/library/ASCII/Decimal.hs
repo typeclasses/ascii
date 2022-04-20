@@ -5,7 +5,7 @@ module ASCII.Decimal
     {- ** Integer -} showInteger, readInteger,
     {- ** Integral -} showIntegral, readIntegral,
 
-    {- * The digit type -} D10 (..),
+    {- * The digit type -} Digit (..),
 
     {- * Decimal digit superset classes -}
     {- ** Of digit -} DigitSuperset (..),
@@ -18,24 +18,32 @@ module ASCII.Decimal
     ) where
 
 import qualified ASCII.Char as ASCII
-import ASCII.Refinement (ASCII, asciiUnsafe, lift)
+import qualified ASCII.Refinement
+import ASCII.Lift (Lift (lift))
+import ASCII.Refinement (ASCII, asciiUnsafe)
 import ASCII.Superset (StringSuperset, fromChar, fromCharList, toCharListMaybe,
                        toCharMaybe)
 
 import Control.Monad ((<=<), (=<<))
 import Data.Bifoldable (bifoldMap)
 import Data.Bits (Bits, toIntegralSized)
-import Data.Bool (Bool, (&&))
+import Data.Bool (Bool, (&&), (||))
+import Data.Data (Data)
+import Data.Eq (Eq)
 import Data.Function (id, (.))
 import Data.Functor (fmap)
+import Data.Hashable (Hashable)
 import Data.List.NonEmpty (NonEmpty, nonEmpty)
 import Data.Maybe (Maybe (..), fromJust, isJust)
 import Data.Monoid (mempty)
 import Data.Ord (Ord (..))
 import Data.Word (Word8)
+import GHC.Generics (Generic)
 import Numeric.Natural (Natural)
-import Prelude (Integer, Integral, abs, fromEnum, fromInteger, fromIntegral,
-                negate, quotRem, toEnum, toInteger, (*), (+), (-))
+import Prelude (Bounded (..), Enum (..), Integer, Integral, abs, fromEnum,
+                fromInteger, fromIntegral, negate, quotRem, toEnum, toInteger,
+                (*), (+), (-))
+import Text.Show (Show)
 
 import qualified Data.Bool as Bool
 import qualified Data.Char as Unicode
@@ -52,8 +60,26 @@ import qualified Data.Text.Lazy.Builder as TB
 import DList (DList)
 import qualified DList
 
-import D10.Safe (D10 (..))
-import qualified D10.Safe as D10
+{- |
+
+The subset of ASCII used to represent unsigned decimal numbers:
+
+* 'ASCII.Char.Digit0' to 'ASCII.Char.Digit9'
+
+-}
+data Digit
+    = Digit0  -- ^ Zero
+    | Digit1  -- ^ One
+    | Digit2  -- ^ Two
+    | Digit3  -- ^ Three
+    | Digit4  -- ^ Four
+    | Digit5  -- ^ Five
+    | Digit6  -- ^ Six
+    | Digit7  -- ^ Seven
+    | Digit8  -- ^ Eight
+    | Digit9  -- ^ Nine
+    deriving stock (Bounded, Enum, Eq, Ord, Show, Data, Generic)
+    deriving anyclass Hashable
 
 
 ---  Show functions  ---
@@ -69,13 +95,13 @@ Examples:
 showNatural :: DigitStringSuperset string => Natural -> string
 showNatural =
     \case
-        0 -> fromDigitList [ D0 ]
+        0 -> fromDigitList [ Digit0 ]
         n -> fromDigitList (naturalList n)
   where
-    naturalList :: Natural -> [D10]
+    naturalList :: Natural -> [Digit]
     naturalList = DList.toList . r
       where
-        r :: Natural -> DList D10
+        r :: Natural -> DList Digit
         r = \case
             0 -> mempty
             n ->
@@ -136,7 +162,7 @@ Examples:
 readNatural :: DigitStringSuperset string => string -> Maybe Natural
 readNatural = (Just . readNaturalDigits) <=< nonEmpty <=< toDigitListMaybe
   where
-    readNaturalDigits :: NonEmpty D10 -> Natural
+    readNaturalDigits :: NonEmpty Digit -> Natural
     readNaturalDigits = List.foldl' (\total x -> (10 * total) + fromIntegral (fromEnum x)) 0
 
 {- |
@@ -163,7 +189,7 @@ readInteger = readIntegerCharList <=< toCharListMaybe
     readNonNegative :: [ASCII.Char] -> Maybe Integer
     readNonNegative = (Just . toInteger . readIntegerDigits) <=< nonEmpty <=< toDigitListMaybe
 
-    readIntegerDigits :: NonEmpty D10 -> Integer
+    readIntegerDigits :: NonEmpty Digit -> Integer
     readIntegerDigits = List.foldl' (\total x -> (10 * total) + fromIntegral (fromEnum x)) 0
 
 {- |
@@ -193,8 +219,8 @@ Examples:
 * @naturalDigitMaybe 12@ = @Nothing@
 
 -}
-naturalDigitMaybe :: Natural -> Maybe D10
-naturalDigitMaybe = D10.natD10Maybe
+naturalDigitMaybe :: Natural -> Maybe Digit
+naturalDigitMaybe n = if n > 9 then Nothing else Just (toEnum (fromIntegral n))
 
 {- |
 
@@ -204,14 +230,25 @@ Examples:
 * @integerDigitMaybe 12@ = @Nothing@
 
 -}
-integerDigitMaybe :: Integer -> Maybe D10
-integerDigitMaybe = D10.integerD10Maybe
+integerDigitMaybe :: Integer -> Maybe Digit
+integerDigitMaybe n = if (n < 0 || n > 9) then Nothing else Just (toEnum (fromInteger n))
 
-digitNatural :: D10 -> Natural
-digitNatural = D10.d10Nat
+digitNatural :: Digit -> Natural
+digitNatural = fromIntegral . fromEnum
 
-digitInteger :: D10 -> Integer
-digitInteger = D10.d10Integer
+digitInteger :: Digit -> Integer
+digitInteger = fromIntegral . fromEnum
+
+
+---  Lift instances  ---
+
+instance DigitSuperset char => Lift Digit char
+  where
+    lift = fromDigit
+
+instance DigitStringSuperset string => Lift [Digit] string
+  where
+    lift = fromDigitList
 
 
 ---  Classes  ---
@@ -219,15 +256,15 @@ digitInteger = D10.d10Integer
 class DigitSuperset char
   where
 
-    fromDigit :: D10 -> char
+    fromDigit :: Digit -> char
 
     isDigit :: char -> Bool
     isDigit = isJust . toDigitMaybe
 
-    toDigitUnsafe :: char -> D10
+    toDigitUnsafe :: char -> Digit
     toDigitUnsafe = fromJust . toDigitMaybe
 
-    toDigitMaybe :: char -> Maybe D10
+    toDigitMaybe :: char -> Maybe Digit
     toDigitMaybe x = if isDigit x then Just (toDigitUnsafe x) else Nothing
 
     {-# minimal fromDigit, ((isDigit, toDigitUnsafe) | toDigitMaybe) #-}
@@ -235,15 +272,15 @@ class DigitSuperset char
 class DigitStringSuperset string
   where
 
-    fromDigitList :: [D10] -> string
+    fromDigitList :: [Digit] -> string
 
     isDigitString :: string -> Bool
     isDigitString = isJust . toDigitListMaybe
 
-    toDigitListUnsafe :: string -> [D10]
+    toDigitListUnsafe :: string -> [Digit]
     toDigitListUnsafe = fromJust . toDigitListMaybe
 
-    toDigitListMaybe :: string -> Maybe [D10]
+    toDigitListMaybe :: string -> Maybe [Digit]
     toDigitListMaybe x = if isDigitString x then Just (toDigitListUnsafe x) else Nothing
 
     {-# minimal fromDigitList, ((isDigitString, toDigitListUnsafe) | toDigitListMaybe) #-}
@@ -251,7 +288,7 @@ class DigitStringSuperset string
 
 ---  DigitSuperset instances  ---
 
-instance DigitSuperset D10
+instance DigitSuperset Digit
   where
     isDigit _ = Bool.True
     fromDigit = id
@@ -277,15 +314,15 @@ instance DigitSuperset Word8
 
 instance DigitSuperset char => DigitSuperset (ASCII char)
   where
-    isDigit = isDigit . lift
+    isDigit = isDigit . ASCII.Refinement.lift
     fromDigit = asciiUnsafe . fromDigit
-    toDigitUnsafe = toDigitUnsafe . lift
-    toDigitMaybe = toDigitMaybe . lift
+    toDigitUnsafe = toDigitUnsafe . ASCII.Refinement.lift
+    toDigitMaybe = toDigitMaybe . ASCII.Refinement.lift
 
 
 ---  DigitStringSuperset instances  ---
 
-instance DigitStringSuperset [D10]
+instance DigitStringSuperset [Digit]
   where
     isDigitString _ = Bool.True
     fromDigitList = id
@@ -340,7 +377,7 @@ instance DigitStringSuperset BSB.Builder
 
 instance DigitStringSuperset char => DigitStringSuperset (ASCII char)
   where
-    isDigitString = isDigitString . lift
+    isDigitString = isDigitString . ASCII.Refinement.lift
     fromDigitList = asciiUnsafe . fromDigitList
-    toDigitListUnsafe = toDigitListUnsafe . lift
-    toDigitListMaybe = toDigitListMaybe . lift
+    toDigitListUnsafe = toDigitListUnsafe . ASCII.Refinement.lift
+    toDigitListMaybe = toDigitListMaybe . ASCII.Refinement.lift

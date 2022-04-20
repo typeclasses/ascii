@@ -4,6 +4,7 @@ import ASCII.Case (Case (..))
 import qualified ASCII.Char as ASCII
 import qualified ASCII.Decimal as Dec
 import qualified ASCII.Hexadecimal as Hex
+import qualified ASCII.Word4 as Word4
 
 import Control.Applicative (liftA2)
 import Control.Monad (Monad (..), when)
@@ -123,7 +124,7 @@ prop_showNaturalHex_10_to_ff = withTests 1 $ property $
 
 prop_toDigitListMaybe :: Property
 prop_toDigitListMaybe = withTests 1 $ property $
-    Dec.toDigitListMaybe ("846" :: T.Text) === Just [Dec.D8, Dec.D4, Dec.D6]
+    Dec.toDigitListMaybe ("846" :: T.Text) === Just [Dec.Digit8, Dec.Digit4, Dec.Digit6]
 
 prop_toDigitListMaybe_fail :: Property
 prop_toDigitListMaybe_fail = withTests 1 $ property $
@@ -227,7 +228,7 @@ prop_readIntegral_natural_minus4 = withTests 1 $ property $
 
 prop_naturalDigitMaybe_5 :: Property
 prop_naturalDigitMaybe_5 = withTests 1 $ property $
-    Dec.naturalDigitMaybe 5 === Just Dec.D5
+    Dec.naturalDigitMaybe 5 === Just Dec.Digit5
 
 prop_naturalDigitMaybe_12 :: Property
 prop_naturalDigitMaybe_12 = withTests 1 $ property $
@@ -235,7 +236,7 @@ prop_naturalDigitMaybe_12 = withTests 1 $ property $
 
 prop_integerDigitMaybe_5 :: Property
 prop_integerDigitMaybe_5 = withTests 1 $ property $
-    Dec.integerDigitMaybe 5 === Just Dec.D5
+    Dec.integerDigitMaybe 5 === Just Dec.Digit5
 
 prop_integerDigitMaybe_12 :: Property
 prop_integerDigitMaybe_12 = withTests 1 $ property $
@@ -251,10 +252,10 @@ checkEnumBounded xs =
 prop_D16_enumBounded :: Property
 prop_D16_enumBounded = withTests 1 $ property $
     checkEnumBounded
-      [ Hex.D0, Hex.D1, Hex.D2, Hex.D3
-      , Hex.D4, Hex.D5, Hex.D6, Hex.D7
-      , Hex.D8, Hex.D9, Hex.D10, Hex.D11
-      , Hex.D12, Hex.D13, Hex.D14, Hex.D15
+      [ Word4.Number0, Word4.Number1, Word4.Number2, Word4.Number3
+      , Word4.Number4, Word4.Number5, Word4.Number6, Word4.Number7
+      , Word4.Number8, Word4.Number9, Word4.Number10, Word4.Number11
+      , Word4.Number12, Word4.Number13, Word4.Number14, Word4.Number15
       ]
 
 prop_HexLetter_enumBounded :: Property
@@ -278,16 +279,16 @@ prop_HexChar_enumBounded = withTests 1 $ property $
 prop_HexCharBreakdown_enumBounded :: Property
 prop_HexCharBreakdown_enumBounded = withTests 1 $ property $
     checkEnumBounded
-      [ Hex.HexDigit Dec.D0
-      , Hex.HexDigit Dec.D1
-      , Hex.HexDigit Dec.D2
-      , Hex.HexDigit Dec.D3
-      , Hex.HexDigit Dec.D4
-      , Hex.HexDigit Dec.D5
-      , Hex.HexDigit Dec.D6
-      , Hex.HexDigit Dec.D7
-      , Hex.HexDigit Dec.D8
-      , Hex.HexDigit Dec.D9
+      [ Hex.HexDigit Dec.Digit0
+      , Hex.HexDigit Dec.Digit1
+      , Hex.HexDigit Dec.Digit2
+      , Hex.HexDigit Dec.Digit3
+      , Hex.HexDigit Dec.Digit4
+      , Hex.HexDigit Dec.Digit5
+      , Hex.HexDigit Dec.Digit6
+      , Hex.HexDigit Dec.Digit7
+      , Hex.HexDigit Dec.Digit8
+      , Hex.HexDigit Dec.Digit9
       , Hex.HexLetter UpperCase Hex.LetterA
       , Hex.HexLetter UpperCase Hex.LetterB
       , Hex.HexLetter UpperCase Hex.LetterC
@@ -313,12 +314,12 @@ functionEq xs f g =
 prop_hexLetterD16 :: Property
 prop_hexLetterD16 = withTests 1 $ property $
     functionEq every Hex.hexLetterD16 $ \case
-        Hex.LetterA -> Hex.D10
-        Hex.LetterB -> Hex.D11
-        Hex.LetterC -> Hex.D12
-        Hex.LetterD -> Hex.D13
-        Hex.LetterE -> Hex.D14
-        Hex.LetterF -> Hex.D15
+        Hex.LetterA -> Word4.Number10
+        Hex.LetterB -> Word4.Number11
+        Hex.LetterC -> Word4.Number12
+        Hex.LetterD -> Word4.Number13
+        Hex.LetterE -> Word4.Number14
+        Hex.LetterF -> Word4.Number15
 
 prop_d16HexLetter :: Property
 prop_d16HexLetter = withTests 1 $ property $
@@ -392,68 +393,68 @@ prop_asciiCharHex = withTests 1 $ property $
 prop_d16HexChar :: Property
 prop_d16HexChar = withTests 1 $ property $
     functionEq (liftA2 (,) every every) (uncurry Hex.d16HexChar) $ \case
-        (_, Hex.D0) -> Hex.Digit0
-        (_, Hex.D1) -> Hex.Digit1
-        (_, Hex.D2) -> Hex.Digit2
-        (_, Hex.D3) -> Hex.Digit3
-        (_, Hex.D4) -> Hex.Digit4
-        (_, Hex.D5) -> Hex.Digit5
-        (_, Hex.D6) -> Hex.Digit6
-        (_, Hex.D7) -> Hex.Digit7
-        (_, Hex.D8) -> Hex.Digit8
-        (_, Hex.D9) -> Hex.Digit9
-        (UpperCase, Hex.D10) -> Hex.CapitalLetterA
-        (UpperCase, Hex.D11) -> Hex.CapitalLetterB
-        (UpperCase, Hex.D12) -> Hex.CapitalLetterC
-        (UpperCase, Hex.D13) -> Hex.CapitalLetterD
-        (UpperCase, Hex.D14) -> Hex.CapitalLetterE
-        (UpperCase, Hex.D15) -> Hex.CapitalLetterF
-        (LowerCase, Hex.D10) -> Hex.SmallLetterA
-        (LowerCase, Hex.D11) -> Hex.SmallLetterB
-        (LowerCase, Hex.D12) -> Hex.SmallLetterC
-        (LowerCase, Hex.D13) -> Hex.SmallLetterD
-        (LowerCase, Hex.D14) -> Hex.SmallLetterE
-        (LowerCase, Hex.D15) -> Hex.SmallLetterF
+        (_, Word4.Number0) -> Hex.Digit0
+        (_, Word4.Number1) -> Hex.Digit1
+        (_, Word4.Number2) -> Hex.Digit2
+        (_, Word4.Number3) -> Hex.Digit3
+        (_, Word4.Number4) -> Hex.Digit4
+        (_, Word4.Number5) -> Hex.Digit5
+        (_, Word4.Number6) -> Hex.Digit6
+        (_, Word4.Number7) -> Hex.Digit7
+        (_, Word4.Number8) -> Hex.Digit8
+        (_, Word4.Number9) -> Hex.Digit9
+        (UpperCase, Word4.Number10) -> Hex.CapitalLetterA
+        (UpperCase, Word4.Number11) -> Hex.CapitalLetterB
+        (UpperCase, Word4.Number12) -> Hex.CapitalLetterC
+        (UpperCase, Word4.Number13) -> Hex.CapitalLetterD
+        (UpperCase, Word4.Number14) -> Hex.CapitalLetterE
+        (UpperCase, Word4.Number15) -> Hex.CapitalLetterF
+        (LowerCase, Word4.Number10) -> Hex.SmallLetterA
+        (LowerCase, Word4.Number11) -> Hex.SmallLetterB
+        (LowerCase, Word4.Number12) -> Hex.SmallLetterC
+        (LowerCase, Word4.Number13) -> Hex.SmallLetterD
+        (LowerCase, Word4.Number14) -> Hex.SmallLetterE
+        (LowerCase, Word4.Number15) -> Hex.SmallLetterF
 
 prop_hexCharD16 :: Property
 prop_hexCharD16 = withTests 1 $ property $
     functionEq every Hex.hexCharD16 $ \case
-        Hex.Digit0 -> Hex.D0
-        Hex.Digit1 -> Hex.D1
-        Hex.Digit2 -> Hex.D2
-        Hex.Digit3 -> Hex.D3
-        Hex.Digit4 -> Hex.D4
-        Hex.Digit5 -> Hex.D5
-        Hex.Digit6 -> Hex.D6
-        Hex.Digit7 -> Hex.D7
-        Hex.Digit8 -> Hex.D8
-        Hex.Digit9 -> Hex.D9
-        Hex.CapitalLetterA -> Hex.D10
-        Hex.CapitalLetterB -> Hex.D11
-        Hex.CapitalLetterC -> Hex.D12
-        Hex.CapitalLetterD -> Hex.D13
-        Hex.CapitalLetterE -> Hex.D14
-        Hex.CapitalLetterF -> Hex.D15
-        Hex.SmallLetterA   -> Hex.D10
-        Hex.SmallLetterB   -> Hex.D11
-        Hex.SmallLetterC   -> Hex.D12
-        Hex.SmallLetterD   -> Hex.D13
-        Hex.SmallLetterE   -> Hex.D14
-        Hex.SmallLetterF   -> Hex.D15
+        Hex.Digit0 -> Word4.Number0
+        Hex.Digit1 -> Word4.Number1
+        Hex.Digit2 -> Word4.Number2
+        Hex.Digit3 -> Word4.Number3
+        Hex.Digit4 -> Word4.Number4
+        Hex.Digit5 -> Word4.Number5
+        Hex.Digit6 -> Word4.Number6
+        Hex.Digit7 -> Word4.Number7
+        Hex.Digit8 -> Word4.Number8
+        Hex.Digit9 -> Word4.Number9
+        Hex.CapitalLetterA -> Word4.Number10
+        Hex.CapitalLetterB -> Word4.Number11
+        Hex.CapitalLetterC -> Word4.Number12
+        Hex.CapitalLetterD -> Word4.Number13
+        Hex.CapitalLetterE -> Word4.Number14
+        Hex.CapitalLetterF -> Word4.Number15
+        Hex.SmallLetterA   -> Word4.Number10
+        Hex.SmallLetterB   -> Word4.Number11
+        Hex.SmallLetterC   -> Word4.Number12
+        Hex.SmallLetterD   -> Word4.Number13
+        Hex.SmallLetterE   -> Word4.Number14
+        Hex.SmallLetterF   -> Word4.Number15
 
 prop_breakDownHexChar :: Property
 prop_breakDownHexChar = withTests 1 $ property $
     functionEq every Hex.breakDownHexChar $ \case
-        Hex.Digit0 -> Hex.HexDigit Dec.D0
-        Hex.Digit1 -> Hex.HexDigit Dec.D1
-        Hex.Digit2 -> Hex.HexDigit Dec.D2
-        Hex.Digit3 -> Hex.HexDigit Dec.D3
-        Hex.Digit4 -> Hex.HexDigit Dec.D4
-        Hex.Digit5 -> Hex.HexDigit Dec.D5
-        Hex.Digit6 -> Hex.HexDigit Dec.D6
-        Hex.Digit7 -> Hex.HexDigit Dec.D7
-        Hex.Digit8 -> Hex.HexDigit Dec.D8
-        Hex.Digit9 -> Hex.HexDigit Dec.D9
+        Hex.Digit0 -> Hex.HexDigit Dec.Digit0
+        Hex.Digit1 -> Hex.HexDigit Dec.Digit1
+        Hex.Digit2 -> Hex.HexDigit Dec.Digit2
+        Hex.Digit3 -> Hex.HexDigit Dec.Digit3
+        Hex.Digit4 -> Hex.HexDigit Dec.Digit4
+        Hex.Digit5 -> Hex.HexDigit Dec.Digit5
+        Hex.Digit6 -> Hex.HexDigit Dec.Digit6
+        Hex.Digit7 -> Hex.HexDigit Dec.Digit7
+        Hex.Digit8 -> Hex.HexDigit Dec.Digit8
+        Hex.Digit9 -> Hex.HexDigit Dec.Digit9
         Hex.CapitalLetterA -> Hex.HexLetter UpperCase Hex.LetterA
         Hex.CapitalLetterB -> Hex.HexLetter UpperCase Hex.LetterB
         Hex.CapitalLetterC -> Hex.HexLetter UpperCase Hex.LetterC

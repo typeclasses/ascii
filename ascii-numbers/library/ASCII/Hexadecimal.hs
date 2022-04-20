@@ -5,7 +5,7 @@ module ASCII.Hexadecimal
     {- ** Integer  -} showInteger,  readInteger,
     {- ** Integral -} showIntegral, readIntegral,
 
-    {- * Various digit types -} D16 (..), HexChar (..), HexLetter (..), HexCharBreakdown (..),
+    {- * Various digit types -} HexChar (..), HexLetter (..), HexCharBreakdown (..),
 
     {- * Monomorphic character conversions -}
     {- ** HexLetter ↔ D16              -} hexLetterD16, d16HexLetter,
@@ -29,9 +29,12 @@ module ASCII.Hexadecimal
 import ASCII.Case (Case (..))
 import qualified ASCII.Char as ASCII
 import qualified ASCII.Decimal as Dec
+import ASCII.Lift (Lift (lift))
 import ASCII.Refinement (ASCII, asciiUnsafe, lift)
 import ASCII.Superset (StringSuperset, fromChar, fromCharList, toCharListMaybe,
                        toCharMaybe)
+import ASCII.Word4 (Word4)
+import qualified ASCII.Word4 as Word4
 
 import Control.Monad (guard, (<=<), (=<<))
 import Data.Bifoldable (bifoldMap)
@@ -71,27 +74,6 @@ import qualified Data.Text.Lazy.Builder as TB
 
 ---  Types  ---
 
--- | A whole number between /0/ and /15/
-data D16
-    = D0  -- ^ Zero
-    | D1  -- ^ One
-    | D2  -- ^ Two
-    | D3  -- ^ Three
-    | D4  -- ^ Four
-    | D5  -- ^ Five
-    | D6  -- ^ Six
-    | D7  -- ^ Seven
-    | D8  -- ^ Eight
-    | D9  -- ^ Nine
-    | D10 -- ^ Ten      (A)
-    | D11 -- ^ Eleven   (B)
-    | D12 -- ^ Twelve   (C)
-    | D13 -- ^ Thirteen (D)
-    | D14 -- ^ Fourteen (E)
-    | D15 -- ^ Fifteen  (F)
-    deriving stock (Bounded, Enum, Eq, Ord, Show, Data, Generic)
-    deriving anyclass Hashable
-
 -- | Letters used as hexadecimal digits above 9, without a notion of case.
 data HexLetter =
     LetterA -- ^ 10
@@ -119,7 +101,7 @@ data HexChar =
     deriving stock (Bounded, Enum, Eq, Ord, Show, Data, Generic)
     deriving anyclass Hashable
 
-data HexCharBreakdown = HexDigit Dec.D10 | HexLetter Case HexLetter
+data HexCharBreakdown = HexDigit Dec.Digit | HexLetter Case HexLetter
     deriving stock (Eq, Ord, Show, Data, Generic)
     deriving anyclass Hashable
 
@@ -152,17 +134,17 @@ assembleHexChar =
         HexLetter UpperCase x  ->  toEnum (fromEnum x + 10)
         HexLetter LowerCase x  ->  toEnum (fromEnum x + 16)
 
-d16HexChar :: Case -> D16 -> HexChar
+d16HexChar :: Case -> Word4 -> HexChar
 d16HexChar c =
     toEnum
     .
     case c of
         UpperCase -> fromEnum
         LowerCase -> \case
-            x | x <= D9  ->  fromEnum x
-            x            ->  fromEnum x + 6
+            x | x <= Word4.Number9  ->  fromEnum x
+            x                       ->  fromEnum x + 6
 
-hexCharD16 :: HexChar -> D16
+hexCharD16 :: HexChar -> Word4
 hexCharD16 =
     \case
         x | x < SmallLetterA  ->  toEnum (fromEnum x)
@@ -194,13 +176,13 @@ asciiCharHex =
 
         _ -> Nothing
 
-hexLetterD16 :: HexLetter -> D16
+hexLetterD16 :: HexLetter -> Word4
 hexLetterD16 = toEnum . (\x -> x + 10) . fromEnum
 
-d16HexLetter :: D16 -> Maybe HexLetter
+d16HexLetter :: Word4 -> Maybe HexLetter
 d16HexLetter x =
   do
-    guard (x >= D10)
+    guard (x >= Word4.Number10)
     Just (toEnum (fromEnum x - 10))
 
 letterHexChar :: Case -> HexLetter -> HexChar
@@ -277,30 +259,42 @@ hexCharInteger =
     .
     fromEnum
 
-naturalD16Maybe :: Natural -> Maybe D16
+naturalD16Maybe :: Natural -> Maybe Word4
 naturalD16Maybe =
     \case
         x | x <= 15  ->  Just (toEnum (fromIntegral x))
         _            ->  Nothing
 
-d16Natural :: D16 -> Natural
+d16Natural :: Word4 -> Natural
 d16Natural = fromIntegral . fromEnum
 
-integerD16Maybe :: Integer -> Maybe D16
+integerD16Maybe :: Integer -> Maybe Word4
 integerD16Maybe =
     \case
         x | x < 0    ->  Nothing
         x | x <= 15  ->  Just (toEnum (fromInteger x))
         _            ->  Nothing
 
-d16Integer :: D16 -> Integer
+d16Integer :: Word4 -> Integer
 d16Integer = toInteger . fromEnum
 
-naturalD16Unsafe :: Natural -> D16
+naturalD16Unsafe :: Natural -> Word4
 naturalD16Unsafe = toEnum . fromIntegral
 
-integerD16Unsafe :: Integer -> D16
+integerD16Unsafe :: Integer -> Word4
 integerD16Unsafe = toEnum . fromIntegral
+
+
+---  Lift instances  ---
+
+instance HexCharSuperset char => Lift HexChar char
+  where
+    lift = fromHexChar
+
+instance HexStringSuperset string => Lift [HexChar] string
+  where
+    lift = fromHexCharList
+
 
 
 ---  Classes  ---
@@ -355,7 +349,7 @@ showNatural =
         0 -> fromHexCharList [ Digit0 ]
         n -> fromHexCharList (fmap (d16HexChar c) (naturalList n))
   where
-    naturalList :: Natural -> [D16]
+    naturalList :: Natural -> [Word4]
     naturalList = DList.toList . r
       where
         r = \case
@@ -419,7 +413,7 @@ Examples:
 readNatural :: HexStringSuperset string => string -> Maybe Natural
 readNatural = (Just . readNaturalDigits) <=< nonEmpty <=< (Just . fmap hexCharD16) <=< toHexCharListMaybe
   where
-    readNaturalDigits :: NonEmpty D16 -> Natural
+    readNaturalDigits :: NonEmpty Word4 -> Natural
     readNaturalDigits = List.foldl' (\total x -> (16 * total) + d16Natural x) 0
 
 {- |
@@ -447,7 +441,7 @@ readInteger = readIntegerCharList <=< toCharListMaybe
     readNonNegative :: [ASCII.Char] -> Maybe Integer
     readNonNegative = (Just . toInteger . readIntegerDigits) <=< nonEmpty <=< (Just . fmap hexCharD16) <=< toHexCharListMaybe
 
-    readIntegerDigits :: NonEmpty D16 -> Integer
+    readIntegerDigits :: NonEmpty Word4 -> Integer
     readIntegerDigits = List.foldl' (\total x -> (16 * total) + d16Integer x) 0
 
 {- |
@@ -490,10 +484,10 @@ instance HexCharSuperset Word8
 
 instance HexCharSuperset char => HexCharSuperset (ASCII char)
   where
-    isHexChar = isHexChar . lift
+    isHexChar = isHexChar . ASCII.Refinement.lift
     fromHexChar = asciiUnsafe . fromHexChar
-    toHexCharUnsafe = toHexCharUnsafe . lift
-    toHexCharMaybe = toHexCharMaybe . lift
+    toHexCharUnsafe = toHexCharUnsafe . ASCII.Refinement.lift
+    toHexCharMaybe = toHexCharMaybe . ASCII.Refinement.lift
 
 
 ---  HexStringSuperset instances  ---
@@ -553,7 +547,7 @@ instance HexStringSuperset BSB.Builder
 
 instance HexStringSuperset char => HexStringSuperset (ASCII char)
   where
-    isHexString = isHexString . lift
+    isHexString = isHexString . ASCII.Refinement.lift
     fromHexCharList = asciiUnsafe . fromHexCharList
-    toHexCharListUnsafe = toHexCharListUnsafe . lift
-    toHexCharListMaybe = toHexCharListMaybe . lift
+    toHexCharListUnsafe = toHexCharListUnsafe . ASCII.Refinement.lift
+    toHexCharListMaybe = toHexCharListMaybe . ASCII.Refinement.lift

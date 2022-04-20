@@ -59,6 +59,7 @@ library
     reexported-modules:
         ASCII.Decimal
       , ASCII.Hexadecimal
+      , ASCII.Word4
 
     build-depends: ascii-predicates == 1.0.0.*
     reexported-modules:
