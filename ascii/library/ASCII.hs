@@ -31,8 +31,22 @@ module ASCII
     charToInt, intToCharMaybe, intToCharUnsafe,
     {- ** @ASCII.Char@ ↔ @Word8@ -} {- $word8Conversions -}
     charToWord8, word8ToCharMaybe, word8ToCharUnsafe,
-    {- ** @ASCII.Char@ ↔ @Char@ -} {- $unicodeCharConversions -}
+    {- ** @ASCII.Char@ ↔ Unicode @Char@ -} {- $unicodeCharConversions -}
     charToUnicode, unicodeToCharMaybe, unicodeToCharUnsafe,
+
+    {- * Monomorphic digit conversions -}
+    {- ** @Digit@ ↔ @Word8@ -} {- $digitWord8Conversions -}
+    digitToWord8, word8ToDigitMaybe, word8ToDigitUnsafe,
+    {- ** @Digit@ ↔ @ASCII.Char@ -} {- $digitCharConversions -}
+    digitToChar, charToDigitMaybe, charToDigitUnsafe,
+    {- ** @Digit@ ↔ Unicode @Char@ -} {- $digitUnicodeConversions -}
+    digitToUnicode, unicodeToDigitMaybe, unicodeToDigitUnsafe,
+    {- ** @HexChar@ ↔ @Word8@ -} {- $hexCharWord8Conversions -}
+    hexCharToWord8, word8ToHexCharMaybe, word8ToHexCharUnsafe,
+    {- ** @HexChar@ ↔ @ASCII.Char@ -} {- $hexCharCharConversions -}
+    hexCharToChar, charToHexCharMaybe, charToHexCharUnsafe,
+    {- ** @HexChar@ ↔ Unicode @Char@ -} {- $hexCharUnicodeConversions -}
+    hexCharToUnicode, unicodeToHexCharMaybe, unicodeToHexCharUnsafe,
 
     {- * Monomorphic string conversions -}
     {- ** @ASCII.Char@ ↔ @String@ -} {- $unicodeStringConversions -}
@@ -57,6 +71,7 @@ module ASCII
     {- * Refinement type -} {- $refinement -} ASCII,
 
     {- * Polymorphic conversions -}
+    {- ** Narrowing -} toAsciiCharMaybe, toDigitMaybe, toHexCharMaybe,
     {- ** Validate -} validateChar, validateString,
     {- ** Lift -} {- $lift -} lift,
     {- ** Convert -} {- $supersetConversions -}
@@ -287,6 +302,101 @@ unicodeToCharMaybe = ASCII.Superset.toCharMaybe
 
 unicodeToCharUnsafe :: Unicode.Char -> Char
 unicodeToCharUnsafe = ASCII.Superset.toCharUnsafe
+
+{- $digitWord8Conversions
+
+These functions convert between the ASCII 'Digit' type and ASCII digits in their byte encoding.
+
+These conversions do /not/ correspond to the numeric interpretations of 'Digit' and 'Word8'. For example, 'digitToWord8' 'ASCII.Decimal.Digit0' is 48, not 0.
+
+-}
+
+digitToWord8 :: Digit -> Word8
+digitToWord8 = ASCII.Decimal.fromDigit
+
+word8ToDigitMaybe :: Word8 -> Maybe Digit
+word8ToDigitMaybe = ASCII.Decimal.toDigitMaybe
+
+word8ToDigitUnsafe :: Word8 -> Digit
+word8ToDigitUnsafe = ASCII.Decimal.toDigitUnsafe
+
+{- $digitCharConversions
+
+These functions convert between the ASCII 'Digit' type and the ASCII 'Char' type.
+
+-}
+
+digitToChar :: Digit -> Char
+digitToChar = ASCII.Decimal.fromDigit
+
+charToDigitMaybe :: Char -> Maybe Digit
+charToDigitMaybe = ASCII.Decimal.toDigitMaybe
+
+charToDigitUnsafe :: Char -> Digit
+charToDigitUnsafe = ASCII.Decimal.toDigitUnsafe
+
+{- $digitUnicodeConversions
+
+These functions convert between the ASCII 'Digit' type and the Unicode 'Unicode.Char' type.
+
+-}
+
+digitToUnicode :: Digit -> Unicode.Char
+digitToUnicode = ASCII.Decimal.fromDigit
+
+unicodeToDigitMaybe :: Unicode.Char -> Maybe Digit
+unicodeToDigitMaybe = ASCII.Decimal.toDigitMaybe
+
+unicodeToDigitUnsafe :: Unicode.Char -> Digit
+unicodeToDigitUnsafe = ASCII.Decimal.toDigitUnsafe
+
+
+{- $hexCharWord8Conversions
+
+These functions convert between the ASCII 'HexChar' type and ASCII characters in their byte encoding.
+
+These conversions do /not/ correspond to the numeric interpretations of 'HexChar' and 'Word8'. For example, 'hexCharToWord8' 'ASCII.Hexadecimal.CapitalLetterA' is 65, not 10.
+
+-}
+
+hexCharToWord8 :: HexChar -> Word8
+hexCharToWord8 = ASCII.Hexadecimal.fromHexChar
+
+word8ToHexCharMaybe :: Word8 -> Maybe HexChar
+word8ToHexCharMaybe = ASCII.Hexadecimal.toHexCharMaybe
+
+word8ToHexCharUnsafe :: Word8 -> HexChar
+word8ToHexCharUnsafe = ASCII.Hexadecimal.toHexCharUnsafe
+
+{- $hexCharCharConversions
+
+These functions convert between the ASCII 'HexChar' type and the ASCII 'Char' type.
+
+-}
+
+hexCharToChar :: HexChar -> Char
+hexCharToChar = ASCII.Hexadecimal.fromHexChar
+
+charToHexCharMaybe :: Char -> Maybe HexChar
+charToHexCharMaybe = ASCII.Hexadecimal.toHexCharMaybe
+
+charToHexCharUnsafe :: Char -> HexChar
+charToHexCharUnsafe = ASCII.Hexadecimal.toHexCharUnsafe
+
+{- $hexCharUnicodeConversions
+
+These functions convert between the ASCII 'HexChar' type and the Unicode 'Unicode.Char' type.
+
+-}
+
+hexCharToUnicode :: HexChar -> Unicode.Char
+hexCharToUnicode = ASCII.Hexadecimal.fromHexChar
+
+unicodeToHexCharMaybe :: Unicode.Char -> Maybe HexChar
+unicodeToHexCharMaybe = ASCII.Hexadecimal.toHexCharMaybe
+
+unicodeToHexCharUnsafe :: Unicode.Char -> HexChar
+unicodeToHexCharUnsafe = ASCII.Hexadecimal.toHexCharUnsafe
 
 {- $unicodeStringConversions
 
@@ -718,3 +828,12 @@ A string containing a single hexadecimal digit character 0-9, A-F, or a-f.
 -}
 hexCharString :: HexStringSuperset string => HexChar -> string
 hexCharString x = ASCII.Hexadecimal.fromHexCharList [x]
+
+toAsciiCharMaybe :: CharSuperset char => char -> Maybe Char
+toAsciiCharMaybe = ASCII.Superset.toCharMaybe
+
+toDigitMaybe :: DigitSuperset char => char -> Maybe Digit
+toDigitMaybe = ASCII.Decimal.toDigitMaybe
+
+toHexCharMaybe :: HexCharSuperset char => char -> Maybe HexChar
+toHexCharMaybe = ASCII.Hexadecimal.toHexCharMaybe
