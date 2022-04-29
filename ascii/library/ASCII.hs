@@ -12,7 +12,7 @@ We do not elaborate on the semantics of the control characters here, because thi
 
 module ASCII
   (
-    {- * @Char@ -} {- $char -} Char,
+    {- * @Char@ -} {- $char -} Char, UnicodeChar,
 
     {- * Character classifications -}
     {- ** Print/control groups -} {- $groups -}
@@ -31,7 +31,7 @@ module ASCII
     charToInt, intToCharMaybe, intToCharUnsafe,
     {- ** @ASCII.Char@ ↔ @Word8@ -} {- $word8Conversions -}
     charToWord8, word8ToCharMaybe, word8ToCharUnsafe,
-    {- ** @ASCII.Char@ ↔ Unicode @Char@ -} {- $unicodeCharConversions -}
+    {- ** @ASCII.Char@ ↔ @UnicodeChar@ -} {- $unicodeCharConversions -}
     charToUnicode, unicodeToCharMaybe, unicodeToCharUnsafe,
 
     {- * Monomorphic digit conversions -}
@@ -39,13 +39,13 @@ module ASCII
     digitToWord8, word8ToDigitMaybe, word8ToDigitUnsafe,
     {- ** @Digit@ ↔ @ASCII.Char@ -} {- $digitCharConversions -}
     digitToChar, charToDigitMaybe, charToDigitUnsafe,
-    {- ** @Digit@ ↔ Unicode @Char@ -} {- $digitUnicodeConversions -}
+    {- ** @Digit@ ↔ @UnicodeChar@ -} {- $digitUnicodeConversions -}
     digitToUnicode, unicodeToDigitMaybe, unicodeToDigitUnsafe,
     {- ** @HexChar@ ↔ @Word8@ -} {- $hexCharWord8Conversions -}
     hexCharToWord8, word8ToHexCharMaybe, word8ToHexCharUnsafe,
     {- ** @HexChar@ ↔ @ASCII.Char@ -} {- $hexCharCharConversions -}
     hexCharToChar, charToHexCharMaybe, charToHexCharUnsafe,
-    {- ** @HexChar@ ↔ Unicode @Char@ -} {- $hexCharUnicodeConversions -}
+    {- ** @HexChar@ ↔ @UnicodeChar@ -} {- $hexCharUnicodeConversions -}
     hexCharToUnicode, unicodeToHexCharMaybe, unicodeToHexCharUnsafe,
 
     {- * Monomorphic string conversions -}
@@ -137,6 +137,11 @@ import qualified Data.Text as Text
 See also: "ASCII.Char"
 
 -}
+
+-- | A character in the full range of Unicode
+--
+-- ASCII 'Char' is a subset of this type. Convert using 'charToUnicode' and 'unicodeToCharMaybe'.
+type UnicodeChar = Unicode.Char
 
 {- $groups
 
@@ -290,17 +295,17 @@ word8ToCharUnsafe = ASCII.Superset.toCharUnsafe
 
 {- $unicodeCharConversions
 
-These functions convert between the ASCII 'Char' type and the Unicode 'Unicode.Char' type.
+These functions convert between the ASCII 'Char' type and the 'UnicodeChar' type.
 
 -}
 
-charToUnicode :: Char -> Unicode.Char
+charToUnicode :: Char -> UnicodeChar
 charToUnicode = ASCII.Superset.fromChar
 
-unicodeToCharMaybe :: Unicode.Char -> Maybe Char
+unicodeToCharMaybe :: UnicodeChar -> Maybe Char
 unicodeToCharMaybe = ASCII.Superset.toCharMaybe
 
-unicodeToCharUnsafe :: Unicode.Char -> Char
+unicodeToCharUnsafe :: UnicodeChar -> Char
 unicodeToCharUnsafe = ASCII.Superset.toCharUnsafe
 
 {- $digitWord8Conversions
@@ -337,17 +342,17 @@ charToDigitUnsafe = ASCII.Decimal.toDigitUnsafe
 
 {- $digitUnicodeConversions
 
-These functions convert between the ASCII 'Digit' type and the Unicode 'Unicode.Char' type.
+These functions convert between the ASCII 'Digit' type and the 'UnicodeChar' type.
 
 -}
 
-digitToUnicode :: Digit -> Unicode.Char
+digitToUnicode :: Digit -> UnicodeChar
 digitToUnicode = ASCII.Decimal.fromDigit
 
-unicodeToDigitMaybe :: Unicode.Char -> Maybe Digit
+unicodeToDigitMaybe :: UnicodeChar -> Maybe Digit
 unicodeToDigitMaybe = ASCII.Decimal.toDigitMaybe
 
-unicodeToDigitUnsafe :: Unicode.Char -> Digit
+unicodeToDigitUnsafe :: UnicodeChar -> Digit
 unicodeToDigitUnsafe = ASCII.Decimal.toDigitUnsafe
 
 
@@ -385,17 +390,17 @@ charToHexCharUnsafe = ASCII.Hexadecimal.toHexCharUnsafe
 
 {- $hexCharUnicodeConversions
 
-These functions convert between the ASCII 'HexChar' type and the Unicode 'Unicode.Char' type.
+These functions convert between the ASCII 'HexChar' type and the 'UnicodeChar' type.
 
 -}
 
-hexCharToUnicode :: HexChar -> Unicode.Char
+hexCharToUnicode :: HexChar -> UnicodeChar
 hexCharToUnicode = ASCII.Hexadecimal.fromHexChar
 
-unicodeToHexCharMaybe :: Unicode.Char -> Maybe HexChar
+unicodeToHexCharMaybe :: UnicodeChar -> Maybe HexChar
 unicodeToHexCharMaybe = ASCII.Hexadecimal.toHexCharMaybe
 
-unicodeToHexCharUnsafe :: Unicode.Char -> HexChar
+unicodeToHexCharUnsafe :: UnicodeChar -> HexChar
 unicodeToHexCharUnsafe = ASCII.Hexadecimal.toHexCharUnsafe
 
 {- $unicodeStringConversions
