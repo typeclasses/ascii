@@ -4,7 +4,7 @@ module ASCII.Predicates
     {- * Case predicates -} isLower, isUpper,
     {- * Letter predicates -} isLetter, isAlpha,
     {- * Number predicates -} isDigit, isOctDigit, isHexDigit, isNumber,
-    {- * Miscellaneous predicates -} isSpace, isAlphaNum, isMark, isPunctuation, isSymbol, isSeparator
+    {- * Miscellaneous predicates -} isSpace, isAlphaNum, isMark, isPunctuation, isSymbol, isSeparator, isVisible,
     {- * Notes -} {- $notes -}
   )
   where
@@ -26,7 +26,7 @@ This function is analogous to 'Data.Char.isControl' in the "Data.Char" module.
 -}
 
 isControl :: Char -> Bool
-isControl x  =
+isControl x =
     case x of
         _ | (x < Char.Space) -> True
         Char.Delete          -> True
@@ -40,6 +40,19 @@ This function is analogous to 'Data.Char.isPrint' in the "Data.Char" module.
 
 isPrint :: Char -> Bool
 isPrint = Bool.not . isControl
+
+{- | Returns True for visible characters.
+
+This includes all print characters except 'Char.Space'.
+
+-}
+
+isVisible :: Char -> Bool
+isVisible x =
+    case x of
+        _ | x <= Char.Space -> False
+        Char.Delete         -> False
+        _                   -> True
 
 {- | Returns True for lower-case letters, from 'SmallLetterA' to 'SmallLetterZ'.
 

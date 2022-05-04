@@ -44,4 +44,7 @@ True
 >>> hexDigits == filter isHexDigit all
 True
 
+>>> visibleCharacters == filter isVisible all
+True
+
 -}

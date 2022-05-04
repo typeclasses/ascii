@@ -4,7 +4,8 @@ module ASCII.Lists
     {- ** Every character -} all,
     {- ** Group-related -} printableCharacters, controlCodes,
     {- ** Letter-related -} letters, capitalLetters, smallLetters,
-    {- ** Number-related -} digits, octDigits, hexDigits, numbers
+    {- ** Number-related -} digits, octDigits, hexDigits, numbers,
+    {- ** Other -} visibleCharacters,
     {- * Notes -} {- $notes -}
   )
   where
@@ -22,6 +23,11 @@ all = enumFromTo minBound maxBound
 
 printableCharacters :: [Char]
 printableCharacters = enumFromTo Space Tilde
+
+-- | Characters drawable with ink on a page: 'ExclamationMark', 'QuotationMark', 'NumberSign', 'DollarSign', 'PercentSign', 'Ampersand', 'Apostrophe', 'LeftParenthesis', 'RightParenthesis', 'Asterisk', 'PlusSign', 'Comma', 'HyphenMinus', 'FullStop', 'Slash', 'Digit0', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Colon', 'Semicolon', 'LessThanSign', 'EqualsSign', 'GreaterThanSign', 'QuestionMark', 'AtSign', 'CapitalLetterA', 'CapitalLetterB', 'CapitalLetterC', 'CapitalLetterD', 'CapitalLetterE', 'CapitalLetterF', 'CapitalLetterG', 'CapitalLetterH', 'CapitalLetterI', 'CapitalLetterJ', 'CapitalLetterK', 'CapitalLetterL', 'CapitalLetterM', 'CapitalLetterN', 'CapitalLetterO', 'CapitalLetterP', 'CapitalLetterQ', 'CapitalLetterR', 'CapitalLetterS', 'CapitalLetterT', 'CapitalLetterU', 'CapitalLetterV', 'CapitalLetterW', 'CapitalLetterX', 'CapitalLetterY', 'CapitalLetterZ', 'LeftSquareBracket', 'Backslash', 'RightSquareBracket', 'Caret', 'Underscore', 'GraveAccent', 'SmallLetterA', 'SmallLetterB', 'SmallLetterC', 'SmallLetterD', 'SmallLetterE', 'SmallLetterF', 'SmallLetterG', 'SmallLetterH', 'SmallLetterI', 'SmallLetterJ', 'SmallLetterK', 'SmallLetterL', 'SmallLetterM', 'SmallLetterN', 'SmallLetterO', 'SmallLetterP', 'SmallLetterQ', 'SmallLetterR', 'SmallLetterS', 'SmallLetterT', 'SmallLetterU', 'SmallLetterV', 'SmallLetterW', 'SmallLetterX', 'SmallLetterY', 'SmallLetterZ', 'LeftCurlyBracket', 'VerticalLine', 'RightCurlyBracket', 'Tilde'.
+
+visibleCharacters :: [Char]
+visibleCharacters = enumFromTo ExclamationMark Tilde
 
 -- | Characters in the 'Control' group: 'Null', 'StartOfHeading', 'StartOfText', 'EndOfText', 'EndOfTransmission', 'Enquiry', 'Acknowledgement', 'Bell', 'Backspace', 'HorizontalTab', 'LineFeed', 'VerticalTab', 'FormFeed', 'CarriageReturn', 'ShiftOut', 'ShiftIn', 'DataLinkEscape', 'DeviceControl1', 'DeviceControl2', 'DeviceControl3', 'DeviceControl4', 'NegativeAcknowledgement', 'SynchronousIdle', 'EndOfTransmissionBlock', 'Cancel', 'EndOfMedium', 'Substitute', 'Escape', 'FileSeparator', 'GroupSeparator', 'RecordSeparator', 'UnitSeparator', 'Delete'.
 

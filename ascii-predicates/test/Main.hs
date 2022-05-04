@@ -23,16 +23,20 @@ main = checkParallel $$(discover) >>= \ok -> when (not ok) exitFailure
 
 ---
 
+-- This test ensures that all of the lists give characters in ascending order.
+
 lists :: [[ASCII.Char.Char]]
 lists = [ all, printableCharacters, controlCodes, letters,
           capitalLetters, smallLetters, digits, octDigits,
-          hexDigits, numbers ]
+          hexDigits, numbers, visibleCharacters ]
 
 prop_lists_are_sorted :: Property
 prop_lists_are_sorted = withTests 1 $ property $
     assert $ List.all (\xs -> List.sort xs == xs) lists
 
 ---
+
+-- These tests check that the predicates in our package that have corresponding functions in `base` behave the same as their counterparts.
 
 eq :: (MonadTest m, Eq a) => (ASCII.Char.Char -> a) -> (Char.Char -> a) -> m ()
 eq f g = assert $ List.all (\x -> f x == g (convert x)) ASCII.Char.allCharacters
@@ -105,6 +109,8 @@ prop_eq_separator = withTests 1 $ property $
 
 ---
 
+-- These tests ensure that the predicates are coherent with the lists.
+
 prop_list_control :: Property
 prop_list_control = withTests 1 $ property $
     controlCodes === filter isControl all
@@ -140,3 +146,7 @@ prop_list_oct = withTests 1 $ property $
 prop_list_hex :: Property
 prop_list_hex = withTests 1 $ property $
     hexDigits === filter isHexDigit all
+
+prop_list_visible :: Property
+prop_list_visible = withTests 1 $ property $
+    visibleCharacters === filter isVisible all
