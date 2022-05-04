@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: ascii
-version: 1.2.2.0
+version: 1.2.3.0
 synopsis: The ASCII character set and encoding
 category: Data, Text
 
@@ -61,7 +61,7 @@ library
       , ASCII.Hexadecimal
       , ASCII.Word4
 
-    build-depends: ascii-predicates == 1.0.0.*
+    build-depends: ascii-predicates == 1.0.1.*
     reexported-modules:
         ASCII.Predicates
       , ASCII.Lists

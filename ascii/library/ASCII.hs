@@ -24,7 +24,7 @@ module ASCII
     {- ** Decimal digits -} {- $digit -} isDigit, Digit,
     {- ** Hexadecimal digits -} {- $hexchar -} isHexDigit, HexChar,
     {- ** Octal digits -} isOctDigit,
-    {- ** Spaces and symbols   -} isSpace, isPunctuation, isSymbol,
+    {- ** Spaces and symbols   -} isSpace, isPunctuation, isSymbol, isVisible,
 
     {- * Monomorphic character conversions -} {- $monomorphicConversions -}
     {- ** @ASCII.Char@ ↔ @Int@ -} {- $intConversions -}
@@ -629,6 +629,15 @@ isPunctuation x = any ASCII.Predicates.isPunctuation (convertCharMaybe x)
 
 isSymbol :: CharSuperset char => char -> Bool
 isSymbol x = any ASCII.Predicates.isSymbol (convertCharMaybe x)
+
+{- | Returns True for visible characters.
+
+This includes all print characters except 'ASCII.Char.Space'.
+
+-}
+
+isVisible :: CharSuperset char => char -> Bool
+isVisible x = any ASCII.Predicates.isVisible (convertCharMaybe x)
 
 {- $numbers
 
