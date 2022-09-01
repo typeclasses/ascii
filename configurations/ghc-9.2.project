@@ -11,5 +11,5 @@ packages:
 constraints:
     base == 4.16.*
   , hashable == 1.4.*
-  , hedgehog == 1.1.*
+  , hedgehog == 1.2.*
   , template-haskell == 2.18.*
