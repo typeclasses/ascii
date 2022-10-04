@@ -2,7 +2,7 @@ cabal-version: 3.0
 
 name: ascii-superset
 version: 1.0.1.13
-x-revision: 1
+x-revision: 2
 synopsis: Representing ASCII with refined supersets
 category: Data, Text
 
