@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: ascii-th
-version: 1.0.0.11
+version: 1.0.0.10
 x-revision: 1
 synopsis: Template Haskell support for ASCII
 category: Data, Text
