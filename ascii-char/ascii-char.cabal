@@ -2,6 +2,7 @@ cabal-version: 3.0
 
 name: ascii-char
 version: 1.0.0.15
+x-revision: 1
 synopsis: A Char type representing an ASCII character
 category: Data, Text
 
