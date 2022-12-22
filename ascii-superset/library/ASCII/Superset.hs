@@ -39,10 +39,13 @@ import qualified Prelude
 class CharSuperset char
   where
 
+    -- | Is the character an ASCII character?
     isAsciiChar :: char -> Bool
 
+    -- | Lift an ASCII character into the superset
     fromChar :: ASCII.Char -> char
 
+    -- | Defined only where 'isAsciiChar' is 'True'
     toCharUnsafe :: char -> ASCII.Char
 
 asCharUnsafe :: CharSuperset char => (ASCII.Char -> ASCII.Char) -> char -> char
