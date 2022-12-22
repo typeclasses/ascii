@@ -48,20 +48,25 @@ library
     hs-source-dirs: library
 
     default-extensions:
+        DataKinds
         DeriveDataTypeable
         DeriveGeneric
         DerivingStrategies
         GeneralizedNewtypeDeriving
+        KindSignatures
         StandaloneDeriving
 
     build-depends:
-        bytestring ^>= 0.10 || ^>= 0.11
+        ascii-case ^>= 1.0
+      , ascii-caseless ^>= 1.0
+      , bytestring ^>= 0.10 || ^>= 0.11
       , hashable >= 1.3 && < 1.5
 
     exposed-modules:
         ASCII.Superset
       , ASCII.Isomorphism
       , ASCII.Refinement
+      , ASCII.CaseRefinement
       , ASCII.Lift
 
 test-suite test-ascii-superset
