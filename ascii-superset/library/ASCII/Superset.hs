@@ -48,18 +48,23 @@ class CharSuperset char
     -- | Defined only where 'isAsciiChar' is 'True'
     toCharUnsafe :: char -> ASCII.Char
 
+-- | Manipulate a character under an unchecked assumption that it is an ASCII character; undefined if it is not
 asCharUnsafe :: CharSuperset char => (ASCII.Char -> ASCII.Char) -> char -> char
 asCharUnsafe f = fromChar . f . toCharUnsafe
 
+-- | Convert a character to the ASCII character type, or return 'Nothing' if this is not possible
 toCharMaybe :: CharSuperset char => char -> Maybe ASCII.Char
 toCharMaybe = toCharOrFail
 
+-- | Convert a character to an ASCII character if possible, or 'fail' otherwise
 toCharOrFail :: (CharSuperset char, MonadFail context) => char -> context ASCII.Char
 toCharOrFail x = if isAsciiChar x then return (toCharUnsafe x) else fail "Not an ASCII character"
 
+-- | Convert a character to an ASCII character if possible, or return 'ASCII.Substitute' otherwise
 toCharSub :: CharSuperset char => char -> ASCII.Char
 toCharSub x = if isAsciiChar x then toCharUnsafe x else ASCII.Substitute
 
+-- | Return the argument if it is an ASCII character; if not, return 'ASCII.Substitute' instead
 substituteChar :: CharSuperset char => char -> char
 substituteChar x = if isAsciiChar x then x else fromChar ASCII.Substitute
 
@@ -77,22 +82,30 @@ convertCharOrFail = fmap fromChar . toCharOrFail
 class StringSuperset string
   where
 
+    -- | Does the string consist entirely of ASCII characters?
     isAsciiString :: string -> Bool
 
+    -- | Lift a list of ASCII characters into the superset
     fromCharList :: [ASCII.Char] -> string
 
+    -- | Defined only where 'isAsciiString' is 'True'
     toCharListUnsafe :: string -> [ASCII.Char]
 
+    -- | Convert a possibly non-ASCII string to a list of ASCII characters, using 'ASCII.Substitute' to stand in as the representation for each non-ASCII character
     toCharListSub :: string -> [ASCII.Char]
 
+    -- | Replace each non-ASCII character with 'ASCII.Substitute'
     substituteString :: string -> string
 
+    -- | Map over each character in the string; defined only where 'isAsciiString' is 'True'
     mapCharsUnsafe :: (ASCII.Char -> ASCII.Char) -> string -> string
     mapCharsUnsafe f = fromCharList  . List.map f . toCharListUnsafe
 
+-- | Convert a string to a list of ASCII characters, or return 'Nothing' if the string contains any non-ASCII characters
 toCharListMaybe :: StringSuperset string => string -> Maybe [ASCII.Char]
 toCharListMaybe = toCharListOrFail
 
+-- | Convert a string to a list of ASCII characters, or 'fail' if the string contains an non-ASCII characters
 toCharListOrFail :: (StringSuperset string, MonadFail context) => string -> context [ASCII.Char]
 toCharListOrFail x = if isAsciiString x then return (toCharListUnsafe x) else fail "String contains non-ASCII characters"
 
