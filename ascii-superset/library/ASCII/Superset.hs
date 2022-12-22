@@ -36,6 +36,7 @@ import qualified Prelude
 
 ---  Char  ---
 
+-- | Class for character types that can represent every ASCII character and potentially more
 class CharSuperset char
   where
 
@@ -79,6 +80,7 @@ convertCharOrFail = fmap fromChar . toCharOrFail
 
 ---  String  ---
 
+-- | Class for string types whose character set includes every ASCII character and potentially more
 class StringSuperset string
   where
 
