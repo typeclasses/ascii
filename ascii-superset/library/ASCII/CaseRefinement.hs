@@ -109,8 +109,9 @@ type ASCII'lower superset = ASCII'case 'LowerCase superset
 
 ---
 
-class KnownCase (letterCase :: Case) where
-    theCase :: Case
+class KnownCase (letterCase :: Case) where theCase :: Case
+instance KnownCase 'UpperCase where theCase = UpperCase
+instance KnownCase 'LowerCase where theCase = LowerCase
 
 oppositeCase :: Case -> Case
 oppositeCase UpperCase = LowerCase
