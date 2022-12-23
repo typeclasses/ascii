@@ -75,14 +75,15 @@ library
 test-suite test-ascii-superset
     import: base
     type: exitcode-stdio-1.0
+    ghc-options: -threaded -rtsopts -with-rtsopts=-N
     hs-source-dirs: test
     main-is: Main.hs
 
     default-extensions:
+        BlockArguments
+        FlexibleContexts
         OverloadedStrings
-        QuasiQuotes
-        TemplateHaskell
 
     build-depends:
         ascii-superset
-      , hedgehog ^>= 1.0.5 || ^>= 1.1 || ^>= 1.2
+      , sydtest ^>= 0.11 || ^>= 0.12 || ^>= 0.13

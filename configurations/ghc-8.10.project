@@ -14,5 +14,6 @@ constraints:
   , bytestring == 0.10.*
   , hashable == 1.3.*
   , hedgehog == 1.0.5
+  , sydtest == 0.11.0.0
   , template-haskell == 2.16.*
   , text == 1.2.4.1

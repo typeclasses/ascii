@@ -1,5 +1,7 @@
 module Main (main) where
 
+import Test.Syd
+
 import ASCII.Refinement (ASCII, asciiUnsafe)
 
 import qualified ASCII.Lift as Lift
@@ -7,51 +9,47 @@ import qualified ASCII.Refinement as Refinement
 
 import ASCII.Char (Char (..))
 
-import Control.Monad (Monad (..), when)
-import Data.Bool (not)
-import Data.Function (($))
-import Data.Int (Int)
-import Data.List (map)
-import Data.Maybe (Maybe (..))
-import Data.String (String)
 import Data.Text (Text)
 import Data.Word (Word8)
-import System.Exit (exitFailure)
-import System.IO (IO)
-
-import Hedgehog (Property, checkParallel, discover, property, withTests, (===))
+import Prelude
 
 main :: IO ()
-main = checkParallel $$(discover) >>= \ok -> when (not ok) exitFailure
+main = sydTest do
 
-prop_lift_letter :: Property
-prop_lift_letter = withTests 1 $ property $
-    (Lift.lift CapitalLetterA :: Word8) === 65
+    describe "lift" do
 
-prop_lift_list :: Property
-prop_lift_list = withTests 1 $ property $
-    (Lift.lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text) === "Hi!"
+        it "letter" do
+            let f x = Lift.lift x :: Word8
+            f CapitalLetterA `shouldBe` 65
 
-prop_validate_char :: Property
-prop_validate_char = withTests 1 $ property $
-    (map Refinement.validateChar [-1, 65, 97, 128] :: [Maybe (ASCII Int)]) === [Nothing, Just (asciiUnsafe 65), Just (asciiUnsafe 97), Nothing]
+        it "list" do
+            let f x = Lift.lift x :: Text
+            f [CapitalLetterH,SmallLetterI,ExclamationMark] `shouldBe` "Hi!"
 
-prop_from_char_list :: Property
-prop_from_char_list = withTests 1 $ property $
-    (Refinement.fromCharList [CapitalLetterH,SmallLetterI,ExclamationMark] :: ASCII Text) === asciiUnsafe "Hi!"
+    describe "refinement" do
 
-prop_to_char_list :: Property
-prop_to_char_list = withTests 1 $ property $
-    Refinement.toCharList (Refinement.substituteString "Piñata" :: ASCII Text) === [CapitalLetterP, SmallLetterI, Substitute, SmallLetterA, SmallLetterT, SmallLetterA]
+        it "validateChar" do
+            let f x = Refinement.validateChar x :: Maybe (ASCII Int)
+            f (-1) `shouldBe` Nothing
+            f 65 `shouldBe` Just (asciiUnsafe 65)
+            f 97 `shouldBe` Just (asciiUnsafe 97)
+            f 128 `shouldBe` Nothing
 
-prop_substitute_string :: Property
-prop_substitute_string = withTests 1 $ property $
-    (Refinement.substituteString "Cristóbal" :: ASCII Text) === asciiUnsafe "Crist\SUBbal"
+        it "fromCharList" do
+            let f x = Refinement.fromCharList x :: ASCII Text
+            f [CapitalLetterH,SmallLetterI,ExclamationMark] `shouldBe` asciiUnsafe "Hi!"
 
-prop_validate_text :: Property
-prop_validate_text = withTests 1 $ property $
-    (map Refinement.validateString ["Hello", "Cristóbal"] :: [Maybe (ASCII Text)]) === [Just (asciiUnsafe "Hello"), Nothing]
+        it "toCharList" do
+            let f x = Refinement.toCharList
+                          (Refinement.substituteString x :: ASCII Text)
+            f "Piñata" `shouldBe` [CapitalLetterP, SmallLetterI, Substitute,
+                                   SmallLetterA, SmallLetterT, SmallLetterA]
 
-prop_validate_string :: Property
-prop_validate_string = withTests 1 $ property $
-    (map Refinement.validateString ["Hello", "Cristóbal"] :: [Maybe (ASCII String)]) === [Just (asciiUnsafe "Hello"), Nothing]
+        it "substituteString" do
+            let f x = Refinement.substituteString x :: ASCII Text
+            f "Cristóbal" `shouldBe` asciiUnsafe "Crist\SUBbal"
+
+        it "validateString" do
+            let f x = Refinement.validateString x :: Maybe (ASCII Text)
+            f "Hello" `shouldBe` Just (asciiUnsafe "Hello")
+            f "Cristóbal" `shouldBe` Nothing
