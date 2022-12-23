@@ -5,9 +5,10 @@ import ASCII.Case (Case (..))
 
 import Control.Applicative (Applicative (..))
 import Control.Monad (Monad (..))
-import Data.Bool (Bool (..), (&&))
+import Data.Bool (Bool (..), (&&), (||))
 import Data.Eq (Eq ((==)))
-import Data.Function (($), (.))
+import Data.Foldable (all)
+import Data.Function (($), (.), (&), flip)
 import Data.Functor (Functor (..))
 import Data.List (intercalate, length, map, null)
 import Data.Semigroup ((<>))
@@ -16,6 +17,7 @@ import System.Exit (die)
 import System.IO (IO, putStrLn)
 import Text.Show (show)
 
+import qualified ASCII.Case as Case
 import qualified ASCII.Char as CaseSensitive
 import qualified ASCII.Caseless as Caseless
 
@@ -25,6 +27,18 @@ main = dieIfFailures $ do
     test 2 testDisregardCase
     test 3 testToUpper
     test 4 testToLower
+    test 5 testAssumeCaseUnsafe
+
+testAssumeCaseUnsafe :: Bool
+testAssumeCaseUnsafe =
+    [UpperCase, LowerCase] & flip all $ \letterCase ->
+        CaseSensitive.allCharacters & flip all $ \x ->
+            Case.isCase (oppositeCase letterCase) x  -- (assumeCaseUnsafe letterCase x) is not defined
+            || Caseless.assumeCaseUnsafe letterCase x == Caseless.disregardCase x
+
+oppositeCase :: Case -> Case
+oppositeCase UpperCase = LowerCase
+oppositeCase LowerCase = UpperCase
 
 testDisregardCase :: Bool
 testDisregardCase =

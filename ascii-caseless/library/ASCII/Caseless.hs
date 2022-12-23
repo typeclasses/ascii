@@ -2,7 +2,7 @@ module ASCII.Caseless
   (
     {- * The @Char@ type -} CaselessChar (..),
     {- * Enumeration -} allCharacters,
-    {- * Conversion -} disregardCase, toCase,
+    {- * Conversion -} disregardCase, toCase, assumeCaseUnsafe,
   )
   where
 
@@ -79,6 +79,15 @@ disregardCase :: ASCII.Char -> CaselessChar
 disregardCase x
     | x <= ASCII.GraveAccent  = Enum.toEnum (Enum.fromEnum x)
     | x <= ASCII.SmallLetterZ = Enum.toEnum (Enum.fromEnum x - 32)
+    | Bool.otherwise          = Enum.toEnum (Enum.fromEnum x - 26)
+
+-- | Like 'disregardCase', but defined only where the character is either a letter in the given case or a non-letter
+--
+-- For upper case, this is slightly more efficient than 'disregardCase'.
+assumeCaseUnsafe :: Case -> ASCII.Char -> CaselessChar
+assumeCaseUnsafe LowerCase x = disregardCase x
+assumeCaseUnsafe UpperCase x
+    | x <= ASCII.GraveAccent  = Enum.toEnum (Enum.fromEnum x)
     | Bool.otherwise          = Enum.toEnum (Enum.fromEnum x - 26)
 
 toCase :: Case -> CaselessChar -> ASCII.Char
