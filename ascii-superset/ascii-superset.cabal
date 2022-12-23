@@ -48,13 +48,16 @@ library
     hs-source-dirs: library
 
     default-extensions:
+        AllowAmbiguousTypes
         DataKinds
         DeriveDataTypeable
         DeriveGeneric
         DerivingStrategies
         GeneralizedNewtypeDeriving
         KindSignatures
+        ScopedTypeVariables
         StandaloneDeriving
+        TypeApplications
 
     build-depends:
         ascii-case ^>= 1.0
