@@ -1,26 +1,3 @@
-
-
-
-
-
-
-
-
-
--- todo: tests for this module!
-
-
-
-
-
-
-
-
-
-
-
-
-
 module ASCII.CaseRefinement
   (
     {- * ASCII'case type constructor -} ASCII'case, lift, asciiCaseUnsafe,

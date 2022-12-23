@@ -2,7 +2,6 @@ module Main (main) where
 
 import ASCII.Refinement (ASCII, asciiUnsafe)
 
-import qualified ASCII.Lift as Lift
 import qualified ASCII.Refinement as Refinement
 
 import ASCII.Char (Char (..))
@@ -15,7 +14,6 @@ import Data.List (map)
 import Data.Maybe (Maybe (..))
 import Data.String (String)
 import Data.Text (Text)
-import Data.Word (Word8)
 import System.Exit (exitFailure)
 import System.IO (IO)
 
@@ -23,14 +21,6 @@ import Hedgehog (Property, checkParallel, discover, property, withTests, (===))
 
 main :: IO ()
 main = checkParallel $$(discover) >>= \ok -> when (not ok) exitFailure
-
-prop_lift_letter :: Property
-prop_lift_letter = withTests 1 $ property $
-    (Lift.lift CapitalLetterA :: Word8) === 65
-
-prop_lift_list :: Property
-prop_lift_list = withTests 1 $ property $
-    (Lift.lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text) === "Hi!"
 
 prop_validate_char :: Property
 prop_validate_char = withTests 1 $ property $

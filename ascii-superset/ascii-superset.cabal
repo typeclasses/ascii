@@ -42,6 +42,18 @@ common base
       , base >= 4.14 && < 4.18
       , text ^>= 1.2.4.1 || ^>= 2.0
 
+common test
+    import: base
+
+    default-extensions:
+        OverloadedStrings
+        QuasiQuotes
+        TemplateHaskell
+
+    build-depends:
+        ascii-superset
+      , hedgehog ^>= 1.0.5 || ^>= 1.1 || ^>= 1.2
+
 library
     import: base
     ghc-options: -fno-warn-unused-imports
@@ -72,17 +84,14 @@ library
       , ASCII.CaseRefinement
       , ASCII.Lift
 
-test-suite test-ascii-superset
-    import: base
+test-suite test-ascii-lift
+    import: test
     type: exitcode-stdio-1.0
-    hs-source-dirs: test
+    hs-source-dirs: test-ascii-lift
     main-is: Main.hs
 
-    default-extensions:
-        OverloadedStrings
-        QuasiQuotes
-        TemplateHaskell
-
-    build-depends:
-        ascii-superset
-      , hedgehog ^>= 1.0.5 || ^>= 1.1 || ^>= 1.2
+test-suite test-ascii-refinement
+    import: test
+    type: exitcode-stdio-1.0
+    hs-source-dirs: test-ascii-refinement
+    main-is: Main.hs
