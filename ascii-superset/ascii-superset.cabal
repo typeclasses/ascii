@@ -86,4 +86,4 @@ test-suite test-ascii-superset
 
     build-depends:
         ascii-superset
-      , sydtest ^>= 0.11 || ^>= 0.12 || ^>= 0.13
+      , hspec ^>= 2.10

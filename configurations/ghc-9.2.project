@@ -13,5 +13,4 @@ constraints:
     base == 4.16.*
   , hashable == 1.4.*
   , hedgehog == 1.2.*
-  , sydtest == 0.12.*
   , template-haskell == 2.18.*

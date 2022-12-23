@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Test.Syd
+import Test.Hspec
 
 import ASCII.Refinement (ASCII, asciiUnsafe)
 
@@ -14,7 +14,7 @@ import Data.Word (Word8)
 import Prelude
 
 main :: IO ()
-main = sydTest do
+main = hspec do
 
     describe "lift" do
 
