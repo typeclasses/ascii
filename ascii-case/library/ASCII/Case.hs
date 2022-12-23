@@ -4,7 +4,7 @@
 
 -}
 
-module ASCII.Case ( Case (..), letterCase, isCase, toCase ) where
+module ASCII.Case ( Case (..), letterCase, isCase, toCase, opposite ) where
 
 import ASCII.Char (Char (..))
 import Data.Bool (Bool, otherwise)

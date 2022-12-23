@@ -1,26 +1,3 @@
-
-
-
-
-
-
-
-
-
--- todo: tests for this module!
-
-
-
-
-
-
-
-
-
-
-
-
-
 module ASCII.CaseRefinement
   (
     {- * ASCII'case type constructor -} ASCII'case, lift, asciiCaseUnsafe,
@@ -113,10 +90,6 @@ class KnownCase (letterCase :: Case) where theCase :: Case
 instance KnownCase 'UpperCase where theCase = UpperCase
 instance KnownCase 'LowerCase where theCase = LowerCase
 
-oppositeCase :: Case -> Case
-oppositeCase UpperCase = LowerCase
-oppositeCase LowerCase = UpperCase
-
 ---
 
 -- | Return 'Just' an 'ASCII'case' character if the input is an ASCII character in the proper case, or 'Nothing' otherwise
@@ -124,7 +97,7 @@ validateChar :: forall letterCase superset. KnownCase letterCase => CharSuperset
     superset -> Maybe (ASCII'case letterCase superset)
 validateChar x = do
     c <- Superset.toCharMaybe x
-    guard (Bool.not (Case.isCase (oppositeCase (theCase @letterCase)) c))
+    guard (Bool.not (Case.isCase (Case.opposite (theCase @letterCase)) c))
     Just (asciiCaseUnsafe x)
 
 -- | Return an 'ASCII'case' character if the input is an ASCII character in the proper case, or 'ASCII.Substitute' otherwise
@@ -158,7 +131,7 @@ validateString :: forall letterCase superset. KnownCase letterCase => StringSupe
     superset -> Maybe (ASCII'case letterCase superset)
 validateString x = do
     s <- Superset.toCharListMaybe x
-    guard (Bool.not (any (Case.isCase (oppositeCase (theCase @letterCase))) s))
+    guard (Bool.not (any (Case.isCase (Case.opposite (theCase @letterCase))) s))
     Just (asciiCaseUnsafe x)
 
 -- | Lift a list of 'CaselessChar' into a superset string type, wrapped in the 'ASCII'case' refinement to save the evidence that all of the characters in the string are ASCII in a particular case.
@@ -175,7 +148,7 @@ substituteString :: forall letterCase superset. KnownCase letterCase => StringSu
     superset -> ASCII'case letterCase superset
 substituteString = asciiCaseUnsafe . Superset.fromCharList . List.map f . Superset.toCharListSub
   where
-    f x = if Case.isCase (oppositeCase (theCase @letterCase)) x
+    f x = if Case.isCase (Case.opposite (theCase @letterCase)) x
           then ASCII.Substitute
           else x
 

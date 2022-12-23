@@ -33,12 +33,8 @@ testAssumeCaseUnsafe :: Bool
 testAssumeCaseUnsafe =
     [UpperCase, LowerCase] & flip all $ \letterCase ->
         CaseSensitive.allCharacters & flip all $ \x ->
-            Case.isCase (oppositeCase letterCase) x  -- (assumeCaseUnsafe letterCase x) is not defined
+            Case.isCase (Case.opposite letterCase) x  -- (assumeCaseUnsafe letterCase x) is not defined
             || Caseless.assumeCaseUnsafe letterCase x == Caseless.disregardCase x
-
-oppositeCase :: Case -> Case
-oppositeCase UpperCase = LowerCase
-oppositeCase LowerCase = UpperCase
 
 testDisregardCase :: Bool
 testDisregardCase =
