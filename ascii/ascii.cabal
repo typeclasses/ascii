@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: ascii
-version: 1.2.5.0
+version: 1.2.6.0
 synopsis: The ASCII character set and encoding
 category: Data, Text
 
@@ -71,12 +71,13 @@ library
       , ASCII.Lists
       , ASCII.ListsAndPredicates
 
-    build-depends: ascii-superset == 1.0.1.*
+    build-depends: ascii-superset == 1.0.2.*
     reexported-modules:
-        ASCII.Superset
+        ASCII.CaseRefinement
       , ASCII.Isomorphism
-      , ASCII.Refinement
       , ASCII.Lift
+      , ASCII.Refinement
+      , ASCII.Superset
 
     build-depends: ascii-th == 1.0.0.*
     reexported-modules:

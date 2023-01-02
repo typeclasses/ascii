@@ -18,6 +18,7 @@ depOverrides = new: old: {
     ascii-caseless = new.callPackage ./nix/ascii-caseless-0.0.0.0.nix {};
     ascii-numbers = new.callPackage ./nix/ascii-numbers-1.1.0.1.nix {};
     ascii-predicates = new.callPackage ./nix/ascii-predicates-1.0.1.1.nix {};
+    ascii-superset = new.callPackage ./nix/ascii-superset-1.0.2.0.nix {};
 };
 
 ghc."8.10" = nixos-22-05.haskell.packages.ghc8107.override (old: {

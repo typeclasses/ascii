@@ -1,4 +1,8 @@
-### 1.2.5.0 (2022-01-02)
+### 1.2.6.0 (2023-01-02)
+
+Update `ascii-superset` to `1.0.2`. This adds the `ASCII.CaseRefinement` module.
+
+### 1.2.5.0 (2023-01-02)
 
 Add the `ASCII.Caseless` module (re-exported from the `ascii-caseless` package)
 
