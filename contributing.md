@@ -32,8 +32,6 @@ These packages are all included in the [Stackage](https://github.com/commercialh
 
 Little effort so far has been put into making the libraries fast, but submissions of benchmarks and performance improvements would be welcome.
 
-### Change log
+### Making changes
 
-For descriptions of changes between versions, see the [Releases](https://github.com/typeclasses/ascii/releases) page. Every package version published on Hackage has a corresponding git tag and GitHub release. Metadata revisions on Hackage may optionally have a corresponding git tag, if the change might be particularly interesting to users of the package (e.g. supporting a new compiler version).
-
-When making a change that should be mentioned in the release notes, add some mention of what changed in the `changes.md` file within the relevant package directory (create the file if it does not already exist). When publishing a release, delete the `changes.md` and use its contents as the release notes. In general, a package should be released as soon as it has something new that users might want.
+When making a change that should be mentioned in the release notes, add some mention of what changed in the `changelog.md` file within the relevant package directory (create the file if it does not already exist). In general, a package should be released as soon as it has something new that users might want.
