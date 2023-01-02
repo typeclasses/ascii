@@ -1,3 +1,11 @@
+### 1.2.5.0 (2022-01-02)
+
+Add the `ASCII.Caseless` module (re-exported from the `ascii-caseless` package)
+
+Additions to the `ASCII` module:
+
+* `CaselessChar`
+
 ### 1.2.4.1 (2022-12-30)
 
 Metadata changes only

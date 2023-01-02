@@ -12,7 +12,10 @@ We do not elaborate on the semantics of the control characters here, because thi
 
 module ASCII
   (
-    {- * @Char@ -} {- $char -} Char, UnicodeChar,
+    {- * @Char@ -}
+    {- ** ASCII -} {- $char -} Char,
+    {- ** Unicode -} UnicodeChar,
+    {- ** Case-insensitive -} {- $caselessChar -} CaselessChar,
 
     {- * Character classifications -}
     {- ** Print/control groups -} {- $groups -}
@@ -96,6 +99,7 @@ module ASCII
   where
 
 import ASCII.Case (Case (..))
+import ASCII.Caseless (CaselessChar)
 import ASCII.Char (Char)
 import ASCII.Decimal (Digit, DigitStringSuperset, DigitSuperset)
 import ASCII.Group (Group (..))
@@ -135,6 +139,12 @@ import qualified Data.Text as Text
 {- $char
 
 See also: "ASCII.Char"
+
+-}
+
+{- $caselessChar
+
+See also: "ASCII.Caseless"
 
 -}
 

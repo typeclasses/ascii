@@ -15,6 +15,7 @@ sourceOverrides = haskell.lib.packageSourceOverrides {
 
 depOverrides = new: old: {
     ascii-case = new.callPackage ./nix/ascii-case-1.0.1.0.nix {};
+    ascii-caseless = new.callPackage ./nix/ascii-caseless-0.0.0.0.nix {};
     ascii-numbers = new.callPackage ./nix/ascii-numbers-1.1.0.1.nix {};
     ascii-predicates = new.callPackage ./nix/ascii-predicates-1.0.1.1.nix {};
 };
