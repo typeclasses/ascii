@@ -11,8 +11,7 @@ Nowadays instead of ASCII we typically work with text using an encoding such as
 UTF-8 that can represent the entire Unicode character set, which includes over a
 hundred thousand characters and is not limited to the symbols of any particular
 writing system or culture. However, ASCII is still relevant to network
-protocols; for example, we can see it in the specification of [HTTP message
-headers][ietf].
+protocols; for example, we can see it in the specification of [HTTP].
 
 There is a convenient relationship between ASCII and Unicode: the ASCII
 characters are the first 128 characters of the much larger Unicode character
@@ -54,7 +53,7 @@ repositories.
     the `StringSuperset` class, including `[ASCII.Char]`, [`String`][string],
     [`ByteString`][bytestring], and [`Text`][text].
 
-  [ietf]: https://tools.ietf.org/html/rfc7230#section-1.2
+  [HTTP]: https://www.rfc-editor.org/rfc/rfc9110.html#name-syntax-notation
   [unicode]: https://www.unicode.org/charts/PDF/U0000.pdf
   [ascii]: https://hackage.haskell.org/package/ascii/docs/ASCII.html
   [char]: https://hackage.haskell.org/package/ascii-char/docs/ASCII-Char.html
