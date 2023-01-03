@@ -3,10 +3,8 @@
 }:
 mkDerivation {
   pname = "ascii-th";
-  version = "1.0.0.14";
-  sha256 = "300d9439b053304e1d9e5d287a2a25e83fceea62f35d16346ed7af93f9b1a072";
-  revision = "1";
-  editedCabalFile = "0ddljiw2mqp3ypz19kkly4xwqs4qsk6xi14n3qr8vnxxsv91rign";
+  version = "1.1.0.0";
+  sha256 = "983f8d95a36e83a33f15e96890ad78ccdd06a33858b2a33a686e80a3d6d52828";
   libraryHaskellDepends = [
     ascii-char ascii-superset base template-haskell
   ];
