@@ -1,3 +1,13 @@
+### 1.3.0.0 (2023-01-03)
+
+Update `ascii-superset` to `1.1.0`.
+
+This adds several classes to the `ASCII.Superset` module: `ToChar`, `FromChar`,
+`ToString`, `FromString`, `ToCaselessChar`, and `ToCaselessString`.
+
+This is a breaking change because these are superclasses of the existing
+`CharSuperset` and `StringSuperset` classes, and they take methods from them.
+
 ### 1.2.6.0 (2023-01-02)
 
 Update `ascii-superset` to `1.0.2`. This adds the `ASCII.CaseRefinement` module.
