@@ -6,6 +6,9 @@ Additions to the `ASCII` module: `disregardCase`, `ASCII'case`, `ASCII'upper`,
 Update `ascii-superset` to `1.2.0`. This adds `CharSuperset (toCaseChar)`,
 `StringSuperset (toCaseString)`, `refineCharToCase`, and `refineStringToCase`.
 
+The constraint on `toCaseChar` is relaxed from `CharIso` to `CharSuperset`.
+The constraint on `toCaseString` is relaxed from `StringIso` to `StringSuperset`.
+
 ### 1.3.1.0 (2023-01-03)
 
 Update `ascii-th` to `1.1.1`.

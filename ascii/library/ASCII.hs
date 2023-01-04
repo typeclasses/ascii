@@ -255,8 +255,8 @@ CapitalLetterA
 
 -}
 
-toCaseChar :: CharIso char => Case -> char -> char
-toCaseChar c = ASCII.Isomorphism.asChar (ASCII.Case.toCase c)
+toCaseChar :: CharSuperset char => Case -> char -> char
+toCaseChar = ASCII.Superset.toCaseChar
 
 {- | Maps each of the characters in a string to its upper/lower case equivalent.
 
@@ -268,8 +268,8 @@ asciiUnsafe "HEY!"
 
 -}
 
-toCaseString :: StringIso string => Case -> string -> string
-toCaseString c = ASCII.Isomorphism.mapChars (ASCII.Case.toCase c)
+toCaseString :: StringSuperset string => Case -> string -> string
+toCaseString = ASCII.Superset.toCaseString
 
 {-| Convert from ASCII character to caseless ASCII character, discarding the
 case if the character is a letter -}
