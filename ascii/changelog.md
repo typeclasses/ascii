@@ -1,6 +1,10 @@
-### 1.3.2.0
+### 1.4.0.0
 
-Add `disregardCase :: Char -> CaselessChar`
+Additions to the `ASCII` module: `disregardCase`, `ASCII'case`, `ASCII'upper`,
+`ASCII'lower`, `KnownCase (..)`, `refineCharToCase`, `refineStringToCase`
+
+Update `ascii-superset` to `1.2.0`. This adds `CharSuperset (toCaseChar)`,
+`StringSuperset (toCaseString)`, `refineCharToCase`, and `refineStringToCase`.
 
 ### 1.3.1.0 (2023-01-03)
 

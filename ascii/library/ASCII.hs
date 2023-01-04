@@ -37,7 +37,8 @@ module ASCII
     {- ** Print/control groups -} {- $groups -}
     Group (..), charGroup,  inGroup,
     {- ** Upper/lower case -} {- $case -}
-    Case (..), letterCase, isCase, toCaseChar, toCaseString, disregardCase,
+    Case (..), letterCase, isCase, toCaseChar, toCaseString,
+    disregardCase, refineCharToCase, refineStringToCase,
     {- ** Letters  -} isLetter,
     {- ** Letters and numbers  -} isAlphaNum,
     {- ** Decimal digits -} {- $digit -} isDigit, Digit,
@@ -87,7 +88,8 @@ module ASCII
     {- ** @Natural@ ↔ @[HexChar]@ -}
     showNaturalHexChars, readNaturalHexChars,
 
-    {- * Refinement type -} {- $refinement -} ASCII,
+    {- * Refinement types -} {- $refinement -} ASCII,
+    ASCII'case, ASCII'upper, ASCII'lower, KnownCase (..),
 
     {- * Polymorphic conversions -}
     {- ** Narrowing -} toAsciiCharMaybe, toDigitMaybe, toHexCharMaybe,
@@ -115,6 +117,7 @@ module ASCII
   where
 
 import ASCII.Case (Case (..))
+import ASCII.CaseRefinement (KnownCase (..), ASCII'case, ASCII'upper, ASCII'lower, refineCharToCase, refineStringToCase)
 import ASCII.Caseless (CaselessChar)
 import ASCII.Char (Char)
 import ASCII.Decimal (Digit, DigitStringSuperset, DigitSuperset)
@@ -489,7 +492,7 @@ byteStringToCharListUnsafe = ASCII.Superset.toCharListUnsafe
 
 {- $refinement
 
-See also: "ASCII.Refinement"
+See also: "ASCII.Refinement", "ASCII.CaseRefinement"
 
 -}
 
