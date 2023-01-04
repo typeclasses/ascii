@@ -37,7 +37,7 @@ module ASCII
     {- ** Print/control groups -} {- $groups -}
     Group (..), charGroup,  inGroup,
     {- ** Upper/lower case -} {- $case -}
-    Case (..), letterCase, isCase, toCaseChar, toCaseString,
+    Case (..), letterCase, isCase, toCaseChar, toCaseString, disregardCase,
     {- ** Letters  -} isLetter,
     {- ** Letters and numbers  -} isAlphaNum,
     {- ** Decimal digits -} {- $digit -} isDigit, Digit,
@@ -139,6 +139,7 @@ import Numeric.Natural (Natural)
 import Prelude (Integral)
 
 import qualified ASCII.Case
+import qualified ASCII.Caseless
 import qualified ASCII.Decimal
 import qualified ASCII.Group
 import qualified ASCII.Hexadecimal
@@ -266,6 +267,11 @@ asciiUnsafe "HEY!"
 
 toCaseString :: StringIso string => Case -> string -> string
 toCaseString c = ASCII.Isomorphism.mapChars (ASCII.Case.toCase c)
+
+{-| Convert from ASCII character to caseless ASCII character, discarding the
+case if the character is a letter -}
+disregardCase :: Char -> CaselessChar
+disregardCase = ASCII.Caseless.disregardCase
 
 {- $monomorphicConversions
 

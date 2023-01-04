@@ -1,3 +1,7 @@
+### 1.3.2.0
+
+Add `disregardCase :: Char -> CaselessChar`
+
 ### 1.3.1.0 (2023-01-03)
 
 Update `ascii-th` to `1.1.1`.
