@@ -110,7 +110,7 @@ module ASCII
     {- ** Supersets of numeric characters -}
     DigitSuperset, DigitStringSuperset, HexCharSuperset, HexStringSuperset,
 
-    {- * Quasi-quoters -} char, string
+    {- * Quasi-quoters -} char, string, caseless, lower, upper,
   )
   where
 
@@ -122,7 +122,7 @@ import ASCII.Group (Group (..))
 import ASCII.Hexadecimal (HexChar, HexCharSuperset, HexStringSuperset)
 import ASCII.Isomorphism (CharIso, StringIso)
 import ASCII.Lift (Lift)
-import ASCII.QuasiQuoters (char, string)
+import ASCII.QuasiQuoters (char, string, caseless, lower, upper)
 import ASCII.Refinement (ASCII, validateChar, validateString)
 import ASCII.Superset (CharSuperset, StringSuperset)
 

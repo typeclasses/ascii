@@ -1,3 +1,11 @@
+### 1.3.1.0 (2023-01-03)
+
+Update `ascii-th` to `1.1.1`.
+
+This adds, most notably, to the `ASCII.QuasiQuoters` module.
+The new quasi-quoters are `caseless`, `lower`, and `upper`.
+These are also re-exported from the `ASCII` module.
+
 ### 1.3.0.0 (2023-01-03)
 
 Update `ascii-superset` to `1.1.0`.
