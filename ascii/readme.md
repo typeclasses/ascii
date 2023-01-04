@@ -45,7 +45,7 @@ repositories.
 
   * The `ascii-numbers` package provides utilities for working with numbers
     represented using ASCII digits 0-9, ASCII letters A-F to represent
-    hexadecimal digits 10-15, and the `HypenMinus` character for negation.
+    hexadecimal digits 10-15, and the `HyphenMinus` character for negation.
 
   * The `ascii-th` package provides a [quasi-quoter][qq] that allows one to
     safely and conveniently express ASCII string literals. The generated
