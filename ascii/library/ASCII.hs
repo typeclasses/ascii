@@ -35,16 +35,16 @@ module ASCII
 
     {- * Character classifications -}
     {- ** Print/control groups -} {- $groups -}
-    Group (..), charGroup,  inGroup,
+    Group (..), charGroup, inGroup,
     {- ** Upper/lower case -} {- $case -}
     Case (..), letterCase, isCase, toCaseChar, toCaseString,
     disregardCase, refineCharToCase, refineStringToCase,
-    {- ** Letters  -} isLetter,
-    {- ** Letters and numbers  -} isAlphaNum,
+    {- ** Letters -} isLetter,
+    {- ** Letters and numbers -} isAlphaNum,
     {- ** Decimal digits -} {- $digit -} isDigit, Digit,
     {- ** Hexadecimal digits -} {- $hexchar -} isHexDigit, HexChar,
     {- ** Octal digits -} isOctDigit,
-    {- ** Spaces and symbols   -} isSpace, isPunctuation, isSymbol, isVisible,
+    {- ** Spaces and symbols -} isSpace, isPunctuation, isSymbol, isVisible,
 
     {- * Monomorphic character conversions -} {- $monomorphicConversions -}
     {- ** @ASCII.Char@ ↔ @Int@ -} {- $intConversions -}
@@ -158,145 +158,127 @@ import qualified Data.Text as Text
 
 {- $char
 
-See also: "ASCII.Char"
-
--}
+See also: "ASCII.Char" -}
 
 {- $caselessChar
 
-See also: "ASCII.Caseless"
+See also: "ASCII.Caseless" -}
 
--}
+{-| A character in the full range of Unicode
 
--- | A character in the full range of Unicode
---
--- ASCII 'Char' is a subset of this type. Convert using 'charToUnicode' and 'unicodeToCharMaybe'.
+ASCII 'Char' is a subset of this type. Convert using 'charToUnicode' and
+'unicodeToCharMaybe'. -}
 type UnicodeChar = Unicode.Char
 
 {- $groups
 
-ASCII characters are broadly categorized into two groups: /control codes/ and /printable characters/.
+ASCII characters are broadly categorized into two groups: /control codes/ and
+/printable characters/.
 
-See also: "ASCII.Group"
+See also: "ASCII.Group" -}
 
--}
+{-| Determine which group a particular character belongs to
 
+@
+charGroup CapitalLetterA == Printable
 
-{- | Determine which group a particular character belongs to.
-
->>> map charGroup [CapitalLetterA,EndOfTransmission]
-[Printable,Control]
-
--}
-
+charGroup EndOfTransmission == Control
+@ -}
 charGroup :: CharIso char => char -> Group
 charGroup = ASCII.Group.charGroup . ASCII.Isomorphism.toChar
 
-{- | Test whether a character belongs to a particular ASCII group.
+{-| Test whether a character belongs to a particular ASCII group
 
->>> inGroup Printable EndOfTransmission
-False
+@
+not (inGroup Printable EndOfTransmission)
 
->>> inGroup Control EndOfTransmission
-True
+inGroup Control EndOfTransmission
 
->>> map (inGroup Printable) ( [-1, 5, 65, 97, 127, 130] :: [Int] )
-[False,False,True,True,False,False]
-
--}
-
+map (inGroup Printable) ([-1, 5, 65, 97, 127, 130] :: [Int])
+    == [False, False, True, True, False, False]
+@ -}
 inGroup :: CharSuperset char => Group -> char -> Bool
 inGroup g = maybe False (ASCII.Group.inGroup g) . ASCII.Superset.toCharMaybe
 
 {- $case
 
-/Case/ is a property of letters. /A-Z/ are /upper case/ letters, and /a-z/ are /lower case/ letters. No other ASCII characters have case.
+/Case/ is a property of letters. /A-Z/ are /upper case/ letters, and /a-z/ are
+/lower case/ letters. No other ASCII characters have case.
 
-See also: "ASCII.Case"
+See also: "ASCII.Case" -}
 
--}
+{-| Determines whether a character is an ASCII letter, and if so, whether it is
+    upper or lower case
 
-{- | Determines whether a character is an ASCII letter, and if so, whether it is upper or lower case.
+@
+map letterCase [SmallLetterA, CapitalLetterA, ExclamationMark]
+    == [Just LowerCase, Just UpperCase, Nothing]
 
->>> map letterCase [SmallLetterA, CapitalLetterA, ExclamationMark]
-[Just LowerCase,Just UpperCase,Nothing]
-
->>> map letterCase ( [string|Hey!|] :: [ASCII Word8] )
-[Just UpperCase,Just LowerCase,Just LowerCase,Nothing]
-
--}
-
+map letterCase ([string|Hey!|] :: [ASCII Word8])
+    == [Just UpperCase, Just LowerCase, Just LowerCase, Nothing]
+@ -}
 letterCase :: CharSuperset char => char -> Maybe Case
 letterCase = ASCII.Superset.toCharMaybe >=> ASCII.Case.letterCase
 
-{- | Determines whether a character is an ASCII letter of a particular case.
+{-| Determines whether a character is an ASCII letter of a particular case
 
->>> map (isCase UpperCase) [SmallLetterA, CapitalLetterA, ExclamationMark]
-[False,True,False]
+@
+map (isCase UpperCase) [SmallLetterA, CapitalLetterA, ExclamationMark]
+    == [False, True, False]
 
->>> map (isCase UpperCase) ( [string|Hey!|] :: [ASCII Word8] )
-[True,False,False,False]
+map (isCase UpperCase) ([string|Hey!|] :: [ASCII Word8])
+    == [True, False, False, False]
 
->>> map (isCase UpperCase) ( [-1, 65, 97, 150] :: [Int] )
-[False,True,False,False]
-
--}
-
+map (isCase UpperCase) ([-1, 65, 97, 150] :: [Int])
+    == [False, True, False, False]
+@ -}
 isCase :: CharSuperset char => Case -> char -> Bool
 isCase c = maybe False (ASCII.Case.isCase c) . ASCII.Superset.toCharMaybe
 
-{- | Maps a letter character to its upper/lower case equivalent.
+{-| Maps a letter character to its upper/lower case equivalent
 
->>> toCaseChar UpperCase SmallLetterA
-CapitalLetterA
+@
+toCaseChar UpperCase SmallLetterA == CapitalLetterA
 
->>> ([char|a|] :: ASCII Word8, toCaseChar UpperCase [char|a|] :: ASCII Word8)
-(asciiUnsafe 97,asciiUnsafe 65)
-
--}
-
+(                     [char|a|] :: ASCII Word8) == asciiUnsafe 97
+(toCaseChar UpperCase [char|a|] :: ASCII Word8) == asciiUnsafe 65
+@ -}
 toCaseChar :: CharSuperset char => Case -> char -> char
 toCaseChar = ASCII.Superset.toCaseChar
 
-{- | Maps each of the characters in a string to its upper/lower case equivalent.
+{-| Maps each of the characters in a string to its upper/lower case equivalent
 
->>> toCaseString UpperCase [CapitalLetterH,SmallLetterE,SmallLetterY,ExclamationMark]
-[CapitalLetterH,CapitalLetterE,CapitalLetterY,ExclamationMark]
+@
+toCaseString UpperCase [CapitalLetterH, SmallLetterE, SmallLetterY, ExclamationMark]
+    == [CapitalLetterH, CapitalLetterE, CapitalLetterY, ExclamationMark]
 
->>> toCaseString UpperCase [string|Hey!|] :: ASCII Text
-asciiUnsafe "HEY!"
-
--}
-
+(toCaseString UpperCase [string|Hey!|] :: ASCII Text) == asciiUnsafe "HEY!"
+@ -}
 toCaseString :: StringSuperset string => Case -> string -> string
 toCaseString = ASCII.Superset.toCaseString
 
 {-| Convert from ASCII character to caseless ASCII character, discarding the
-case if the character is a letter -}
+    case if the character is a letter -}
 disregardCase :: Char -> CaselessChar
 disregardCase = ASCII.Caseless.disregardCase
 
 {- $monomorphicConversions
 
-These are a few simple monomorphic functions to convert between ASCII and types representing some other character set.
+These are a few simple monomorphic functions to convert between ASCII and types
+representing some other character set.
 
-This is not intended to be an exhaustive list of all possible conversions. For more options, see "ASCII.Superset".
-
--}
+This is not intended to be an exhaustive list of all possible conversions. For
+more options, see "ASCII.Superset". -}
 
 {- $intConversions
 
-These functions convert between the ASCII 'Char' type and 'Int'.
+These functions convert between the ASCII 'Char' type and 'Int'. -}
 
--}
+{-|
 
-{- |
-
->>> map charToInt [Null, CapitalLetterA, SmallLetterA, Delete]
-[0,65,97,127]
-
--}
-
+@
+map charToInt [Null, CapitalLetterA, SmallLetterA, Delete] == [0, 65, 97, 127]
+@ -}
 charToInt :: Char -> Int
 charToInt = ASCII.Superset.fromChar
 
@@ -308,17 +290,13 @@ intToCharUnsafe = ASCII.Superset.toCharUnsafe
 
 {- $word8Conversions
 
-These functions convert between the ASCII 'Char' type and 'Word8'.
+These functions convert between the ASCII 'Char' type and 'Word8'. -}
 
--}
+{-|
 
-{- |
-
->>> map charToWord8 [Null, CapitalLetterA, SmallLetterA, Delete]
-[0,65,97,127]
-
--}
-
+@
+map charToWord8 [Null, CapitalLetterA, SmallLetterA, Delete] == [0, 65, 97, 127]
+@ -}
 charToWord8 :: Char -> Word8
 charToWord8 = ASCII.Superset.fromChar
 
@@ -330,9 +308,8 @@ word8ToCharUnsafe = ASCII.Superset.toCharUnsafe
 
 {- $unicodeCharConversions
 
-These functions convert between the ASCII 'Char' type and the 'UnicodeChar' type.
-
--}
+These functions convert between the ASCII 'Char' type and the 'UnicodeChar'
+type. -}
 
 charToUnicode :: Char -> UnicodeChar
 charToUnicode = ASCII.Superset.fromChar
@@ -345,11 +322,11 @@ unicodeToCharUnsafe = ASCII.Superset.toCharUnsafe
 
 {- $digitWord8Conversions
 
-These functions convert between the ASCII 'Digit' type and ASCII digits in their byte encoding.
+These functions convert between the ASCII 'Digit' type and ASCII digits in their
+byte encoding.
 
-These conversions do /not/ correspond to the numeric interpretations of 'Digit' and 'Word8'. For example, 'digitToWord8' 'ASCII.Decimal.Digit0' is 48, not 0.
-
--}
+These conversions do /not/ correspond to the numeric interpretations of 'Digit'
+and 'Word8'. For example, 'digitToWord8' 'ASCII.Decimal.Digit0' is 48, not 0. -}
 
 digitToWord8 :: Digit -> Word8
 digitToWord8 = ASCII.Decimal.fromDigit
@@ -362,9 +339,8 @@ word8ToDigitUnsafe = ASCII.Decimal.toDigitUnsafe
 
 {- $digitCharConversions
 
-These functions convert between the ASCII 'Digit' type and the ASCII 'Char' type.
-
--}
+These functions convert between the ASCII 'Digit' type and the ASCII 'Char'
+type. -}
 
 digitToChar :: Digit -> Char
 digitToChar = ASCII.Decimal.fromDigit
@@ -377,9 +353,8 @@ charToDigitUnsafe = ASCII.Decimal.toDigitUnsafe
 
 {- $digitUnicodeConversions
 
-These functions convert between the ASCII 'Digit' type and the 'UnicodeChar' type.
-
--}
+These functions convert between the ASCII 'Digit' type and the 'UnicodeChar'
+type. -}
 
 digitToUnicode :: Digit -> UnicodeChar
 digitToUnicode = ASCII.Decimal.fromDigit
@@ -393,11 +368,12 @@ unicodeToDigitUnsafe = ASCII.Decimal.toDigitUnsafe
 
 {- $hexCharWord8Conversions
 
-These functions convert between the ASCII 'HexChar' type and ASCII characters in their byte encoding.
+These functions convert between the ASCII 'HexChar' type and ASCII characters in
+their byte encoding.
 
-These conversions do /not/ correspond to the numeric interpretations of 'HexChar' and 'Word8'. For example, 'hexCharToWord8' 'ASCII.Hexadecimal.CapitalLetterA' is 65, not 10.
-
--}
+These conversions do /not/ correspond to the numeric interpretations of
+'HexChar' and 'Word8'. For example, 'hexCharToWord8'
+'ASCII.Hexadecimal.CapitalLetterA' is 65, not 10. -}
 
 hexCharToWord8 :: HexChar -> Word8
 hexCharToWord8 = ASCII.Hexadecimal.fromHexChar
@@ -410,9 +386,8 @@ word8ToHexCharUnsafe = ASCII.Hexadecimal.toHexCharUnsafe
 
 {- $hexCharCharConversions
 
-These functions convert between the ASCII 'HexChar' type and the ASCII 'Char' type.
-
--}
+These functions convert between the ASCII 'HexChar' type and the ASCII 'Char'
+type. -}
 
 hexCharToChar :: HexChar -> Char
 hexCharToChar = ASCII.Hexadecimal.fromHexChar
@@ -425,9 +400,8 @@ charToHexCharUnsafe = ASCII.Hexadecimal.toHexCharUnsafe
 
 {- $hexCharUnicodeConversions
 
-These functions convert between the ASCII 'HexChar' type and the 'UnicodeChar' type.
-
--}
+These functions convert between the ASCII 'HexChar' type and the 'UnicodeChar'
+type. -}
 
 hexCharToUnicode :: HexChar -> UnicodeChar
 hexCharToUnicode = ASCII.Hexadecimal.fromHexChar
@@ -440,9 +414,8 @@ unicodeToHexCharUnsafe = ASCII.Hexadecimal.toHexCharUnsafe
 
 {- $unicodeStringConversions
 
-These functions convert between @['Char']@ (a list of ASCII characters) and 'Unicode.String' (a list of Unicode characters).
-
--}
+These functions convert between @['Char']@ (a list of ASCII characters) and
+'Unicode.String' (a list of Unicode characters). -}
 
 charListToUnicodeString :: [Char] -> Unicode.String
 charListToUnicodeString = ASCII.Superset.fromCharList
@@ -455,17 +428,13 @@ unicodeStringToCharListUnsafe = ASCII.Superset.toCharListUnsafe
 
 {- $textConversions
 
-These functions convert between @['Char']@ and 'Text.Text'.
+These functions convert between @['Char']@ and 'Text.Text'. -}
 
--}
+{-|
 
-{- |
-
->>> charListToText [CapitalLetterH,SmallLetterI,ExclamationMark]
-"Hi!"
-
--}
-
+@
+charListToText [CapitalLetterH, SmallLetterI, ExclamationMark] == "Hi!"
+@ -}
 charListToText :: [Char] -> Text.Text
 charListToText = ASCII.Superset.fromCharList
 
@@ -477,9 +446,7 @@ textToCharListUnsafe = ASCII.Superset.toCharListUnsafe
 
 {- $byteStringConversions
 
-These functions convert between @['Char']@ and 'BS.ByteString'.
-
--}
+These functions convert between @['Char']@ and 'BS.ByteString'. -}
 
 charListToByteString :: [Char] -> BS.ByteString
 charListToByteString = ASCII.Superset.fromCharList
@@ -492,40 +459,36 @@ byteStringToCharListUnsafe = ASCII.Superset.toCharListUnsafe
 
 {- $refinement
 
-See also: "ASCII.Refinement", "ASCII.CaseRefinement"
-
--}
+See also: "ASCII.Refinement", "ASCII.CaseRefinement" -}
 
 {- $lift
 
-See also: "ASCII.Lift"
+See also: "ASCII.Lift" -}
 
--}
-
-{- | Converts from ASCII to any larger type.
+{-| Converts from ASCII to any larger type
 
 For example, @(lift \@ASCII.Char \@Word8)@ is the same function as 'charToWord8'.
 
->>> lift CapitalLetterA :: Word8
-65
+@
+(lift CapitalLetterA :: Word8) == 65
+@
 
 And @(lift \@[ASCII.Char] \@Text)@ is equivalent to 'charListToText'.
 
->>> lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text
-"Hi!"
+@
+(lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text) == "Hi!"
+@
 
-Due to the highly polymorphic nature of the 'lift' function, often it must used with an explicit type signature or type application to avoid any type ambiguity.
-
+Due to the highly polymorphic nature of the 'lift' function, often it must used
+with an explicit type signature or type application to avoid any type ambiguity.
 -}
-
 lift :: Lift ascii superset => ascii -> superset
 lift = ASCII.Lift.lift
 
 {- $supersetConversions
 
-These functions all convert from one ASCII-superset type to another, failing if any of the characters in the input is outside the ASCII character set.
-
--}
+These functions all convert from one ASCII-superset type to another, failing if
+any of the characters in the input is outside the ASCII character set. -}
 
 convertCharMaybe :: (CharSuperset char1, CharSuperset char2) => char1 -> Maybe char2
 convertCharMaybe = ASCII.Superset.convertCharMaybe
@@ -541,18 +504,19 @@ convertStringOrFail = ASCII.Superset.convertStringOrFail
 
 {- $monoSupersetConversions
 
-These functions are all specializations of 'convertStringMaybe'. They convert a string from one ASCII-superset type to another.
+These functions are all specializations of 'convertStringMaybe'.
+They convert a string from one ASCII-superset type to another.
 
->>> ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x50]
-Just "HTTP"
+@
+ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x50] == Just "HTTP"
+@
 
-If any of the characters in the input is outside the ASCII character set, the result is 'Nothing'.
+If any of the characters in the input is outside the ASCII character set, the
+result is 'Nothing'.
 
->>> ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x80]
-Nothing
-
--}
-
+@
+ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x80] == Nothing
+@ -}
 byteStringToUnicodeStringMaybe :: BS.ByteString -> Maybe Unicode.String
 byteStringToUnicodeStringMaybe = convertStringMaybe
 
@@ -565,59 +529,48 @@ byteListToUnicodeStringMaybe = convertStringMaybe
 unicodeStringToByteListMaybe :: Unicode.String -> Maybe [Word8]
 unicodeStringToByteListMaybe = convertStringMaybe
 
-{- | Returns True for ASCII letters:
+{-| Returns True for ASCII letters:
 
 - 'ASCII.Char.SmallLetterA' to 'ASCII.Char.SmallLetterZ'
-- 'ASCII.Char.CapitalLetterA' to 'ASCII.Char.CapitalLetterZ'
-
--}
-
+- 'ASCII.Char.CapitalLetterA' to 'ASCII.Char.CapitalLetterZ' -}
 isLetter :: CharSuperset char => char -> Bool
 isLetter x = any ASCII.Predicates.isLetter (convertCharMaybe x)
 
-{- | Returns True for the characters from 'ASCII.Char.Digit0' to 'ASCII.Char.Digit9'. -}
-
+{-| Returns True for the characters from 'ASCII.Char.Digit0' to
+'ASCII.Char.Digit9'. -}
 isDigit :: CharSuperset char => char -> Bool
 isDigit x = any ASCII.Predicates.isDigit (convertCharMaybe x)
 
-
-{- | Returns True for the characters from 'ASCII.Char.Digit0' to 'ASCII.Char.Digit7'. -}
-
+{-| Returns True for the characters from 'ASCII.Char.Digit0' to
+'ASCII.Char.Digit7'. -}
 isOctDigit :: CharSuperset char => char -> Bool
 isOctDigit x = any ASCII.Predicates.isOctDigit (convertCharMaybe x)
 
-
-{- | Returns True for characters in any of the following ranges:
+{-| Returns True for characters in any of the following ranges:
 
 - 'ASCII.Char.Digit0' to 'ASCII.Char.Digit9'
 - 'ASCII.Char.CapitalLetterA' to 'ASCII.Char.CapitalLetterF'
-- 'ASCII.Char.SmallLetterA' to 'ASCII.Char.SmallLetterF'
-
--}
-
+- 'ASCII.Char.SmallLetterA' to 'ASCII.Char.SmallLetterF' -}
 isHexDigit :: CharSuperset char => char -> Bool
 isHexDigit x = any ASCII.Predicates.isHexDigit (convertCharMaybe x)
 
-{- | Returns True for the following characters:
+{-| Returns True for the following characters:
 
 - 'ASCII.Char.Space'
 - 'ASCII.Char.HorizontalTab'
 - 'ASCII.Char.LineFeed'
 - 'ASCII.Char.VerticalTab'
 - 'ASCII.Char.FormFeed'
-- 'ASCII.Char.CarriageReturn'
-
--}
-
+- 'ASCII.Char.CarriageReturn' -}
 isSpace :: CharSuperset char => char -> Bool
 isSpace x = any ASCII.Predicates.isSpace (convertCharMaybe x)
 
-{- | Returns True if the character is either an ASCII letter ('isLetter') or an ASCII digit ('isDigit'). -}
-
+{-| Returns True if the character is either an ASCII letter ('isLetter') or an
+ASCII digit ('isDigit'). -}
 isAlphaNum :: CharSuperset char => char -> Bool
 isAlphaNum x = any ASCII.Predicates.isAlphaNum (convertCharMaybe x)
 
-{- | Returns True for the following characters:
+{-| Returns True for the following characters:
 
 - 'ASCII.Char.ExclamationMark'
 - 'ASCII.Char.QuotationMark'
@@ -641,14 +594,11 @@ isAlphaNum x = any ASCII.Predicates.isAlphaNum (convertCharMaybe x)
 - 'ASCII.Char.RightSquareBracket'
 - 'ASCII.Char.Underscore'
 - 'ASCII.Char.LeftCurlyBracket'
-- 'ASCII.Char.RightCurlyBracket'
-
--}
-
+- 'ASCII.Char.RightCurlyBracket' -}
 isPunctuation :: CharSuperset char => char -> Bool
 isPunctuation x = any ASCII.Predicates.isPunctuation (convertCharMaybe x)
 
-{- | Returns True for the following characters:
+{-| Returns True for the following characters:
 
 - 'ASCII.Char.DollarSign'
 - 'ASCII.Char.PlusSign'
@@ -658,61 +608,46 @@ isPunctuation x = any ASCII.Predicates.isPunctuation (convertCharMaybe x)
 - 'ASCII.Char.Caret'
 - 'ASCII.Char.GraveAccent'
 - 'ASCII.Char.VerticalLine'
-- 'ASCII.Char.Tilde'
-
--}
-
+- 'ASCII.Char.Tilde' -}
 isSymbol :: CharSuperset char => char -> Bool
 isSymbol x = any ASCII.Predicates.isSymbol (convertCharMaybe x)
 
-{- | Returns True for visible characters.
+{- |Returns True for visible characters
 
-This includes all print characters except 'ASCII.Char.Space'.
-
--}
-
+This includes all print characters except 'ASCII.Char.Space'. -}
 isVisible :: CharSuperset char => char -> Bool
 isVisible x = any ASCII.Predicates.isVisible (convertCharMaybe x)
 
 {- $numbers
 
-See also: "ASCII.Decimal" and "ASCII.Hexadecimal"
+See also: "ASCII.Decimal" and "ASCII.Hexadecimal" -}
 
--}
+{-| Gives the ASCII string representation of an integer in decimal (base 10)
+    notation, using digits 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9',
+    leading with 'ASCII.Char.HyphenMinus' for negative numbers
 
-{- |
-
-Gives the ASCII string representation of an integer in decimal (base 10)
-notation, using digits 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9',
-leading with 'ASCII.Char.HyphenMinus' for negative numbers.
-
-For example, @'showIntegralDecimal' (-512 :: 'Prelude.Integer')@ = @"-512"@.
-
--}
-
+For example, @'showIntegralDecimal' (-512 :: 'Prelude.Integer')@ = @"-512"@. -}
 showIntegralDecimal :: (Integral n, StringSuperset string) => n -> string
 showIntegralDecimal = ASCII.Decimal.showIntegral
 
-{- |
+{-| Gives the ASCII string representation of an integer in hexadecimal (base 16)
+    notation
 
-Gives the ASCII string representation of an integer in hexadecimal (base 16)
-notation, using digits 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9', for
-digits 0 though 9. The representation of digits 10 to 15 is determined by the
-value of 'Case' parameter: 'UpperCase' means 'ASCII.Char.CapitalLetterA' to
+The characters 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9' represent digits
+0 though 9. The representation of digits 10 to 15 is determined by the value of
+'Case' parameter: 'UpperCase' means 'ASCII.Char.CapitalLetterA' to
 'ASCII.Char.CapitalLetterF', and 'LowerCase' means 'ASCII.Char.SmallLetterA' to
 'ASCII.Char.SmallLetterF'. For negative numbers, the resulting string begins
 with 'ASCII.Char.HyphenMinus'.
 
-For example, @'showIntegralHexadecimal' 'UpperCase' ('Prelude.negate' (256 + 12) :: 'Prelude.Integer')@ = @"-10C"@.
-
--}
-
-showIntegralHexadecimal :: (Integral n, StringSuperset string) => Case -> n -> string
+@
+'showIntegralHexadecimal' 'UpperCase' ('Prelude.negate' (256 + 12) :: 'Prelude.Integer') == "-10C"
+@ -}
+showIntegralHexadecimal :: (Integral n, StringSuperset string) =>
+    Case -> n -> string
 showIntegralHexadecimal = ASCII.Hexadecimal.showIntegral
 
-{- |
-
-Roughly the inverse of 'showIntegralDecimal'
+{-| Roughly the inverse of 'showIntegralDecimal'
 
 * Leading zeroes are accepted, as in @"0074"@ and @"-0074"@
 
@@ -720,16 +655,13 @@ Conditions where the result is 'Data.Maybe.Nothing':
 
 * If the input is empty
 * If the input contains any other extraneous characters
-* If the resulting number would be outside the range supported by the 'Integral' (determined by its 'Bits' instance)
-
--}
-
-readIntegralDecimal :: (StringSuperset string, Integral number, Bits number) => string -> Maybe number
+* If the resulting number would be outside the range supported by the 'Integral'
+  (determined by its 'Bits' instance) -}
+readIntegralDecimal :: (StringSuperset string, Integral number, Bits number) =>
+    string -> Maybe number
 readIntegralDecimal = ASCII.Decimal.readIntegral
 
-{- |
-
-Roughly the inverse of 'showIntegralHexadecimal'
+{-| Roughly the inverse of 'showIntegralHexadecimal'
 
 * Upper and lower case letters are treated equally
 * Leading zeroes are accepted, as in @"006a"@ and @"-006a"@
@@ -738,60 +670,48 @@ Conditions where the result is 'Data.Maybe.Nothing':
 
 * If the input is empty
 * If the input contains any other extraneous characters
-* If the resulting number would be outside the range supported by the 'Integral' (determined by its 'Bits' instance)
-
--}
-
-readIntegralHexadecimal :: (StringSuperset string, Integral number, Bits number) => string -> Maybe number
+* If the resulting number would be outside the range supported by the 'Integral'
+  (determined by its 'Bits' instance) -}
+readIntegralHexadecimal :: (StringSuperset string, Integral number, Bits number) =>
+    string -> Maybe number
 readIntegralHexadecimal = ASCII.Hexadecimal.readIntegral
 
-{- |
+{-| Gives the ASCII string representation of an natural number in decimal
+    (base 10) notation, using digits 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9'
 
-Gives the ASCII string representation of an natural number in decimal (base 10)
-notation, using digits 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9'.
-
-For example, @'showNaturalDecimal' 512@ = @"512"@.
-
--}
-
+@
+'showNaturalDecimal' 512 == @"512"
+@ -}
 showNaturalDecimal :: DigitStringSuperset string => Natural -> string
 showNaturalDecimal = ASCII.Decimal.showNatural
 
-{- |
+{-| Gives the ASCII string representation of an integer in hexadecimal (base 16)
+    notation
 
-Gives the ASCII string representation of an integer in hexadecimal (base 16)
-notation, using digits 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9', for
-digits 0 though 9. The representation of digits 10 to 15 is determined by the
-value of 'Case' parameter: 'UpperCase' means 'ASCII.Char.CapitalLetterA' to
+Characters 'ASCII.Char.Digit0' through 'ASCII.Char.Digit9' represent digits 0
+though 9. The representation of digits 10 to 15 is determined by the value of
+'Case' parameter: 'UpperCase' means 'ASCII.Char.CapitalLetterA' to
 'ASCII.Char.CapitalLetterF', and 'LowerCase' means 'ASCII.Char.SmallLetterA' to
 'ASCII.Char.SmallLetterF'.
 
-For example, @'showNaturalHexadecimal' 'UpperCase' (256 + 12)@ = @"10C"@.
-
--}
-
+@
+'showNaturalHexadecimal' 'UpperCase' (256 + 12) == "10C"
+@ -}
 showNaturalHexadecimal :: HexStringSuperset string => Case -> Natural -> string
 showNaturalHexadecimal = ASCII.Hexadecimal.showNatural
 
-{- |
-
-Roughly the inverse of 'showNaturalDecimal'
+{-| Roughly the inverse of 'showNaturalDecimal'
 
 * Leading zeroes are accepted, as in @"0074"@
 
 Conditions where the result is 'Data.Maybe.Nothing':
 
 * If the input is empty
-* If the input contains any other extraneous characters
-
--}
-
+* If the input contains any other extraneous characters -}
 readNaturalDecimal :: DigitStringSuperset string => string -> Maybe Natural
 readNaturalDecimal = ASCII.Decimal.readNatural
 
-{- |
-
-Roughly the inverse of 'showNaturalHexadecimal'
+{-| Roughly the inverse of 'showNaturalHexadecimal'
 
 * Upper and lower case letters are treated equally
 * Leading zeroes are accepted, as in @"006a"@
@@ -799,82 +719,49 @@ Roughly the inverse of 'showNaturalHexadecimal'
 Conditions where the result is 'Data.Maybe.Nothing':
 
 * If the input is empty
-* If the input contains any other extraneous characters
-
--}
-
+* If the input contains any other extraneous characters -}
 readNaturalHexadecimal :: HexStringSuperset string => string -> Maybe Natural
 readNaturalHexadecimal = ASCII.Hexadecimal.readNatural
 
 {- $digit
 
-See also: "ASCII.Decimal"
-
--}
+See also: "ASCII.Decimal" -}
 
 {- $hexchar
 
-See also: "ASCII.Hexadecimal"
+See also: "ASCII.Hexadecimal" -}
 
--}
+{-| Specialization of 'showNaturalDecimal'
 
-{- |
-
-Specialization of 'showNaturalDecimal'
-
-See also: 'showIntegralDecimal'
-
--}
-
+See also: 'showIntegralDecimal' -}
 showNaturalDigits :: Natural -> [Digit]
 showNaturalDigits = showNaturalDecimal
 
-{- |
+{-| Specialization of 'readNaturalDecimal'
 
-Specialization of 'readNaturalDecimal'
-
-See also: 'readIntegralDecimal'
-
--}
-
+See also: 'readIntegralDecimal' -}
 readNaturalDigits :: [Digit] -> Maybe Natural
 readNaturalDigits = readNaturalDecimal
 
-{- |
+{-| Specialization of 'showNaturalHexadecimal'
 
-Specialization of 'showNaturalHexadecimal'
-
-See also: 'showIntegralHexadecimal'
-
--}
+See also: 'showIntegralHexadecimal' -}
 
 showNaturalHexChars :: Case -> Natural -> [HexChar]
 showNaturalHexChars = showNaturalHexadecimal
 
-{- |
+{-| Specialization of 'readNaturalHexadecimal'
 
-Specialization of 'readNaturalHexadecimal'
-
-See also: 'readIntegralHexadecimal'
-
--}
-
+See also: 'readIntegralHexadecimal' -}
 readNaturalHexChars :: [HexChar] -> Maybe Natural
 readNaturalHexChars = readNaturalHexadecimal
 
-{- |
-
-A string containing a single digit character 0-9
-
--}
+{-| A string containing a single digit character 0-9 -}
 digitString :: DigitStringSuperset string => Digit -> string
 digitString x = ASCII.Decimal.fromDigitList [x]
 
-{- |
-
-A string containing a single hexadecimal digit character 0-9, A-F, or a-f.
-
--}
+{-| A string containing a single hexadecimal digit character
+    0-9, A-F, or a-f -}
 hexCharString :: HexStringSuperset string => HexChar -> string
 hexCharString x = ASCII.Hexadecimal.fromHexCharList [x]
 
