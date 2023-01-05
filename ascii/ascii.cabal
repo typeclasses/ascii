@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: ascii
-version: 1.4.0.0
+version: 1.4.1.0
 synopsis: The ASCII character set and encoding
 category: Data, Text
 
@@ -29,7 +29,7 @@ common base
     default-extensions: NoImplicitPrelude
     build-depends:
         ascii-caseless == 0.0.0.*
-      , ascii-char == 1.0.0.*
+      , ascii-char == 1.0.1.*
       , ascii-group == 1.0.0.*
       , ascii-case == 1.0.1.*
       , ascii-numbers == 1.1.0.*

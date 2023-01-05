@@ -1,4 +1,9 @@
-### 1.4.0.0
+### 1.4.1.0 (2023-01-05)
+
+Raise `ascii-char` version to `1.0.1`. This adds `Word8` conversions to the
+`ASCII.Char` module.
+
+### 1.4.0.0 (2023-01-03)
 
 Additions to the `ASCII` module: `disregardCase`, `ASCII'case`, `ASCII'upper`,
 `ASCII'lower`, `KnownCase (..)`, `refineCharToCase`, `refineStringToCase`
