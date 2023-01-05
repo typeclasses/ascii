@@ -1,3 +1,7 @@
+### 1.4.1.1 (2023-01-05)
+
+Change test suite from `hedgehog` to `hspec`
+
 ### 1.4.1.0 (2023-01-05)
 
 Raise `ascii-char` version to `1.0.1`. This adds `Word8` conversions to the

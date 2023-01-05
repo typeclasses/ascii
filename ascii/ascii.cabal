@@ -28,7 +28,7 @@ common base
     ghc-options: -Wall
     default-extensions: NoImplicitPrelude
     build-depends:
-        ascii-caseless == 0.0.0.*
+      , ascii-caseless == 0.0.0.*
       , ascii-char == 1.0.1.*
       , ascii-group == 1.0.0.*
       , ascii-case == 1.0.1.*
@@ -46,7 +46,7 @@ library
     default-extensions: RankNTypes ScopedTypeVariables TypeApplications
     exposed-modules: ASCII
     reexported-modules:
-        ASCII.Case
+      , ASCII.Case
       , ASCII.Caseless
       , ASCII.CaseRefinement
       , ASCII.Char
@@ -69,7 +69,7 @@ test-suite test-ascii
     type: exitcode-stdio-1.0
     hs-source-dirs: test
     main-is: Main.hs
-    default-extensions: OverloadedStrings QuasiQuotes TemplateHaskell
+    default-extensions: OverloadedStrings QuasiQuotes
     build-depends:
-        ascii
-      , hedgehog ^>= 1.0.5 || ^>= 1.1 || ^>= 1.2
+      , ascii
+      , hspec ^>= 2.8.5 || ^>= 2.9 || ^>= 2.10

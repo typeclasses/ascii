@@ -5,8 +5,7 @@ import ASCII
 import ASCII.Char (Char (..))
 import ASCII.Refinement (asciiUnsafe)
 
-import Control.Monad (Monad (..), when)
-import Data.Bool (Bool (..), not)
+import Data.Bool (Bool (..))
 import Data.Function (($))
 import Data.Int (Int)
 import Data.List (map)
@@ -14,108 +13,134 @@ import Data.Maybe (Maybe (..))
 import Data.Text (Text)
 import Data.Word (Word8)
 import Prelude (enumFromTo, maxBound, minBound)
-import System.Exit (exitFailure)
 import System.IO (IO)
 
-import Hedgehog (Property, assert, checkParallel, discover, property, withTests,
-                 (===))
+import Test.Hspec (describe, hspec, it, shouldBe)
 
 main :: IO ()
-main = checkParallel $$(discover) >>= \ok -> when (not ok) exitFailure
+main = hspec $ do
 
-prop_letter_printable :: Property
-prop_letter_printable = withTests 1 $ property $
-    charGroup CapitalLetterA === Printable
+    describe "charGroup" $ do
+        let c ~> g = charGroup c `shouldBe` g
 
-prop_eot_control :: Property
-prop_eot_control = withTests 1 $ property $
-    charGroup EndOfTransmission === Control
+        it "A is printable"                 $ CapitalLetterA    ~> Printable
+        it "end-of-transmission is control" $ EndOfTransmission ~> Control
 
-prop_eot_not_printable :: Property
-prop_eot_not_printable = withTests 1 $ property $
-    assert $ not $ inGroup Printable EndOfTransmission
+    describe "inGroup" $ do
 
-prop_is_eot_control :: Property
-prop_is_eot_control = withTests 1 $ property $
-    assert $ inGroup Control EndOfTransmission
+        describe "tests Char" $ do
+            it "end-of-transmission is not printable" $
+                inGroup Printable EndOfTransmission `shouldBe` False
+            it "end-of-transmission is control" $
+                inGroup Control   EndOfTransmission `shouldBe` True
 
-prop_inGroup_printable :: Property
-prop_inGroup_printable = withTests 1 $ property $
-    map (inGroup Printable) ([-1, 5, 65, 97, 127, 130] :: [Int]) === [False, False, True, True, False, False]
+        describe "tests Int" $ do
+            let i ~> b = inGroup Printable (i :: Int) `shouldBe` b
 
-prop_cases :: Property
-prop_cases = withTests 1 $ property $
-    map letterCase [SmallLetterA, CapitalLetterA, ExclamationMark] === [Just LowerCase, Just UpperCase, Nothing]
+            it "-1 is not printable (isn't anything)"  $ (-1) ~> False
+            it "5 is not printable"                    $ 5    ~> False
+            it "65 is printable"                       $ 65   ~> True
+            it "97 is printable"                       $ 97   ~> True
+            it "127 is not printable"                  $ 127  ~> False
+            it "128 is not printable (isn't anything)" $ 128  ~> False
 
-prop_cases_string_qq :: Property
-prop_cases_string_qq = withTests 1 $ property $
-    map letterCase ([string|Hey!|] :: [ASCII Word8]) === [Just UpperCase, Just LowerCase, Just LowerCase, Nothing]
+    describe "letterCase" $ do
+        let ch ~> ca = letterCase ch `shouldBe` ca
 
-prop_is_upper_char :: Property
-prop_is_upper_char = withTests 1 $ property $
-    map (isCase UpperCase) [SmallLetterA, CapitalLetterA, ExclamationMark] === [False, True, False]
+        describe "works with Char" $ do
+            it "a is lower"    $ SmallLetterA    ~> Just LowerCase
+            it "A is upper"    $ CapitalLetterA  ~> Just UpperCase
+            it "! has no case" $ ExclamationMark ~> Nothing
 
-prop_is_upper_string_qq :: Property
-prop_is_upper_string_qq = withTests 1 $ property $
-    map (isCase UpperCase) ([string|Hey!|] :: [ASCII Word8]) === [True, False, False, False]
+        it "works with ASCII Word8" $ do
+            map letterCase ([string|Hey!|] :: [ASCII Word8]) `shouldBe`
+                [Just UpperCase, Just LowerCase, Just LowerCase, Nothing]
 
-prop_is_upper_int :: Property
-prop_is_upper_int = withTests 1 $ property $
-    map (isCase UpperCase) ([-1, 65, 97, 150] :: [Int]) === [False, True, False, False]
+    describe "isCase" $ do
 
-prop_to_upper_letter :: Property
-prop_to_upper_letter = withTests 1 $ property $
-    toCaseChar UpperCase SmallLetterA === CapitalLetterA
+        describe "works with Char" $ do
+            let c ~> b = isCase UpperCase c `shouldBe` b
 
-prop_to_upper_char_qq :: Property
-prop_to_upper_char_qq = withTests 1 $ property $
-    ([char|a|] :: ASCII Word8, toCaseChar UpperCase [char|a|] :: ASCII Word8) === (asciiUnsafe 97, asciiUnsafe 65)
+            it "a is not upper" $ SmallLetterA    ~> False
+            it "A is upper"     $ CapitalLetterA  ~> True
+            it "! is not upper" $ ExclamationMark ~> False
 
-prop_to_upper_various :: Property
-prop_to_upper_various = withTests 1 $ property $
-    toCaseString UpperCase [CapitalLetterH,SmallLetterE,SmallLetterY,ExclamationMark] === [CapitalLetterH, CapitalLetterE, CapitalLetterY, ExclamationMark]
+        it "works with ASCII Word8" $ do
+            map (isCase UpperCase) ([string|Hey!|] :: [ASCII Word8])
+                `shouldBe` [True, False, False, False]
 
-prop_to_upper_string_qq :: Property
-prop_to_upper_string_qq = withTests 1 $ property $
-    (toCaseString UpperCase [string|Hey!|] :: ASCII Text) === asciiUnsafe "HEY!"
+        describe "works with Int" $ do
+            let i ~> b = isCase UpperCase (i :: Int) `shouldBe` b
 
-prop_to_int :: Property
-prop_to_int = withTests 1 $ property $
-    map charToInt [Null, CapitalLetterA, SmallLetterA, Delete] === [0, 65, 97, 127]
+            it "-1 is not upper (isn't anything)"  $ (-1) ~> False
+            it "65 is upper"                       $ 65   ~> True
+            it "97 is not upper"                   $ 97   ~> False
+            it "128 is not upper (isn't anything)" $ 128  ~> False
 
-prop_to_word8 :: Property
-prop_to_word8 = withTests 1 $ property $
-    map charToWord8 [Null, CapitalLetterA, SmallLetterA, Delete] === [0, 65, 97, 127]
+    describe "toCaseChar" $ do
 
-prop_to_text :: Property
-prop_to_text = withTests 1 $ property $
-    charListToText [CapitalLetterH, SmallLetterI, ExclamationMark] === "Hi!"
+        describe "works with Char" $ do
+            it "a to upper is A" $ toCaseChar UpperCase SmallLetterA
+                `shouldBe` CapitalLetterA
 
-prop_lift_to_word8 :: Property
-prop_lift_to_word8 = withTests 1 $ property $
-    (lift CapitalLetterA :: Word8) === 65
+        describe "works with ASCII Word8" $ do
+            it "a to upper is 65" $ toCaseChar UpperCase ([char|a|] :: ASCII Word8)
+                `shouldBe` (asciiUnsafe 65 :: ASCII Word8)
 
-prop_lift_to_text :: Property
-prop_lift_to_text = withTests 1 $ property $
-    (lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text) === "Hi!"
+    describe "toCaseString" $ do
+        it "converts each Char to a case" $ do
+            let check a b = toCaseString UpperCase a `shouldBe` b
+            check [ CapitalLetterH, SmallLetterE,   SmallLetterY,   ExclamationMark ]
+                  [ CapitalLetterH, CapitalLetterE, CapitalLetterY, ExclamationMark ]
 
-prop_bytes_to_string :: Property
-prop_bytes_to_string = withTests 1 $ property $
-    ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x50] === Just "HTTP"
+        it "works with ASCII Text" $
+            (toCaseString UpperCase [string|Hey!|] :: ASCII Text)
+                `shouldBe` asciiUnsafe "HEY!"
 
-prop_bytes_to_string_fail :: Property
-prop_bytes_to_string_fail = withTests 1 $ property $
-    ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x80] === Nothing
+    describe "charToInt" $ do
+        let c ~> i = charToInt c `shouldBe` i
 
-prop_digitStrings :: Property
-prop_digitStrings = withTests 1 $ property $
-    map digitString (enumFromTo minBound maxBound) ===
-    (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] :: [Text])
+        it "Null is 0"     $ Null           ~> 0
+        it "A is 65"       $ CapitalLetterA ~> 65
+        it "a is 97"       $ SmallLetterA   ~> 97
+        it "Delete is 127" $ Delete         ~> 127
 
-prop_hexCharStrings :: Property
-prop_hexCharStrings = withTests 1 $ property $
-    map hexCharString (enumFromTo minBound maxBound) ===
-    ( [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
-      , "A", "B", "C", "D", "E", "F"
-      , "a", "b", "c", "d", "e", "f"
-      ] :: [Text] )
+    describe "charToWord8" $ do
+        let c ~> i = charToWord8 c `shouldBe` i
+
+        it "Null is 0"     $ Null           ~> 0
+        it "A is 65"       $ CapitalLetterA ~> 65
+        it "a is 97"       $ SmallLetterA   ~> 97
+        it "Delete is 127" $ Delete         ~> 127
+
+    describe "charListToText" $ do
+        it "packs a list of Char into Text" $
+            charListToText [CapitalLetterH, SmallLetterI, ExclamationMark]
+                `shouldBe` "Hi!"
+
+    describe "lift" $ do
+        it "converts Char to Word8" $ (lift CapitalLetterA :: Word8) `shouldBe` 65
+        it "converts [Char] to Text" $
+            (lift [CapitalLetterH, SmallLetterI, ExclamationMark] :: Text)
+                `shouldBe` "Hi!"
+
+    describe "byteListToUnicodeStringMaybe" $ do
+        it "converts [Word8] to String" $
+            ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x50]
+                `shouldBe` Just "HTTP"
+        it "can fail" $ ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x80]
+            `shouldBe` Nothing
+
+    describe "digitString" $ do
+        it "converts Digit to a single character of Text" $ do
+            let f = digitString :: Digit -> Text
+            map f (enumFromTo minBound maxBound) `shouldBe`
+                ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+    describe "hexCharString" $ do
+        it "converts HexChar to a single character of Text" $ do
+            let f = hexCharString :: HexChar -> Text
+            map f (enumFromTo minBound maxBound) `shouldBe`
+                [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+                , "A", "B", "C", "D", "E", "F"
+                , "a", "b", "c", "d", "e", "f" ]
