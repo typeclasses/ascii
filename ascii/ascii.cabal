@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: ascii
-version: 1.5.0.0
+version: 1.5.1.0
 synopsis: The ASCII character set and encoding
 category: Data, Text
 
@@ -34,7 +34,7 @@ common base
       , ascii-case == 1.0.1.*
       , ascii-numbers == 1.1.0.*
       , ascii-predicates == 1.0.1.*
-      , ascii-superset == 1.2.4.*
+      , ascii-superset == 1.2.5.*
       , ascii-th == 1.2.0.*
       , base ^>= 4.14 || ^>= 4.15 || ^>= 4.16 || ^>= 4.17
       , bytestring ^>= 0.10.12 || ^>= 0.11

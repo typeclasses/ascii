@@ -1,3 +1,11 @@
+### 1.5.1.0 (2023-01-06)
+
+Raise `ascii-superset` version to `1.2.5`. This adds a new instance:
+
+```haskell
+instance Lift (ASCII'case letterCase superset) (ASCII superset)
+```
+
 ### 1.5.0.0 (2023-01-06)
 
 Raise `ascii-th` version to `1.2.0`. This changes the constraints on `lower` and
