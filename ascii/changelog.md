@@ -1,3 +1,12 @@
+### 1.5.0.0 (2023-01-06)
+
+Raise `ascii-th` version to `1.2.0`. This changes the constraints on `lower` and
+`upper` quasi-quotations in an expression context. Previously, the constraint
+was `FromString`. The constraints are now `ToCasefulString 'LowerCase` and
+`ToCasefulString 'UpperCase` respectively. This expands the range of types
+inhabited by lower/uppercase quotes to include `ASCII'lower` and `ASCII'upper`,
+which were previously not able to be expressed using quasi-quotations.
+
 ### 1.4.2.0 (2023-01-05)
 
 Raise `ascii-superset` version from `1.2.0` to `1.2.4`. This adds classes

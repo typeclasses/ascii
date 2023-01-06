@@ -20,7 +20,7 @@ depOverrides = new: old: {
     ascii-numbers = new.callPackage ./nix/ascii-numbers-1.1.0.2.nix {};
     ascii-predicates = new.callPackage ./nix/ascii-predicates-1.0.1.1.nix {};
     ascii-superset = new.callPackage ./nix/ascii-superset-1.2.4.0.nix {};
-    ascii-th = new.callPackage ./nix/ascii-th-1.1.1.0.nix {};
+    ascii-th = new.callPackage ./nix/ascii-th-1.2.0.0.nix {};
 };
 
 ghc."8.10" = nixos-22-05.haskell.packages.ghc8107.override (old: {
