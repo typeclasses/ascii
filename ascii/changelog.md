@@ -1,3 +1,9 @@
+### 1.4.2.0 (2023-01-05)
+
+Raise `ascii-superset` version from `1.2.0` to `1.2.4`. This adds classes
+`ToCasefulChar` and `ToCasefulString` to the `ASCII.Superset` module. It also
+adds some instances for the various other superset classes.
+
 ### 1.4.1.1 (2023-01-05)
 
 Change test suite from `hedgehog` to `hspec`
