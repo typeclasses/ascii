@@ -1,3 +1,7 @@
+### 1.5.2.0 (2023-01-25)
+
+New functions: `asciiByteStringToText` and `asciiByteStringToTextLazy`
+
 ### 1.5.1.0 (2023-01-06)
 
 Raise `ascii-superset` version to `1.2.5`. This adds a new instance:

@@ -75,6 +75,8 @@ module ASCII
     charListToText, textToCharListMaybe, textToCharListUnsafe,
     {- ** @ASCII.Char@ ↔ @ByteString@ -} {- $byteStringConversions -}
     charListToByteString, byteStringToCharListMaybe, byteStringToCharListUnsafe,
+    {- ** @ASCII ByteString@ -> @Text@ -}
+    asciiByteStringToText, asciiByteStringToTextLazy,
 
     {- * Monomorphic conversions between ASCII supersets -} {- $monoSupersetConversions -}
     {- ** @ByteString@ ↔ @String@ -}
@@ -152,9 +154,13 @@ import qualified ASCII.Predicates
 import qualified ASCII.Superset
 
 import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Char as Unicode
 import qualified Data.String as Unicode
 import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Text
+import qualified Data.Text.Lazy as LText
+import qualified Data.Text.Lazy.Encoding as LText
 
 {- $char
 
@@ -456,6 +462,12 @@ byteStringToCharListMaybe = ASCII.Superset.toCharListMaybe
 
 byteStringToCharListUnsafe :: BS.ByteString -> [Char]
 byteStringToCharListUnsafe = ASCII.Superset.toCharListUnsafe
+
+asciiByteStringToText :: ASCII BS.ByteString -> Text.Text
+asciiByteStringToText = Text.decodeASCII . lift
+
+asciiByteStringToTextLazy :: ASCII LBS.ByteString -> LText.Text
+asciiByteStringToTextLazy = LText.decodeASCII . lift
 
 {- $refinement
 
