@@ -99,6 +99,7 @@ module ASCII
     {- ** Lift -} {- $lift -} lift,
     {- ** Convert -} {- $supersetConversions -}
     convertCharMaybe, convertCharOrFail, convertStringMaybe, convertStringOrFail,
+    convertRefinedString,
     {- ** Integral strings -} {- $numbers -}
     showIntegralDecimal, showIntegralHexadecimal,
     readIntegralDecimal, readIntegralHexadecimal,
@@ -109,7 +110,7 @@ module ASCII
     digitString, hexCharString,
 
     {- * Classes -}
-    {- ** Supersets of ASCII -} CharSuperset, StringSuperset, Lift,
+    {- ** Supersets of ASCII -} CharSuperset, StringSuperset, StringSupersetConversion, Lift,
     {- ** Equivalents to ASCII -} CharIso, StringIso,
     {- ** Supersets of numeric characters -}
     DigitSuperset, DigitStringSuperset, HexCharSuperset, HexStringSuperset,
@@ -130,6 +131,7 @@ import ASCII.Lift (Lift)
 import ASCII.QuasiQuoters (char, string, caseless, lower, upper)
 import ASCII.Refinement (ASCII, validateChar, validateString)
 import ASCII.Superset (CharSuperset, StringSuperset)
+import ASCII.SupersetConversion (StringSupersetConversion)
 
 import Control.Monad ((>=>))
 import Control.Monad.Fail (MonadFail)
@@ -152,6 +154,7 @@ import qualified ASCII.Isomorphism
 import qualified ASCII.Lift
 import qualified ASCII.Predicates
 import qualified ASCII.Superset
+import qualified ASCII.SupersetConversion as SupersetConversion
 
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as LBS
@@ -785,3 +788,9 @@ toDigitMaybe = ASCII.Decimal.toDigitMaybe
 
 toHexCharMaybe :: HexCharSuperset char => char -> Maybe HexChar
 toHexCharMaybe = ASCII.Hexadecimal.toHexCharMaybe
+
+{-| For example, this function can convert @ASCII ByteString@
+    to @ASCII Text@ and vice versa -}
+convertRefinedString ::
+    StringSupersetConversion a b => ASCII a -> ASCII b
+convertRefinedString = SupersetConversion.convertRefinedString

@@ -1,3 +1,14 @@
+### 1.5.3.0 (2023-02-07)
+
+Raise `ascii-superset` to `1.2.6`
+
+Added class `StringSupersetConversion` and the following function:
+
+```haskell
+convertRefinedString ::
+    StringSupersetConversion a b => ASCII a -> ASCII b
+```
+
 ### 1.5.2.0 (2023-01-25)
 
 New functions: `asciiByteStringToText` and `asciiByteStringToTextLazy`
