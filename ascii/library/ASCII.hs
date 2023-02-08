@@ -96,7 +96,8 @@ module ASCII
     {- * Polymorphic conversions -}
     {- ** Narrowing -} toAsciiCharMaybe, toDigitMaybe, toHexCharMaybe,
     {- ** Validate -} validateChar, validateString,
-    {- ** Lift -} {- $lift -} lift,
+    {- ** Widening -} {- $toText -} toStrictText, toLazyText, toUnicodeCharList,
+    {- $lift -} lift,
     {- ** Convert -} {- $supersetConversions -}
     convertCharMaybe, convertCharOrFail, convertStringMaybe, convertStringOrFail,
     convertRefinedString,
@@ -110,7 +111,8 @@ module ASCII
     digitString, hexCharString,
 
     {- * Classes -}
-    {- ** Supersets of ASCII -} CharSuperset, StringSuperset, StringSupersetConversion, Lift,
+    {- ** Supersets of ASCII -} CharSuperset, StringSuperset,
+    StringSupersetConversion, ToText, Lift,
     {- ** Equivalents to ASCII -} CharIso, StringIso,
     {- ** Supersets of numeric characters -}
     DigitSuperset, DigitStringSuperset, HexCharSuperset, HexStringSuperset,
@@ -132,6 +134,7 @@ import ASCII.QuasiQuoters (char, string, caseless, lower, upper)
 import ASCII.Refinement (ASCII, validateChar, validateString)
 import ASCII.Superset (CharSuperset, StringSuperset)
 import ASCII.SupersetConversion (StringSupersetConversion)
+import ASCII.Superset.Text (ToText (..))
 
 import Control.Monad ((>=>))
 import Control.Monad.Fail (MonadFail)
@@ -479,6 +482,10 @@ See also: "ASCII.Refinement", "ASCII.CaseRefinement" -}
 {- $lift
 
 See also: "ASCII.Lift" -}
+
+{- $toText
+
+See also: "ASCII.Superset.ToText" -}
 
 {-| Converts from ASCII to any larger type
 

@@ -1,3 +1,14 @@
+### 1.5.4.0 (2023-02-08)
+
+Raise `ascii-superset` to `1.2.7`
+
+Adds module `ASCII.Superset.Text`
+
+Added to the `ASCII` module:
+
+- Class `ToText`
+- Functions `toStrictText`, `toLazyText`, `toUnicodeCharList`
+
 ### 1.5.3.0 (2023-02-07)
 
 Raise `ascii-superset` to `1.2.6`
