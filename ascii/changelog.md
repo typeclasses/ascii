@@ -1,3 +1,9 @@
+### 1.7.0.0 (2023-03-01)
+
+Rename `toAsciiCharMaybe` to `toCharMaybe`
+
+Add `toCharListMaybe`
+
 ### 1.6.0.0 (2023-02-08)
 
 Raise `ascii-superset` to `1.3`. This removes the `ASCII.Lift` module.

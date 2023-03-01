@@ -152,7 +152,7 @@ module ASCII
     {- * Polymorphic conversions -}
 
         {- ** Narrowing -}
-            toAsciiCharMaybe, toDigitMaybe, toHexCharMaybe,
+            toCharMaybe, toCharListMaybe, toDigitMaybe, toHexCharMaybe,
 
         {- ** Validate -}
             validateChar, validateString,
@@ -209,7 +209,7 @@ import ASCII.Hexadecimal (HexChar, HexCharSuperset, HexStringSuperset, fromHexCh
 import ASCII.Isomorphism (CharIso, StringIso)
 import ASCII.QuasiQuoters (char, string, caseless, lower, upper)
 import ASCII.Refinement (ASCII, lift, validateChar, validateString)
-import ASCII.Superset (CharSuperset, StringSuperset, fromChar, fromCharList)
+import ASCII.Superset (CharSuperset, StringSuperset, toCharMaybe, toCharListMaybe, fromChar, fromCharList)
 import ASCII.SupersetConversion (StringSupersetConversion)
 import ASCII.Superset.Text (ToText (..))
 
@@ -858,9 +858,6 @@ digitString x = ASCII.Decimal.fromDigitList [x]
     0-9, A-F, or a-f -}
 hexCharString :: HexStringSuperset string => HexChar -> string
 hexCharString x = ASCII.Hexadecimal.fromHexCharList [x]
-
-toAsciiCharMaybe :: CharSuperset char => char -> Maybe Char
-toAsciiCharMaybe = ASCII.Superset.toCharMaybe
 
 toDigitMaybe :: DigitSuperset char => char -> Maybe Digit
 toDigitMaybe = ASCII.Decimal.toDigitMaybe
