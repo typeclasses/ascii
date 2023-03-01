@@ -29,110 +29,187 @@ published by American National Standards Institute (ANSI) and available for purc
 module ASCII
   (
     {- * @Char@ -}
-    {- ** ASCII -} {- $char -} Char,
-    {- ** Unicode -} UnicodeChar,
-    {- ** Case-insensitive -} {- $caselessChar -} CaselessChar,
+
+        {- ** ASCII -}
+            {- $char -} Char,
+
+        {- ** Unicode -}
+            UnicodeChar,
+
+        {- ** Case-insensitive -}
+            {- $caselessChar -} CaselessChar,
 
     {- * Character classifications -}
-    {- ** Print/control groups -} {- $groups -}
-    Group (..), charGroup, inGroup,
-    {- ** Upper/lower case -} {- $case -}
-    Case (..), letterCase, isCase, toCaseChar, toCaseString,
-    disregardCase, refineCharToCase, refineStringToCase,
-    {- ** Letters -} isLetter,
-    {- ** Letters and numbers -} isAlphaNum,
-    {- ** Decimal digits -} {- $digit -} isDigit, Digit,
-    {- ** Hexadecimal digits -} {- $hexchar -} isHexDigit, HexChar,
-    {- ** Octal digits -} isOctDigit,
-    {- ** Spaces and symbols -} isSpace, isPunctuation, isSymbol, isVisible,
 
-    {- * Monomorphic character conversions -} {- $monomorphicConversions -}
-    {- ** @ASCII.Char@ ↔ @Int@ -} {- $intConversions -}
-    charToInt, intToCharMaybe, intToCharUnsafe,
-    {- ** @ASCII.Char@ ↔ @Word8@ -} {- $word8Conversions -}
-    charToWord8, word8ToCharMaybe, word8ToCharUnsafe,
-    {- ** @ASCII.Char@ ↔ @UnicodeChar@ -} {- $unicodeCharConversions -}
-    charToUnicode, unicodeToCharMaybe, unicodeToCharUnsafe,
+        {- ** Print/control groups -}
+            {- $groups -} Group (..), charGroup, inGroup,
+
+        {- ** Upper/lower case -}
+            {- $case -} Case (..), letterCase, isCase, toCaseChar, toCaseString,
+            disregardCase, refineCharToCase, refineStringToCase,
+
+        {- ** Letters -}
+            isLetter,
+
+        {- ** Letters and numbers -}
+            isAlphaNum,
+
+        {- ** Decimal digits -}
+            {- $digit -} isDigit, Digit,
+
+        {- ** Hexadecimal digits -}
+            {- $hexchar -} isHexDigit, HexChar,
+
+        {- ** Octal digits -}
+            isOctDigit,
+
+        {- ** Spaces and symbols -}
+            isSpace, isPunctuation, isSymbol, isVisible,
+
+    {- * Monomorphic character conversions -}
+
+        {- $monomorphicConversions -}
+
+        {- ** @ASCII.Char@ ↔ @Int@ -}
+            {- $intConversions -}
+            charToInt, intToCharMaybe, intToCharUnsafe,
+
+        {- ** @ASCII.Char@ ↔ @Word8@ -}
+            {- $word8Conversions -}
+            charToWord8, word8ToCharMaybe, word8ToCharUnsafe,
+
+        {- ** @ASCII.Char@ ↔ @UnicodeChar@ -}
+            {- $unicodeCharConversions -}
+            charToUnicode, unicodeToCharMaybe, unicodeToCharUnsafe,
 
     {- * Monomorphic digit conversions -}
-    {- ** @Digit@ ↔ @Word8@ -} {- $digitWord8Conversions -}
-    digitToWord8, word8ToDigitMaybe, word8ToDigitUnsafe,
-    {- ** @Digit@ ↔ @ASCII.Char@ -} {- $digitCharConversions -}
-    digitToChar, charToDigitMaybe, charToDigitUnsafe,
-    {- ** @Digit@ ↔ @UnicodeChar@ -} {- $digitUnicodeConversions -}
-    digitToUnicode, unicodeToDigitMaybe, unicodeToDigitUnsafe,
-    {- ** @HexChar@ ↔ @Word8@ -} {- $hexCharWord8Conversions -}
-    hexCharToWord8, word8ToHexCharMaybe, word8ToHexCharUnsafe,
-    {- ** @HexChar@ ↔ @ASCII.Char@ -} {- $hexCharCharConversions -}
-    hexCharToChar, charToHexCharMaybe, charToHexCharUnsafe,
-    {- ** @HexChar@ ↔ @UnicodeChar@ -} {- $hexCharUnicodeConversions -}
-    hexCharToUnicode, unicodeToHexCharMaybe, unicodeToHexCharUnsafe,
+
+        {- ** @Digit@ ↔ @Word8@ -}
+            {- $digitWord8Conversions -}
+            digitToWord8, word8ToDigitMaybe, word8ToDigitUnsafe,
+
+        {- ** @Digit@ ↔ @ASCII.Char@ -}
+            {- $digitCharConversions -}
+            digitToChar, charToDigitMaybe, charToDigitUnsafe,
+
+        {- ** @Digit@ ↔ @UnicodeChar@ -}
+            {- $digitUnicodeConversions -}
+            digitToUnicode, unicodeToDigitMaybe, unicodeToDigitUnsafe,
+
+        {- ** @HexChar@ ↔ @Word8@ -}
+            {- $hexCharWord8Conversions -}
+            hexCharToWord8, word8ToHexCharMaybe, word8ToHexCharUnsafe,
+
+        {- ** @HexChar@ ↔ @ASCII.Char@ -}
+            {- $hexCharCharConversions -}
+            hexCharToChar, charToHexCharMaybe, charToHexCharUnsafe,
+
+        {- ** @HexChar@ ↔ @UnicodeChar@ -}
+            {- $hexCharUnicodeConversions -}
+            hexCharToUnicode, unicodeToHexCharMaybe, unicodeToHexCharUnsafe,
 
     {- * Monomorphic string conversions -}
-    {- ** @ASCII.Char@ ↔ @String@ -} {- $unicodeStringConversions -}
-    charListToUnicodeString, unicodeStringToCharListMaybe, unicodeStringToCharListUnsafe,
-    {- ** @ASCII.Char@ ↔ @Text@ -} {- $textConversions -}
-    charListToText, textToCharListMaybe, textToCharListUnsafe,
-    {- ** @ASCII.Char@ ↔ @ByteString@ -} {- $byteStringConversions -}
-    charListToByteString, byteStringToCharListMaybe, byteStringToCharListUnsafe,
-    {- ** @ASCII ByteString@ -> @Text@ -}
-    asciiByteStringToText, asciiByteStringToTextLazy,
 
-    {- * Monomorphic conversions between ASCII supersets -} {- $monoSupersetConversions -}
-    {- ** @ByteString@ ↔ @String@ -}
-    byteStringToUnicodeStringMaybe, unicodeStringToByteStringMaybe,
-    {- ** @[Word8]@ ↔ @String@ -}
-    byteListToUnicodeStringMaybe, unicodeStringToByteListMaybe,
+        {- ** @ASCII.Char@ ↔ @String@ -}
+            {- $unicodeStringConversions -}
+            charListToUnicodeString, unicodeStringToCharListMaybe,
+            unicodeStringToCharListUnsafe,
+
+        {- ** @ASCII.Char@ ↔ @Text@ -}
+            {- $textConversions -}
+            charListToText, textToCharListMaybe, textToCharListUnsafe,
+
+        {- ** @ASCII.Char@ ↔ @ByteString@ -}
+            {- $byteStringConversions -}
+            charListToByteString, byteStringToCharListMaybe,
+            byteStringToCharListUnsafe,
+
+        {- ** @ASCII ByteString@ -> @Text@ -}
+            asciiByteStringToText, asciiByteStringToTextLazy,
+
+    {- * Monomorphic conversions between ASCII supersets -}
+
+        {- $monoSupersetConversions -}
+
+        {- ** @ByteString@ ↔ @String@ -}
+            byteStringToUnicodeStringMaybe, unicodeStringToByteStringMaybe,
+
+        {- ** @[Word8]@ ↔ @String@ -}
+            byteListToUnicodeStringMaybe, unicodeStringToByteListMaybe,
 
     {- * Monomorphic numeric string conversions -}
-    {- ** @Natural@ ↔ @[Digit]@ -}
-    showNaturalDigits, readNaturalDigits,
-    {- ** @Natural@ ↔ @[HexChar]@ -}
-    showNaturalHexChars, readNaturalHexChars,
 
-    {- * Refinement types -} {- $refinement -} ASCII,
-    ASCII'case, ASCII'upper, ASCII'lower, KnownCase (..),
+        {- ** @Natural@ ↔ @[Digit]@ -}
+            showNaturalDigits, readNaturalDigits,
+
+        {- ** @Natural@ ↔ @[HexChar]@ -}
+            showNaturalHexChars, readNaturalHexChars,
+
+    {- * Refinement types -}
+        {- $refinement -} ASCII,
+        ASCII'case, ASCII'upper, ASCII'lower, KnownCase (..),
 
     {- * Polymorphic conversions -}
-    {- ** Narrowing -} toAsciiCharMaybe, toDigitMaybe, toHexCharMaybe,
-    {- ** Validate -} validateChar, validateString,
-    {- ** Widening -} {- $toText -} toStrictText, toLazyText, toUnicodeCharList,
-    {- $lift -} lift,
-    {- ** Convert -} {- $supersetConversions -}
-    convertCharMaybe, convertCharOrFail, convertStringMaybe, convertStringOrFail,
-    convertRefinedString,
-    {- ** Integral strings -} {- $numbers -}
-    showIntegralDecimal, showIntegralHexadecimal,
-    readIntegralDecimal, readIntegralHexadecimal,
-    {- ** Natural strings -}
-    showNaturalDecimal, showNaturalHexadecimal,
-    readNaturalDecimal, readNaturalHexadecimal,
-    {- ** Single-digit strings -}
-    digitString, hexCharString,
+
+        {- ** Narrowing -}
+            toAsciiCharMaybe, toDigitMaybe, toHexCharMaybe,
+
+        {- ** Validate -}
+            validateChar, validateString,
+
+        {- ** Widening -}
+            {- $lift -} lift,
+            {- $toText -} toStrictText, toLazyText, toUnicodeCharList,
+            {- $fromChar -} fromChar, fromCharList,
+            {- $fromDigit -} fromDigit, fromDigitList,
+            {- $fromHexChar -} fromHexChar, fromHexCharList,
+            {- $forgetCase -} forgetCase,
+
+        {- ** Convert -}
+            {- $supersetConversions -}
+            convertCharMaybe, convertCharOrFail, convertStringMaybe,
+            convertStringOrFail, convertRefinedString,
+
+        {- ** Integral strings -}
+            {- $numbers -}
+            showIntegralDecimal, showIntegralHexadecimal,
+            readIntegralDecimal, readIntegralHexadecimal,
+
+        {- ** Natural strings -}
+            showNaturalDecimal, showNaturalHexadecimal,
+            readNaturalDecimal, readNaturalHexadecimal,
+
+        {- ** Single-digit strings -}
+            digitString, hexCharString,
 
     {- * Classes -}
-    {- ** Supersets of ASCII -} CharSuperset, StringSuperset,
-    StringSupersetConversion, ToText, Lift,
-    {- ** Equivalents to ASCII -} CharIso, StringIso,
-    {- ** Supersets of numeric characters -}
-    DigitSuperset, DigitStringSuperset, HexCharSuperset, HexStringSuperset,
 
-    {- * Quasi-quoters -} char, string, caseless, lower, upper,
+        {- ** Supersets of ASCII -}
+            CharSuperset, StringSuperset,
+            StringSupersetConversion, ToText,
+
+        {- ** Equivalents to ASCII -}
+            CharIso, StringIso,
+
+        {- ** Supersets of numeric characters -}
+            DigitSuperset, DigitStringSuperset, HexCharSuperset, HexStringSuperset,
+
+    {- * Quasi-quoters -}
+        char, string, caseless, lower, upper,
   )
   where
 
 import ASCII.Case (Case (..))
-import ASCII.CaseRefinement (KnownCase (..), ASCII'case, ASCII'upper, ASCII'lower, refineCharToCase, refineStringToCase)
+import ASCII.CaseRefinement (KnownCase (..), ASCII'case, ASCII'upper, ASCII'lower, refineCharToCase, refineStringToCase, forgetCase)
 import ASCII.Caseless (CaselessChar)
 import ASCII.Char (Char)
-import ASCII.Decimal (Digit, DigitStringSuperset, DigitSuperset)
+import ASCII.Decimal (Digit, DigitStringSuperset, DigitSuperset, fromDigit, fromDigitList)
 import ASCII.Group (Group (..))
-import ASCII.Hexadecimal (HexChar, HexCharSuperset, HexStringSuperset)
+import ASCII.Hexadecimal (HexChar, HexCharSuperset, HexStringSuperset, fromHexChar, fromHexCharList)
 import ASCII.Isomorphism (CharIso, StringIso)
-import ASCII.Lift (Lift)
 import ASCII.QuasiQuoters (char, string, caseless, lower, upper)
-import ASCII.Refinement (ASCII, validateChar, validateString)
-import ASCII.Superset (CharSuperset, StringSuperset)
+import ASCII.Refinement (ASCII, lift, validateChar, validateString)
+import ASCII.Superset (CharSuperset, StringSuperset, fromChar, fromCharList)
 import ASCII.SupersetConversion (StringSupersetConversion)
 import ASCII.Superset.Text (ToText (..))
 
@@ -154,7 +231,6 @@ import qualified ASCII.Decimal
 import qualified ASCII.Group
 import qualified ASCII.Hexadecimal
 import qualified ASCII.Isomorphism
-import qualified ASCII.Lift
 import qualified ASCII.Predicates
 import qualified ASCII.Superset
 import qualified ASCII.SupersetConversion as SupersetConversion
@@ -470,10 +546,10 @@ byteStringToCharListUnsafe :: BS.ByteString -> [Char]
 byteStringToCharListUnsafe = ASCII.Superset.toCharListUnsafe
 
 asciiByteStringToText :: ASCII BS.ByteString -> Text.Text
-asciiByteStringToText = Text.decodeASCII . lift
+asciiByteStringToText = Text.decodeUtf8 . ASCII.Refinement.lift
 
 asciiByteStringToTextLazy :: ASCII LBS.ByteString -> LText.Text
-asciiByteStringToTextLazy = LText.decodeASCII . lift
+asciiByteStringToTextLazy = LText.decodeUtf8 . ASCII.Refinement.lift
 
 {- $refinement
 
@@ -481,31 +557,27 @@ See also: "ASCII.Refinement", "ASCII.CaseRefinement" -}
 
 {- $lift
 
-See also: "ASCII.Lift" -}
+See also: "ASCII.Refinement" -}
 
 {- $toText
 
 See also: "ASCII.Superset.ToText" -}
 
-{-| Converts from ASCII to any larger type
+{- $fromChar
 
-For example, @(lift \@ASCII.Char \@Word8)@ is the same function as 'charToWord8'.
+See also: "ASCII.Superset" -}
 
-@
-(lift CapitalLetterA :: Word8) == 65
-@
+{- $fromDigit
 
-And @(lift \@[ASCII.Char] \@Text)@ is equivalent to 'charListToText'.
+See also: "ASCII.Decimal" -}
 
-@
-(lift [CapitalLetterH,SmallLetterI,ExclamationMark] :: Text) == "Hi!"
-@
+{- $fromHexChar
 
-Due to the highly polymorphic nature of the 'lift' function, often it must used
-with an explicit type signature or type application to avoid any type ambiguity.
--}
-lift :: Lift ascii superset => ascii -> superset
-lift = ASCII.Lift.lift
+See also: "ASCII.Hexadecimal" -}
+
+{- $forgetCase
+
+See also: "ASCII.CaseRefinement" -}
 
 {- $supersetConversions
 

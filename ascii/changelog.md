@@ -1,3 +1,27 @@
+### 1.6.0.0 (2023-02-08)
+
+Raise `ascii-superset` to `1.3`. This removes the `ASCII.Lift` module.
+
+Raise `ascii-numbers` to `1.2`.
+
+From the `ASCII` module, the `Lift` class and `lift` function are removed.
+
+The removed `lift` function is replaced with the `lift` function from
+`ASCII.Refinement`. If you were using `lift` specialized as
+`ASCII a -> a`, then this is not a breaking change. Otherwise, migrate
+by using one the new functions below.
+
+```haskell
+fromChar        :: FromChar char               => Char      -> char
+fromCharList    :: FromString string           => [Char]    -> string
+fromDigit       :: DigitSuperset char          => Digit     -> char
+fromDigitList   :: DigitStringSuperset string  => [Digit]   -> string
+fromHexChar     :: HexCharSuperset char        => HexChar   -> char
+fromHexCharList :: HexStringSuperset string    => [HexChar] -> string
+
+forgetCase      :: ASCII'case letterCase superset -> ASCII superset
+```
+
 ### 1.5.4.0 (2023-02-08)
 
 Raise `ascii-superset` to `1.2.7`

@@ -118,10 +118,12 @@ main = hspec $ do
             charListToText [CapitalLetterH, SmallLetterI, ExclamationMark]
                 `shouldBe` "Hi!"
 
-    describe "lift" $ do
-        it "converts Char to Word8" $ (lift CapitalLetterA :: Word8) `shouldBe` 65
+    describe "fromChar" $ do
+        it "converts Char to Word8" $ (fromChar CapitalLetterA :: Word8) `shouldBe` 65
+
+    describe "fromCharList" $ do
         it "converts [Char] to Text" $
-            (lift [CapitalLetterH, SmallLetterI, ExclamationMark] :: Text)
+            (fromCharList [CapitalLetterH, SmallLetterI, ExclamationMark] :: Text)
                 `shouldBe` "Hi!"
 
     describe "byteListToUnicodeStringMaybe" $ do
