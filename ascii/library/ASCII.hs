@@ -602,7 +602,7 @@ These functions are all specializations of 'convertStringMaybe'.
 They convert a string from one ASCII-superset type to another.
 
 @
-ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x50] == Just "HTTP"
+ASCII.byteListToUnicodeStringMaybe [0x48, 0x54, 0x54, 0x50] == Just \"HTTP"
 @
 
 If any of the characters in the input is outside the ASCII character set, the
