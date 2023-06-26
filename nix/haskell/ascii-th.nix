@@ -4,10 +4,8 @@
 }:
 mkDerivation {
   pname = "ascii-th";
-  version = "1.2.0.0";
-  sha256 = "6f41d2216e473011cc660d05429c1ce2a7c76bdb87cd303a816871974b3a661f";
-  revision = "1";
-  editedCabalFile = "1r6z6brkfahs9zifjhr7bpqblkiajcjknkgx2i57jrn5s3b97phk";
+  version = "1.2.0.1";
+  sha256 = "09b9da4fbb9ce3a600c00390b214964a6c4c260522a59a69c346350adc53473e";
   libraryHaskellDepends = [
     ascii-case ascii-caseless ascii-char ascii-superset base
     template-haskell

@@ -1,3 +1,7 @@
+### 1.7.0.1 (2023-06-26)
+
+Upgrade language to GHC2021
+
 ### 1.7.0.0 (2023-03-01)
 
 Rename `toAsciiCharMaybe` to `toCharMaybe`

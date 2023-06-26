@@ -22,7 +22,7 @@ The `ascii` package re-exports definitions and entire modules from other package
 
 The goal is to support new releases of dependencies as quickly as possible. If there is a new version of a library that we do not yet support, please open an [issue](https://github.com/typeclasses/ascii/issues), and consider submitting a fix.
 
-We support any version of GHC that was released within the last two years, plus one older version. Support for anything older will be dropped, even if there is no compelling reason, to make things easier to maintain. (If you have some need for support of older compilers, [talk to us](https://github.com/typeclasses/ascii/discussions) about changing this policy.)
+We support roughly the last three versions of GHC. Support for anything older will be dropped, even if there is no compelling reason, to make things easier to maintain. (If you have some need for support of older compilers, [talk to us](https://github.com/typeclasses/ascii/discussions) about changing this policy.)
 
 Version bounds (the `build-depends` files in Cabal files) should reflect the versions that have been tested; a package should not declare support for a version unless there is an [Action](https://github.com/typeclasses/ascii/actions) that actually builds with it. When submitting a bounds change pull request, please update the [build configurations](https://github.com/typeclasses/ascii/tree/master/configurations) so that the automated testing can verify that everything works with the newly-included version.
 

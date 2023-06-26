@@ -1,8 +1,8 @@
 { mkDerivation, ascii-char, base, hedgehog, lib }:
 mkDerivation {
   pname = "ascii-predicates";
-  version = "1.0.1.1";
-  sha256 = "aceeb9d3c673e519f1bd8574314539cfa0e7760eeb5c8e9230a4c9136e6913e5";
+  version = "1.0.1.3";
+  sha256 = "ae4ed704ea77fbff9c8fb107d6b35413a121f3674c63156236af776639009ebd";
   libraryHaskellDepends = [ ascii-char base ];
   testHaskellDepends = [ ascii-char base hedgehog ];
   homepage = "https://github.com/typeclasses/ascii-predicates";
